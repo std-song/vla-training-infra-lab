@@ -18,6 +18,10 @@ Completed:
 - Ran single-GPU Qwen2-MoE dummy-data training for 5 steps.
 - Saved checkpoint at `checkpoints/qwen2_moe_smoke/5`.
 
+In progress:
+
+- Checkpoint resume from step 5 to step 7.
+
 Observed smoke output:
 
 ```text
@@ -71,9 +75,10 @@ CUDA_DEVICE_MAX_CONNECTIONS=1 PYTHONPATH=src torchrun --nproc_per_node=1 \
 
 ## Roadmap
 
-1. Validate checkpoint resume from step 5 to step 7.
+1. Validate checkpoint resume from step 5 to step 7 using `configs/qwen2_moe/config_qwen2_moe_resume.yaml`.
 2. Run 2-GPU data parallel smoke training.
 3. Run 4/8-GPU DP baseline.
 4. Add expert-parallel experiments: `dp=4, ep=2`, `dp=2, ep=4`, `dp=1, ep=8`.
 5. Add profiling reports for tokens/sec, VRAM, step time, communication, and checkpoint cost.
 6. Extend the project with SmolVLA finetuning and VLA data-pipeline experiments.
+

@@ -67,3 +67,4 @@ train_steps: 7
 ```
 
 Rerun the smoke command and check that training resumes from step 5 and advances to step 7.
+

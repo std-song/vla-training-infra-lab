@@ -14,6 +14,8 @@ Status: completed.
 
 ## Stage 2: Checkpoint Resume
 
+Status: in progress.
+
 Goal: prove training-state reliability.
 
 Tasks:
@@ -77,3 +79,4 @@ Candidate optimizations:
 - CUDA Graph for fixed-shape inference.
 - `torch.compile` or Triton kernels for action modules.
 - speculative decoding or DFlash where token decoding dominates.
+
