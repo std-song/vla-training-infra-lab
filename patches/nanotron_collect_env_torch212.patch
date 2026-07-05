@@ -1,0 +1,8 @@
+﻿diff --git a/src/nanotron/logging/base.py b/src/nanotron/logging/base.py
+--- a/src/nanotron/logging/base.py
++++ b/src/nanotron/logging/base.py
+@@
+-import torch
++import torch
++import torch.utils.collect_env
+ from torch import distributed as torch_dist
