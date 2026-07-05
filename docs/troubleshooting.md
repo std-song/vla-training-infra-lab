@@ -81,3 +81,26 @@ import torch.utils.collect_env
 ```
 
 in `src/nanotron/logging/base.py`.
+
+## Dummy-Data Resume Metadata Assertion
+
+Error:
+
+```text
+AssertionError: Mismatch between the total consumed tokens and the sum of consumed tokens across stages! Something went wrong in the training.
+```
+
+Cause: the dummy CLM dataloader has no dataset folder. Nanotron still increments the global `consumed_tokens_total`, but `consumed_tokens_per_dataset_folder` can remain empty. On resume, strict metadata sanity checking compares the global token count against the sum of per-dataset token counts and fails.
+
+Temporary smoke-test patch:
+
+```python
+stage_consumed_tokens_total = sum(stage.consumed_tokens_all_datasets for stage in self.data_stages)
+if self.consumed_tokens_total is not None:
+    if stage_consumed_tokens_total != 0:
+        assert self.consumed_tokens_total == stage_consumed_tokens_total
+else:
+    self.consumed_tokens_total = stage_consumed_tokens_total
+```
+
+This keeps the strict check for real datasets while allowing dummy-data checkpoint resume validation.

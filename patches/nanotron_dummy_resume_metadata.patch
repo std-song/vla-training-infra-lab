@@ -1,0 +1,18 @@
+﻿diff --git a/src/nanotron/serialize/metadata.py b/src/nanotron/serialize/metadata.py
+--- a/src/nanotron/serialize/metadata.py
++++ b/src/nanotron/serialize/metadata.py
+@@
+-        if self.consumed_tokens_total is not None:
+-            assert self.consumed_tokens_total == sum(stage.consumed_tokens_all_datasets for stage in self.data_stages), "Mismatch between the total consumed tokens and the sum of consumed tokens across stages! Something went wrong in the training."
+-        else:
+-            self.consumed_tokens_total = sum(stage.consumed_tokens_all_datasets for stage in self.data_stages)
++        stage_consumed_tokens_total = sum(stage.consumed_tokens_all_datasets for stage in self.data_stages)
++        # Dummy-data training has no dataset folder, so older Nanotron checkpoints can
++        # have a valid global consumed token count while every per-dataset counter is
++        # empty. Keep the strict check for real datasets and tolerate this smoke-test
++        # metadata shape.
++        if self.consumed_tokens_total is not None:
++            if stage_consumed_tokens_total != 0:
++                assert self.consumed_tokens_total == stage_consumed_tokens_total, "Mismatch between the total consumed tokens and the sum of consumed tokens across stages! Something went wrong in the training."
++        else:
++            self.consumed_tokens_total = stage_consumed_tokens_total
