@@ -1,8 +1,8 @@
-﻿# Roadmap
+# Roadmap
 
 This repository is organized as a staged VLA training-infrastructure portfolio.
 
-## Stage 1: Qwen2-MoE Single-GPU Smoke
+## Stage 1: Qwen2-MoE Single-GPU Correctness
 
 Status: completed.
 
@@ -14,18 +14,39 @@ Status: completed.
 
 ## Stage 2: Checkpoint Resume
 
-Status: in progress.
+Status: completed.
 
 Goal: prove training-state reliability.
 
-Tasks:
+Completed evidence:
 
-- Resume from `checkpoints/qwen2_moe_smoke/5`.
-- Extend `train_steps` from 5 to 7.
-- Verify optimizer and scheduler state loading.
-- Confirm loss/logging continuity.
+- Resumed from `checkpoints/qwen2_moe_smoke/5`.
+- Extended training from step 5 to step 7.
+- Loaded optimizer and scheduler state.
+- Saved checkpoint at `checkpoints/qwen2_moe_smoke/7`.
 
-## Stage 3: Multi-GPU Data Parallel
+## Stage 3: Single-GPU Baseline Profiling
+
+Status: completed for tiny baseline; stronger baseline pending.
+
+Completed:
+
+- 20-step baseline profile.
+- 100-step baseline profile.
+- Memory, throughput, utilization, power, and checkpoint-size summary.
+
+Latest tiny-baseline result:
+
+| Metric | Value |
+| --- | ---: |
+| Avg throughput, steps >= 10 | 9,860 tokens/s |
+| Avg step time, steps >= 10 | 27.09 ms |
+| Max sampled GPU memory | 993 MiB |
+| Checkpoint size | 32 MiB |
+
+Next: increase model size and run 500-1000 steps for a stable, resume-worthy baseline.
+
+## Stage 4: Multi-GPU Data Parallel
 
 Goal: validate distributed launcher and gradient synchronization.
 
@@ -37,7 +58,18 @@ Suggested configs:
 | dp_4 | 4 | 1 | 1 | 1 | throughput scaling |
 | dp_8 | 8 | 1 | 1 | 1 | 8x3090 baseline |
 
-## Stage 4: Expert Parallel Experiments
+## Stage 5: Tensor and Pipeline Parallel
+
+Goal: validate dense-model distributed axes before introducing cross-rank experts.
+
+| Case | GPUs | DP | TP | PP | EP | Purpose |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| tp_2 | 2 | 1 | 2 | 1 | 1 | tensor-parallel smoke |
+| pp_2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel smoke |
+| tp2_dp4 | 8 | 4 | 2 | 1 | 1 | TP+DP scaling |
+| pp2_dp4 | 8 | 4 | 1 | 2 | 1 | PP+DP scaling |
+
+## Stage 6: Expert Parallel Experiments
 
 Goal: study MoE memory/communication tradeoffs on PCIe GPUs.
 
@@ -47,15 +79,9 @@ Goal: study MoE memory/communication tradeoffs on PCIe GPUs.
 | ep_4 | 2 | 1 | 1 | 4 | communication stress |
 | ep_8 | 1 | 1 | 1 | 8 | all-to-all limit |
 
-Metrics:
+Caveat: do not claim true EP until cross-rank expert token dispatch and checkpoint layout are validated under `expert_parallel_size > 1`.
 
-- tokens/sec and tokens/sec/GPU
-- peak allocated/reserved VRAM
-- forward/backward/optimizer time
-- all-reduce and all-to-all time when available
-- checkpoint save/load time
-
-## Stage 5: SmolVLA Finetuning
+## Stage 7: SmolVLA Finetuning
 
 Goal: connect the training-infra work to VLA/robotics data.
 
@@ -67,7 +93,7 @@ Tasks:
 - Validate action-head or expert-only finetuning.
 - Track dataloader throughput and GPU idle time.
 
-## Stage 6: Inference Latency Optimization
+## Stage 8: Inference Latency Optimization
 
 Goal: profile VLA action generation latency.
 
@@ -78,5 +104,4 @@ Candidate optimizations:
 - image encoder feature caching.
 - CUDA Graph for fixed-shape inference.
 - `torch.compile` or Triton kernels for action modules.
-- speculative decoding or DFlash where token decoding dominates.
-
+- DFlash-style acceleration where token decoding dominates.

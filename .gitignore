@@ -12,3 +12,7 @@ outputs/
 *.safetensors
 
 .DS_Store
+*.csv
+profiling_logs/
+results/raw/
+.autodl/

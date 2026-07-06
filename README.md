@@ -1,50 +1,59 @@
-﻿# VLA Training Infrastructure Lab
+# VLA Training Infrastructure Lab
 
 A practical training-infrastructure lab for Vision-Language-Action (VLA) model training experiments on resource-constrained RTX 3090 hardware.
 
-The first milestone validates a Qwen2-MoE small-scale pretraining path with Nanotron. Later milestones extend the same project toward multi-GPU DP/EP experiments, SmolVLA finetuning, data-pipeline profiling, and low-latency VLA inference optimization.
+This repository is organized as a portfolio project for VLA training infrastructure roles. The emphasis is training-system correctness, distributed behavior, memory and throughput measurement, checkpoint reliability, and practical debugging under limited hardware rather than benchmark model quality.
 
-## Why This Project
+## Target Role Alignment
 
-This project is designed for a VLA training infrastructure engineering portfolio. The emphasis is not benchmark model quality; it is training-system correctness, distributed behavior, memory and throughput measurement, checkpoint reliability, and practical debugging under limited hardware.
+The project maps directly to common VLA training-infra requirements:
+
+| Requirement | Project coverage |
+| --- | --- |
+| PyTorch distributed training | Nanotron-based Qwen2-MoE training path, planned DP/TP/PP/EP validation |
+| MoE training | Router top-k, expert token permutation, GroupedGEMM expert MLP, shared expert |
+| Mixed precision | BF16 training on RTX 3090 |
+| Operator acceleration | FlashAttention and fused RMSNorm/rotary paths where available |
+| Checkpoint/resume | Step-5 to step-7 resume validation, step-100 checkpoint artifacts |
+| Performance analysis | tokens/s, step time, memory, GPU utilization, power sampling |
+| Data pipeline | planned VLA/LeRobot-style data schema and shard strategy |
+| Experiment management | structured configs, scripts, troubleshooting notes, result reports |
 
 ## Current Status
 
 Completed:
 
-- Set up AutoDL RTX 3090 environment with Python 3.10.8, PyTorch 2.1.2+cu118, and CUDA toolkit 11.8.
-- Installed Nanotron dependencies, flash-attn, and grouped_gemm.
-- Passed Nanotron MoE kernel smoke test: `tests/test_moe.py`.
-- Ran single-GPU Qwen2-MoE dummy-data training for 5 steps.
-- Saved checkpoint at `checkpoints/qwen2_moe_smoke/5`.
+- AutoDL RTX 3090 environment validated with Python 3.10.8, PyTorch 2.1.2+cu118, CUDA toolkit 11.8.
+- Nanotron dependencies installed, including `flash-attn==2.5.8` and `grouped_gemm`.
+- Nanotron MoE test passed: `PYTHONPATH=src pytest -q tests/test_moe.py`.
+- Qwen2-MoE single-GPU smoke run completed for 5 steps.
+- Checkpoint resume validated from step 5 to step 7.
+- 20-step and 100-step single-GPU baseline profiling completed.
+- Compatibility patches documented for PyTorch 2.1.2 collect-env behavior and dummy-data resume metadata.
 
-In progress:
+Latest baseline summary:
 
-- Checkpoint resume from step 5 to step 7.
+| Metric | Value |
+| --- | ---: |
+| GPU | 1x RTX 3090 24 GiB |
+| Model size | 2.36M params |
+| MoE | 4 experts, top-k=1, shared expert |
+| Parallelism | DP=1, TP=1, PP=1, EP=1 |
+| 100-step avg throughput, steps >= 10 | 9,860 tokens/s |
+| 100-step avg step time, steps >= 10 | 27.09 ms |
+| Max sampled GPU memory | 993 MiB |
+| Max sampled GPU util | 98% |
+| Checkpoint size | 32 MiB |
 
-Observed smoke output:
-
-```text
-iteration: 5 / 5
-consumed_tokens: 1.28K
-time_per_iteration_ms: 20.3
-tokens_per_sec: 12.6K
-tokens_per_sec_per_gpu: 12.6K
-global_batch_size: 256
-grad_norm: 1.64
-lm_loss: 8.35
-lr: 1e-05
-model_tflops_per_gpu: 0.0843
-Saving checkpoint at checkpoints/qwen2_moe_smoke/5
-```
+See the full report: [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
 
 ## Repository Layout
 
 ```text
 configs/qwen2_moe/       Qwen2-MoE training configs
-scripts/                 setup and launch scripts
-results/                 experiment records
-docs/                    design notes, roadmap, troubleshooting
+scripts/                 setup, launch, and profiling scripts
+results/                 curated experiment reports
+docs/                    design notes, roadmap, experiment matrix, troubleshooting
 patches/                 compatibility patches for upstream Nanotron
 ```
 
@@ -58,27 +67,36 @@ git clone https://github.com/huggingface/nanotron.git nanotron
 cd nanotron
 ```
 
-Install the environment following [`scripts/setup_autodl_3090.sh`](scripts/setup_autodl_3090.sh). Then copy the smoke config into Nanotron:
+Install the environment following [`scripts/setup_autodl_3090.sh`](scripts/setup_autodl_3090.sh). Then copy a config into the Nanotron checkout:
 
 ```bash
 mkdir -p examples/smoke
-cp /path/to/vla-training-infra-lab/configs/qwen2_moe/config_qwen2_moe_smoke.yaml \
-  examples/smoke/config_qwen2_moe_smoke.yaml
+cp /root/autodl-tmp/vla-infra/vla-training-infra-lab/configs/qwen2_moe/config_qwen2_moe_baseline_100step.yaml \
+  examples/smoke/config_qwen2_moe_baseline_100step.yaml
 ```
 
-Run the smoke training:
+Run 100-step profiling:
 
 ```bash
-CUDA_DEVICE_MAX_CONNECTIONS=1 PYTHONPATH=src torchrun --nproc_per_node=1 \
-  run_train.py --config-file examples/smoke/config_qwen2_moe_smoke.yaml
+bash /root/autodl-tmp/vla-infra/vla-training-infra-lab/scripts/run_qwen2_moe_profile_100step.sh \
+  examples/smoke/config_qwen2_moe_baseline_100step.yaml \
+  qwen2_moe_baseline_100step
 ```
 
-## Roadmap
+## What This Project Can Honestly Claim Today
 
-1. Validate checkpoint resume from step 5 to step 7 using `configs/qwen2_moe/config_qwen2_moe_resume.yaml`.
-2. Run 2-GPU data parallel smoke training.
-3. Run 4/8-GPU DP baseline.
-4. Add expert-parallel experiments: `dp=4, ep=2`, `dp=2, ep=4`, `dp=1, ep=8`.
-5. Add profiling reports for tokens/sec, VRAM, step time, communication, and checkpoint cost.
-6. Extend the project with SmolVLA finetuning and VLA data-pipeline experiments.
+This project currently validates the single-GPU Qwen2-MoE path: router top-k, expert dispatch inside one rank, GroupedGEMM, FlashAttention, BF16, checkpoint save, checkpoint resume, and coarse profiling.
 
+It does not yet claim full 8-GPU TP/PP/EP training. That is the next milestone and should be validated step by step before appearing as a finished resume bullet.
+
+## Next Step
+
+The immediate next experiment should be a stronger single-GPU baseline before renting 8 GPUs:
+
+1. Increase model size enough to use several GiB of VRAM.
+2. Run 500-1000 steps with `iteration_step_info_interval=10`.
+3. Compare activation recomputation on/off.
+4. Resume from the final checkpoint for another short run.
+5. Then move to 2-GPU DP and 2-GPU TP smoke tests.
+
+The detailed plan is in [`docs/next_steps.md`](docs/next_steps.md) and [`docs/experiment_matrix.md`](docs/experiment_matrix.md).
