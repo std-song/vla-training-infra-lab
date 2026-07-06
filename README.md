@@ -32,6 +32,7 @@ Completed:
 - Stronger 75.5M-parameter 500-step baseline profiling completed.
 - Step-500 checkpoint resumed to step 520.
 - Activation recomputation A/B completed on the 75.5M-parameter baseline v2.
+- First 2-GPU data-parallel distributed run completed with checkpoint/resume.
 - Compatibility patches documented for PyTorch 2.1.2 collect-env behavior and dummy-data resume metadata.
 
 Latest baseline summary:
@@ -48,8 +49,10 @@ Latest baseline summary:
 | Checkpoint size | 1009 MiB |
 | Resume validation | step 500 -> step 520 |
 | Recompute A/B | -21.5% throughput, no useful memory win at this scale |
+| DP=2 throughput | 17,987 tokens/s total, 8,989 tokens/s/GPU |
+| DP=2 resume | step 200 -> step 220 |
 
-See the full reports: [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md) and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
+See the full reports: [`results/qwen2_moe_dp2_2x3090.md`](results/qwen2_moe_dp2_2x3090.md), [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md), and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
 
 ## Repository Layout
 
@@ -94,11 +97,13 @@ It does not yet claim full 8-GPU TP/PP/EP training. That is the next milestone a
 
 ## Next Step
 
-The immediate next experiment should be 2-GPU distributed smoke validation:
+The immediate next experiment should be 2-GPU tensor/pipeline parallel validation:
 
-1. Run `dp=2, tp=1, pp=1, ep=1` to validate launcher, rank logs, and gradient synchronization.
-2. Run `dp=1, tp=2, pp=1, ep=1` to validate tensor-parallel sharding.
-3. Run `dp=1, tp=1, pp=2, ep=1` to validate pipeline-parallel scheduling.
+1. Run `dp=1, tp=2, pp=1, ep=1` to validate tensor-parallel sharding.
+2. Run `dp=1, tp=1, pp=2, ep=1` to validate pipeline-parallel scheduling and stage checkpointing.
+3. Compare DP=2, TP=2, and PP=2 throughput/memory behavior.
 4. Only after these are stable, rent 8 GPUs for DP/TP/PP scaling and then inspect EP readiness.
 
 The detailed plan is in [`docs/next_steps.md`](docs/next_steps.md) and [`docs/experiment_matrix.md`](docs/experiment_matrix.md).
+
+

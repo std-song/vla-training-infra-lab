@@ -52,7 +52,7 @@ Latest baseline v2 result:
 
 ## Stage 4: Multi-GPU Data Parallel
 
-Status: next.
+Status: completed for `dp=2`; larger DP scaling pending.
 
 Goal: validate distributed launcher and gradient synchronization.
 
@@ -60,7 +60,7 @@ Suggested configs:
 
 | Case | DP | TP | PP | EP | Purpose |
 | --- | ---: | ---: | ---: | ---: | --- |
-| dp_2 | 2 | 1 | 1 | 1 | distributed smoke |
+| dp_2 | 2 | 1 | 1 | 1 | distributed smoke, completed |
 | dp_4 | 4 | 1 | 1 | 1 | throughput scaling |
 | dp_8 | 8 | 1 | 1 | 1 | 8x3090 baseline |
 
@@ -111,3 +111,5 @@ Candidate optimizations:
 - CUDA Graph for fixed-shape inference.
 - `torch.compile` or Triton kernels for action modules.
 - DFlash-style acceleration where token decoding dominates.
+
+
