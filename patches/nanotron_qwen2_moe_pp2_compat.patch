@@ -1,0 +1,39 @@
+diff --git a/src/nanotron/models/qwen.py b/src/nanotron/models/qwen.py
+index a18ff704..814aaaee 100644
+--- a/src/nanotron/models/qwen.py
++++ b/src/nanotron/models/qwen.py
+@@ -762,8 +762,10 @@ class Qwen2Model(nn.Module):
+     ):
+         output = self.token_position_embeddings(input_ids=input_ids, position_ids=position_ids)
+         # Compute cu_seqlens
+-        cu_seqlens: Optional[Union[torch.Tensor, Dict[str, torch.Tensor]]] = None
+-        if position_ids.numel() > 0:
++        cu_seqlens: Optional[Union[torch.Tensor, Dict[str, torch.Tensor], TensorPointer]] = None
++        if isinstance(position_ids, TensorPointer):
++            cu_seqlens = TensorPointer(group_rank=position_ids.group_rank)
++        elif position_ids.numel() > 0:
+             start_indices = torch.where(position_ids.view(-1) == 0)[0]
+             cu_seqlens = torch.cat(
+                 [start_indices, torch.tensor([position_ids.numel()], dtype=torch.int32, device=start_indices.device)]
+diff --git a/src/nanotron/trainer.py b/src/nanotron/trainer.py
+index 13ecf497..abfdd55a 100644
+--- a/src/nanotron/trainer.py
++++ b/src/nanotron/trainer.py
+@@ -778,7 +778,6 @@ class DistributedTrainer:
+                 "tokens_per_sec_per_gpu", tokens_per_sec / self.parallel_context.world_pg.size(), "human_format"
+             ),  # , "1.6E"),
+             LogItem("global_batch_size", self.config.global_batch_size_in_tokens, "human_format"),  # , "5d"),
+-            LogItem("lm_loss", loss_avg.item(), "human_format"),  # , "1.6E"),
+             LogItem("lr", lr, "human_format"),  # , ".3E"),
+             LogItem("model_tflops_per_gpu", model_tflops, "human_format"),  # , ".2f"),
+             # LogItem("hardware_tflops_per_gpu", hardware_tflops, "human_format"),  # , ".2f"),
+@@ -845,6 +844,9 @@ class DistributedTrainer:
+ 
+             return cpu_memory_log_entries + swap_memory_log_entries + process_memory_log_entries
+ 
++        if loss_avg is not None:
++            basic_log_entries.insert(6, LogItem("lm_loss", loss_avg.item(), "human_format"))  # , "1.6E"),
++
+         if z_loss_avg is not None:
+             basic_log_entries.insert(6, LogItem("z_loss", z_loss_avg.item(), "human_format"))  # , "1.6E"),
+ 

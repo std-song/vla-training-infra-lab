@@ -22,12 +22,12 @@ Do not jump directly to `DP/TP/PP/EP=8-way complexity`. Each axis should be vali
 | dp2_resume_220 | 2 | 2 | 1 | 1 | 1 | resume DP checkpoint from step 200 to 220 | done |
 | tp2_100 | 2 | 1 | 2 | 1 | 1 | tensor-parallel training and checkpoint | done |
 | tp2_resume_120 | 2 | 1 | 2 | 1 | 1 | resume TP checkpoint from step 100 to 120 | done |
+| pp2_100 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel training and checkpoint | done |
+| pp2_resume_120 | 2 | 1 | 1 | 2 | 1 | resume PP checkpoint from step 100 to 120 | done |
 
 ## Near-Term Experiments
 
-| ID | GPUs | DP | TP | PP | EP | Goal | Success criteria |
-| --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| pp_2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel path | both stages active, 1F1B schedule works |
+The 2-GPU DP, TP, and PP axes are complete. The near-term work is now 8-GPU composition and EP readiness inspection.
 
 ## 8-GPU Target Experiments
 

@@ -66,14 +66,14 @@ Suggested configs:
 
 ## Stage 5: Tensor and Pipeline Parallel
 
-Status: completed for `tp=2`; `pp=2` pending.
+Status: completed for `tp=2` and `pp=2`; 8-GPU composition pending.
 
 Goal: validate dense-model distributed axes before introducing cross-rank experts.
 
 | Case | GPUs | DP | TP | PP | EP | Purpose |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
 | tp_2 | 2 | 1 | 2 | 1 | 1 | tensor-parallel smoke, completed |
-| pp_2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel smoke |
+| pp_2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel smoke, completed |
 | tp2_dp4 | 8 | 4 | 2 | 1 | 1 | TP+DP scaling |
 | pp2_dp4 | 8 | 4 | 1 | 2 | 1 | PP+DP scaling |
 

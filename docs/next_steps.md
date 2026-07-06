@@ -1,24 +1,26 @@
 # Next Steps
 
-The project now has single-GPU correctness/profiling, a 75.5M-parameter baseline, checkpoint resume, activation recomputation A/B, completed 2-GPU DP smoke with resume, and completed 2-GPU TP smoke with resume. The next work should validate PP=2 on the same 2-GPU machine before renting 8 GPUs.
+The project now has single-GPU correctness/profiling, a 75.5M-parameter baseline, checkpoint resume, activation recomputation A/B, completed 2-GPU DP smoke with resume, completed 2-GPU TP smoke with resume, and completed 2-GPU PP smoke with resume.
 
-## Step 1: Pipeline Parallel Smoke
+## Step 1: Package 8-GPU DP/TP/PP Runs
 
-Run one independent 2-GPU smoke case now that DP=2 and TP=2 are complete:
+The next experiments should compose the validated axes without enabling expert parallelism yet:
 
-| Case | DP | TP | PP | EP | Purpose |
-| --- | ---: | ---: | ---: | ---: | --- |
-| pp_2 | 1 | 1 | 2 | 1 | pipeline schedule and stage checkpointing |
+| Case | GPUs | DP | TP | PP | EP | Purpose |
+| --- | ---: | ---: | ---: | ---: | ---: | --- |
+| dp_8 | 8 | 8 | 1 | 1 | 1 | pure DP scaling baseline |
+| tp2_dp4 | 8 | 4 | 2 | 1 | 1 | DP + TP composition |
+| pp2_dp4 | 8 | 4 | 1 | 2 | 1 | DP + PP composition |
+| tp2_pp2_dp2 | 8 | 2 | 2 | 2 | 1 | combined dense-model parallelism |
 
-The case should first run 20-100 steps, then save and resume from checkpoint.
+## Step 2: Clean Up PP Compatibility
 
-## Step 2: 8-GPU DP/TP/PP Scaling Prep
+Before presenting the PP work as upstream-quality, clean up or document these issues:
 
-Before renting 8 GPUs, package the working 2-GPU configs and scripts. The first 8-GPU targets should still avoid EP:
-
-1. `dp=8, tp=1, pp=1, ep=1`
-2. `dp=4, tp=2, pp=1, ep=1`
-3. `dp=4, tp=1, pp=2, ep=1`
+- Qwen2-MoE PP needs `TensorPointer` handling for `position_ids` and `cu_seqlens`.
+- Trainer logging should skip `lm_loss` on non-loss pipeline stages.
+- The repeated `Timer 'iteration_time' already running` warning should be investigated.
+- The current 4-layer model has an imbalanced PP split; a deeper model would show cleaner pipeline behavior.
 
 ## Step 3: Inspect Expert Parallel Readiness
 
@@ -35,15 +37,6 @@ Checklist:
 
 If upstream Nanotron does not fully support this path for Qwen2-MoE, this becomes a valuable project contribution: implement and test EP rather than merely running a config.
 
-## Step 4: 8-GPU Target Run
-
-After 2-GPU DP/TP/PP are green, rent an 8x3090 instance and run:
-
-1. `dp=8, tp=1, pp=1, ep=1`
-2. `dp=4, tp=2, pp=1, ep=1`
-3. `dp=4, tp=1, pp=2, ep=1`
-4. only then attempt EP compositions
-
 ## Resume Bullet Draft After Current Milestone
 
-Implemented a Nanotron-based Qwen2-MoE training-infra baseline on RTX 3090, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, and profiling of tokens/s, GPU memory, utilization, power, and checkpoint artifacts. Completed single-GPU smoke/resume, 75.5M-parameter 500-step baseline, activation recomputation A/B analysis, 2-GPU DP checkpoint/resume, and 2-GPU TP checkpoint/resume; next stage validates PP=2 before 8-GPU DP/TP/PP scaling.
+Implemented a Nanotron-based Qwen2-MoE training-infra baseline on RTX 3090, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, and profiling of tokens/s, GPU memory, utilization, power, and checkpoint artifacts. Completed single-GPU smoke/resume, 75.5M-parameter 500-step baseline, activation recomputation A/B analysis, 2-GPU DP checkpoint/resume, 2-GPU TP checkpoint/resume, and 2-GPU PP checkpoint/resume; fixed Qwen2-MoE pipeline compatibility issues around `TensorPointer` propagation and loss-stage logging before moving to 8-GPU DP/TP/PP composition.
