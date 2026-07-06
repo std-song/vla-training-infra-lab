@@ -1,58 +1,46 @@
 # Next Steps
 
-The project has a valid single-GPU correctness baseline. The next work should make the result more robust before spending money on an 8-GPU rental.
+The project now has a valid single-GPU correctness baseline, a stronger 75.5M-parameter 500-step baseline, checkpoint resume to step 520, and an activation recomputation A/B result. The next work should validate distributed behavior on 2 GPUs before spending money on an 8-GPU rental.
 
-## Step 1: Stronger Single-GPU Baseline
+## Step 1: 2-GPU Data Parallel Smoke
 
-Goal: produce a more stable profile that uses meaningful RTX 3090 memory.
+Goal: validate distributed launch, rank logging, DDP gradient synchronization, and checkpoint writing.
 
-Suggested changes:
+Suggested config:
 
-- increase `hidden_size` from 128 to 512 or 768
-- increase `intermediate_size` proportionally
-- increase MoE intermediate size to 1024 or 2048
-- keep `num_hidden_layers` at 4 first, then try 8
-- keep `sequence_length=512` if memory allows
-- set `train_steps=500` or `1000`
-- set `logging.iteration_step_info_interval=10`
-- keep `dp=tp=pp=ep=1`
+- `dp=2`
+- `tp=1`
+- `pp=1`
+- `expert_parallel_size=1`
+- reuse the baseline v2 model if memory permits
+- start with 100-200 steps before running longer
 
 Success criteria:
 
-- memory reaches several GiB but stays under 24 GiB
+- both ranks launch and train
 - loss remains finite
-- checkpoint saves successfully
-- resume from final checkpoint advances training
-- average tokens/s is computed over a long enough steady window
-
-## Step 2: Activation Recompute A/B
-
-Run the stronger baseline twice:
-
-| Case | recompute_layer | Expected result |
-| --- | --- | --- |
-| no_recompute | false | faster, higher activation memory |
-| recompute | true | lower memory, slower step time |
-
-Record memory reduction and throughput penalty. This is a strong training-infra talking point because it connects implementation detail to hardware limits.
-
-## Step 3: 2-GPU Distributed Smoke
-
-Before renting 8 GPUs, validate 2 GPUs.
-
-Recommended order:
-
-1. `dp=2, tp=1, pp=1, ep=1`
-2. `dp=1, tp=2, pp=1, ep=1`
-3. `dp=1, tp=1, pp=2, ep=1`
-
-Each case should prove:
-
-- all ranks launch
-- loss is finite
-- checkpoint is saved
-- per-rank logs are interpretable
 - tokens/s/GPU is reported
+- checkpoint contains rank-aware state
+- resume works from the distributed checkpoint
+
+## Step 2: Tensor and Pipeline Parallel Smoke
+
+Run two independent 2-GPU smoke cases:
+
+| Case | DP | TP | PP | EP | Purpose |
+| --- | ---: | ---: | ---: | ---: | --- |
+| tp_2 | 1 | 2 | 1 | 1 | tensor-parallel sharding |
+| pp_2 | 1 | 1 | 2 | 1 | pipeline schedule and stage checkpointing |
+
+Each case should first run 20-100 steps, then save and resume from checkpoint.
+
+## Step 3: 8-GPU DP/TP/PP Scaling Prep
+
+Before renting 8 GPUs, package the working 2-GPU configs and scripts. The first 8-GPU targets should still avoid EP:
+
+1. `dp=8, tp=1, pp=1, ep=1`
+2. `dp=4, tp=2, pp=1, ep=1`
+3. `dp=4, tp=1, pp=2, ep=1`
 
 ## Step 4: Inspect Expert Parallel Readiness
 
@@ -80,4 +68,4 @@ After 2-GPU DP/TP/PP are green, rent an 8x3090 instance and run:
 
 ## Resume Bullet Draft After Current Milestone
 
-Implemented a Nanotron-based Qwen2-MoE training-infra baseline on RTX 3090, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, and profiling of tokens/s, GPU memory, utilization, and checkpoint artifacts. Completed single-GPU smoke, resume, 20-step, and 100-step baseline experiments; next stage expands to stable large-model profiling and DP/TP/PP multi-GPU validation.
+Implemented a Nanotron-based Qwen2-MoE training-infra baseline on RTX 3090, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, and profiling of tokens/s, GPU memory, utilization, power, and checkpoint artifacts. Completed single-GPU smoke/resume, 100-step tiny baseline, 75.5M-parameter 500-step baseline, step-500 to step-520 resume, and activation recomputation A/B analysis; next stage expands to 2-GPU DP/TP/PP validation before 8-GPU scaling.

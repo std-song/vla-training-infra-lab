@@ -14,14 +14,15 @@ Do not jump directly to `DP/TP/PP/EP=8-way complexity`. Each axis should be vali
 | smoke_5 | 1 | 1 | 1 | 1 | 1 | end-to-end train/checkpoint smoke | done |
 | resume_7 | 1 | 1 | 1 | 1 | 1 | checkpoint resume from step 5 | done |
 | baseline_20 | 1 | 1 | 1 | 1 | 1 | first profiling run | done |
-| baseline_100 | 1 | 1 | 1 | 1 | 1 | longer baseline profile | done |
+| baseline_100 | 1 | 1 | 1 | 1 | 1 | longer tiny baseline profile | done |
+| baseline_v2_500 | 1 | 1 | 1 | 1 | 1 | 75.5M-parameter 500-step profile | done |
+| baseline_v2_resume_520 | 1 | 1 | 1 | 1 | 1 | resume baseline v2 from step 500 to 520 | done |
+| recompute_ab | 1 | 1 | 1 | 1 | 1 | activation recomputation tradeoff | done |
 
 ## Near-Term Experiments
 
 | ID | GPUs | DP | TP | PP | EP | Goal | Success criteria |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| baseline_v2 | 1 | 1 | 1 | 1 | 1 | larger model, stable profile | 500-1000 steps, several GiB VRAM, stable tokens/s |
-| recompute_ab | 1 | 1 | 1 | 1 | 1 | activation recomputation tradeoff | memory down, step time impact measured |
 | dp_2 | 2 | 2 | 1 | 1 | 1 | distributed launcher and DDP sync | both ranks train, checkpoint saves, tokens/s/GPU reported |
 | tp_2 | 2 | 1 | 2 | 1 | 1 | tensor-parallel path | model shards correctly, loss finite, checkpoint saves |
 | pp_2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel path | both stages active, 1F1B schedule works |

@@ -27,26 +27,32 @@ Completed evidence:
 
 ## Stage 3: Single-GPU Baseline Profiling
 
-Status: completed for tiny baseline; stronger baseline pending.
+Status: completed.
 
 Completed:
 
-- 20-step baseline profile.
-- 100-step baseline profile.
-- Memory, throughput, utilization, power, and checkpoint-size summary.
+- 20-step tiny baseline profile.
+- 100-step tiny baseline profile.
+- 75.5M-parameter 500-step baseline profile.
+- Step-500 to step-520 checkpoint resume.
+- Activation recomputation A/B.
+- Memory, throughput, utilization, power, and checkpoint-size analysis.
 
-Latest tiny-baseline result:
+Latest baseline v2 result:
 
 | Metric | Value |
 | --- | ---: |
-| Avg throughput, steps >= 10 | 9,860 tokens/s |
-| Avg step time, steps >= 10 | 27.09 ms |
-| Max sampled GPU memory | 993 MiB |
-| Checkpoint size | 32 MiB |
-
-Next: increase model size and run 500-1000 steps for a stable, resume-worthy baseline.
+| Parameters | 75.5M |
+| Avg throughput, logged steps >= 50 | 10,544 tokens/s |
+| Avg step time, logged steps >= 50 | 49.59 ms |
+| Max sampled GPU memory | 2,271 MiB |
+| Checkpoint size | 1009 MiB |
+| Recompute throughput change | -21.5% |
+| Recompute memory change | -0.8% sampled memory |
 
 ## Stage 4: Multi-GPU Data Parallel
+
+Status: next.
 
 Goal: validate distributed launcher and gradient synchronization.
 
