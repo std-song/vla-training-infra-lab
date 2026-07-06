@@ -1,17 +1,16 @@
 # Next Steps
 
-The project now has single-GPU correctness/profiling, a 75.5M-parameter baseline, checkpoint resume, activation recomputation A/B, and a completed 2-GPU DP smoke with resume. The next work should validate TP=2 and PP=2 on the same 2-GPU machine before renting 8 GPUs.
+The project now has single-GPU correctness/profiling, a 75.5M-parameter baseline, checkpoint resume, activation recomputation A/B, completed 2-GPU DP smoke with resume, and completed 2-GPU TP smoke with resume. The next work should validate PP=2 on the same 2-GPU machine before renting 8 GPUs.
 
-## Step 1: Tensor and Pipeline Parallel Smoke
+## Step 1: Pipeline Parallel Smoke
 
-Run two independent 2-GPU smoke cases now that DP=2 is complete:
+Run one independent 2-GPU smoke case now that DP=2 and TP=2 are complete:
 
 | Case | DP | TP | PP | EP | Purpose |
 | --- | ---: | ---: | ---: | ---: | --- |
-| tp_2 | 1 | 2 | 1 | 1 | tensor-parallel sharding |
 | pp_2 | 1 | 1 | 2 | 1 | pipeline schedule and stage checkpointing |
 
-Each case should first run 20-100 steps, then save and resume from checkpoint.
+The case should first run 20-100 steps, then save and resume from checkpoint.
 
 ## Step 2: 8-GPU DP/TP/PP Scaling Prep
 
@@ -47,6 +46,4 @@ After 2-GPU DP/TP/PP are green, rent an 8x3090 instance and run:
 
 ## Resume Bullet Draft After Current Milestone
 
-Implemented a Nanotron-based Qwen2-MoE training-infra baseline on RTX 3090, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, and profiling of tokens/s, GPU memory, utilization, power, and checkpoint artifacts. Completed single-GPU smoke/resume, 100-step tiny baseline, 75.5M-parameter 500-step baseline, step-500 to step-520 resume, and activation recomputation A/B analysis; next stage expands to 2-GPU DP/TP/PP validation before 8-GPU scaling.
-
-
+Implemented a Nanotron-based Qwen2-MoE training-infra baseline on RTX 3090, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, and profiling of tokens/s, GPU memory, utilization, power, and checkpoint artifacts. Completed single-GPU smoke/resume, 75.5M-parameter 500-step baseline, activation recomputation A/B analysis, 2-GPU DP checkpoint/resume, and 2-GPU TP checkpoint/resume; next stage validates PP=2 before 8-GPU DP/TP/PP scaling.

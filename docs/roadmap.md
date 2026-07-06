@@ -66,11 +66,13 @@ Suggested configs:
 
 ## Stage 5: Tensor and Pipeline Parallel
 
+Status: completed for `tp=2`; `pp=2` pending.
+
 Goal: validate dense-model distributed axes before introducing cross-rank experts.
 
 | Case | GPUs | DP | TP | PP | EP | Purpose |
 | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| tp_2 | 2 | 1 | 2 | 1 | 1 | tensor-parallel smoke |
+| tp_2 | 2 | 1 | 2 | 1 | 1 | tensor-parallel smoke, completed |
 | pp_2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel smoke |
 | tp2_dp4 | 8 | 4 | 2 | 1 | 1 | TP+DP scaling |
 | pp2_dp4 | 8 | 4 | 1 | 2 | 1 | PP+DP scaling |
@@ -111,5 +113,3 @@ Candidate optimizations:
 - CUDA Graph for fixed-shape inference.
 - `torch.compile` or Triton kernels for action modules.
 - DFlash-style acceleration where token decoding dominates.
-
-

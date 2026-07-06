@@ -10,11 +10,11 @@ The project maps directly to common VLA training-infra requirements:
 
 | Requirement | Project coverage |
 | --- | --- |
-| PyTorch distributed training | Nanotron-based Qwen2-MoE training path, planned DP/TP/PP/EP validation |
+| PyTorch distributed training | Nanotron-based Qwen2-MoE training path, DP=2 and TP=2 validated, PP/EP planned |
 | MoE training | Router top-k, expert token permutation, GroupedGEMM expert MLP, shared expert |
 | Mixed precision | BF16 training on RTX 3090 |
 | Operator acceleration | FlashAttention and fused RMSNorm/rotary paths where available |
-| Checkpoint/resume | Step-5 to step-7, step-500 to step-520 resume validation |
+| Checkpoint/resume | Step-5 to step-7, step-500 to step-520, DP step-200 to step-220, TP step-100 to step-120 |
 | Performance analysis | tokens/s, step time, memory, GPU utilization, power, checkpoint size |
 | Data pipeline | planned VLA/LeRobot-style data schema and shard strategy |
 | Experiment management | structured configs, scripts, troubleshooting notes, result reports |
@@ -33,6 +33,7 @@ Completed:
 - Step-500 checkpoint resumed to step 520.
 - Activation recomputation A/B completed on the 75.5M-parameter baseline v2.
 - First 2-GPU data-parallel distributed run completed with checkpoint/resume.
+- First 2-GPU tensor-parallel distributed run completed with checkpoint/resume.
 - Compatibility patches documented for PyTorch 2.1.2 collect-env behavior and dummy-data resume metadata.
 
 Latest baseline summary:
@@ -51,8 +52,10 @@ Latest baseline summary:
 | Recompute A/B | -21.5% throughput, no useful memory win at this scale |
 | DP=2 throughput | 17,987 tokens/s total, 8,989 tokens/s/GPU |
 | DP=2 resume | step 200 -> step 220 |
+| TP=2 throughput | 10,311 tokens/s total, 5,154 tokens/s/GPU |
+| TP=2 resume | step 100 -> step 120 |
 
-See the full reports: [`results/qwen2_moe_dp2_2x3090.md`](results/qwen2_moe_dp2_2x3090.md), [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md), and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
+See the full reports: [`results/qwen2_moe_tp2_2x3090.md`](results/qwen2_moe_tp2_2x3090.md), [`results/qwen2_moe_dp2_2x3090.md`](results/qwen2_moe_dp2_2x3090.md), [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md), and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
 
 ## Repository Layout
 
@@ -91,19 +94,16 @@ CUDA_DEVICE_MAX_CONNECTIONS=1 PYTHONPATH=src torchrun --nproc_per_node=1 \
 
 ## What This Project Can Honestly Claim Today
 
-This project currently validates the single-GPU Qwen2-MoE path: router top-k, expert dispatch inside one rank, GroupedGEMM, FlashAttention, BF16, checkpoint save/resume, 500-step stability, activation recomputation A/B, and coarse profiling.
+This project currently validates the single-GPU Qwen2-MoE path and two independent distributed axes: DP=2 and TP=2. The covered features include router top-k, expert dispatch inside one rank, GroupedGEMM, FlashAttention, BF16, checkpoint save/resume, 500-step stability, activation recomputation A/B, DP checkpoint/resume, TP checkpoint/resume, and coarse profiling.
 
-It does not yet claim full 8-GPU TP/PP/EP training. That is the next milestone and should be validated step by step before appearing as a finished resume bullet.
+It does not yet claim full 8-GPU TP/PP/EP training. PP=2 and 8-GPU compositions are the next milestones and should be validated step by step before appearing as finished resume bullets.
 
 ## Next Step
 
-The immediate next experiment should be 2-GPU tensor/pipeline parallel validation:
+The immediate next experiment should be 2-GPU pipeline parallel validation:
 
-1. Run `dp=1, tp=2, pp=1, ep=1` to validate tensor-parallel sharding.
-2. Run `dp=1, tp=1, pp=2, ep=1` to validate pipeline-parallel scheduling and stage checkpointing.
-3. Compare DP=2, TP=2, and PP=2 throughput/memory behavior.
-4. Only after these are stable, rent 8 GPUs for DP/TP/PP scaling and then inspect EP readiness.
+1. Run `dp=1, tp=1, pp=2, ep=1` to validate pipeline-parallel scheduling and stage checkpointing.
+2. Compare DP=2, TP=2, and PP=2 throughput/memory behavior.
+3. Only after these are stable, rent 8 GPUs for DP/TP/PP scaling and then inspect EP readiness.
 
 The detailed plan is in [`docs/next_steps.md`](docs/next_steps.md) and [`docs/experiment_matrix.md`](docs/experiment_matrix.md).
-
-

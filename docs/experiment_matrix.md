@@ -20,12 +20,13 @@ Do not jump directly to `DP/TP/PP/EP=8-way complexity`. Each axis should be vali
 | recompute_ab | 1 | 1 | 1 | 1 | 1 | activation recomputation tradeoff | done |
 | dp2_200 | 2 | 2 | 1 | 1 | 1 | distributed DP training and checkpoint | done |
 | dp2_resume_220 | 2 | 2 | 1 | 1 | 1 | resume DP checkpoint from step 200 to 220 | done |
+| tp2_100 | 2 | 1 | 2 | 1 | 1 | tensor-parallel training and checkpoint | done |
+| tp2_resume_120 | 2 | 1 | 2 | 1 | 1 | resume TP checkpoint from step 100 to 120 | done |
 
 ## Near-Term Experiments
 
 | ID | GPUs | DP | TP | PP | EP | Goal | Success criteria |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| tp_2 | 2 | 1 | 2 | 1 | 1 | tensor-parallel path | model shards correctly, loss finite, checkpoint saves |
 | pp_2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel path | both stages active, 1F1B schedule works |
 
 ## 8-GPU Target Experiments
@@ -53,5 +54,3 @@ Do not jump directly to `DP/TP/PP/EP=8-way complexity`. Each axis should be vali
 ## Known EP Caveat
 
 The current Nanotron Qwen2-MoE path validates expert routing and grouped expert compute within one rank. Before claiming true expert parallelism, the project must verify cross-rank expert token dispatch, process-group semantics, local/global expert id mapping, all-to-all correctness, and checkpoint layout under `expert_parallel_size > 1`.
-
-
