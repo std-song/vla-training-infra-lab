@@ -1,0 +1,41 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="860" height="430" viewBox="0 0 860 430" role="img" aria-labelledby="title desc">
+  <title id="title">Project 3 Qwen2 KV cache speedup</title>
+  <desc id="desc">Bar chart showing cached decode speedup over no-cache decode for selected Qwen2 benchmark shapes.</desc>
+  <rect width="860" height="430" fill="#ffffff"/>
+  <text x="40" y="42" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#172033">KV cache speedup depends on shape</text>
+  <text x="40" y="68" font-family="Arial, sans-serif" font-size="13" fill="#536174">Qwen2-0.5B, SDPA + BF16, speedup = no-cache decode time / cached decode time</text>
+  <line x1="92" y1="330" x2="800" y2="330" stroke="#d6dbe3"/>
+  <line x1="92" y1="279" x2="800" y2="279" stroke="#eef1f5"/>
+  <line x1="92" y1="228" x2="800" y2="228" stroke="#eef1f5"/>
+  <line x1="92" y1="177" x2="800" y2="177" stroke="#eef1f5"/>
+  <line x1="92" y1="126" x2="800" y2="126" stroke="#eef1f5"/>
+  <line x1="92" y1="75" x2="800" y2="75" stroke="#eef1f5"/>
+  <line x1="92" y1="228" x2="800" y2="228" stroke="#8a94a6" stroke-dasharray="5 5"/>
+  <text x="42" y="334" font-family="Arial, sans-serif" font-size="12" fill="#667085">0.0x</text>
+  <text x="42" y="283" font-family="Arial, sans-serif" font-size="12" fill="#667085">0.5x</text>
+  <text x="42" y="232" font-family="Arial, sans-serif" font-size="12" fill="#667085">1.0x</text>
+  <text x="42" y="181" font-family="Arial, sans-serif" font-size="12" fill="#667085">1.5x</text>
+  <text x="42" y="130" font-family="Arial, sans-serif" font-size="12" fill="#667085">2.0x</text>
+  <text x="42" y="79" font-family="Arial, sans-serif" font-size="12" fill="#667085">2.5x</text>
+  <text x="705" y="221" font-family="Arial, sans-serif" font-size="12" fill="#667085">cache parity</text>
+  <rect x="130" y="243" width="78" height="87" rx="5" fill="#d76c5b"/>
+  <rect x="250" y="233" width="78" height="97" rx="5" fill="#d76c5b"/>
+  <rect x="370" y="188" width="78" height="142" rx="5" fill="#4f7cff"/>
+  <rect x="490" y="231" width="78" height="99" rx="5" fill="#d76c5b"/>
+  <rect x="610" y="70" width="78" height="260" rx="5" fill="#17a36b"/>
+  <text x="169" y="235" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">0.85x</text>
+  <text x="289" y="225" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">0.95x</text>
+  <text x="409" y="180" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">1.39x</text>
+  <text x="529" y="223" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">0.97x</text>
+  <text x="649" y="60" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">2.55x</text>
+  <text x="169" y="354" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">B1 P128</text>
+  <text x="169" y="371" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">D64</text>
+  <text x="289" y="354" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">B1 P512</text>
+  <text x="289" y="371" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">D64</text>
+  <text x="409" y="354" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">B2 P512</text>
+  <text x="409" y="371" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">D64</text>
+  <text x="529" y="354" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">B4 P128</text>
+  <text x="529" y="371" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">D64</text>
+  <text x="649" y="354" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">B4 P512</text>
+  <text x="649" y="371" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">D64</text>
+</svg>
