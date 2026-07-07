@@ -98,6 +98,8 @@ This project therefore does not claim true EP training. It claims EP readiness a
 
 DP4 gives the highest total throughput in this small-model regime because it avoids model-parallel communication in the forward path. TP2+DP2 and PP2+DP2 are slightly slower but validate more complex sharding modes that become necessary for larger models. PP2+DP2 shows lower peak sampled memory than DP4 because model parameters are split across pipeline stages, though the 4-layer model has an imbalanced split.
 
+For a deeper explanation of DP scaling efficiency and TP/PP tradeoffs, see [../docs/scaling_analysis.md](../docs/scaling_analysis.md).
+
 The core result is not a benchmark claim. It is a reproducible infrastructure claim: on commodity 3090 hardware, the project validates Qwen2-MoE training under single GPU, DP, TP, PP, composed 4-GPU DP/TP/PP modes, checkpointing, resume, profiling, and EP implementation-gap analysis.
 
 ## Limitations

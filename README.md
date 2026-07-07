@@ -15,7 +15,7 @@ The project maps directly to common VLA training-infra requirements:
 | Mixed precision | BF16 training on RTX 3090 |
 | Operator acceleration | FlashAttention and fused RMSNorm/rotary paths where available |
 | Checkpoint/resume | Step-5 to step-7, step-500 to step-520, DP step-200 to step-220, TP step-100 to step-120, PP step-100 to step-120 |
-| Performance analysis | tokens/s, step time, memory, GPU utilization, power, checkpoint size |
+| Performance analysis | tokens/s, step time, memory, GPU utilization, power, checkpoint size, scaling efficiency |
 | Data pipeline | planned VLA/LeRobot-style data schema and shard strategy |
 | Experiment management | structured configs, scripts, troubleshooting notes, result reports |
 
@@ -63,7 +63,7 @@ Latest baseline summary:
 | 4-GPU TP2+DP2 throughput | 20,071 tokens/s total, 5,019 tokens/s/GPU |
 | 4-GPU PP2+DP2 throughput | 20,500 tokens/s total, 5,127 tokens/s/GPU |
 
-See the full reports: [`results/qwen2_moe_4gpu_composition.md`](results/qwen2_moe_4gpu_composition.md), [`results/qwen2_moe_pp2_2x3090.md`](results/qwen2_moe_pp2_2x3090.md), [`results/qwen2_moe_tp2_2x3090.md`](results/qwen2_moe_tp2_2x3090.md), [`results/qwen2_moe_dp2_2x3090.md`](results/qwen2_moe_dp2_2x3090.md), [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md), and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
+See the full reports: [`results/qwen2_moe_4gpu_composition.md`](results/qwen2_moe_4gpu_composition.md), [`docs/scaling_analysis.md`](docs/scaling_analysis.md), [`results/qwen2_moe_pp2_2x3090.md`](results/qwen2_moe_pp2_2x3090.md), [`results/qwen2_moe_tp2_2x3090.md`](results/qwen2_moe_tp2_2x3090.md), [`results/qwen2_moe_dp2_2x3090.md`](results/qwen2_moe_dp2_2x3090.md), [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md), and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
 
 ## Repository Layout
 
