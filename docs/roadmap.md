@@ -52,7 +52,7 @@ Latest baseline v2 result:
 
 ## Stage 4: Multi-GPU Data Parallel
 
-Status: completed for `dp=2`; larger DP scaling pending.
+Status: completed for `dp=2` and `dp=4`.
 
 Goal: validate distributed launcher and gradient synchronization.
 
@@ -66,7 +66,7 @@ Suggested configs:
 
 ## Stage 5: Tensor and Pipeline Parallel
 
-Status: completed for `tp=2` and `pp=2`; 8-GPU composition pending.
+Status: completed for `tp=2`, `pp=2`, `tp2_dp2`, and `pp2_dp2` on 4 GPUs.
 
 Goal: validate dense-model distributed axes before introducing cross-rank experts.
 
@@ -87,7 +87,7 @@ Goal: study MoE memory/communication tradeoffs on PCIe GPUs.
 | ep_4 | 2 | 1 | 1 | 4 | communication stress |
 | ep_8 | 1 | 1 | 1 | 8 | all-to-all limit |
 
-Caveat: do not claim true EP until cross-rank expert token dispatch and checkpoint layout are validated under `expert_parallel_size > 1`.
+Caveat: EP2+DP2 was attempted on 4 GPUs. After a minimal process-group assert fix, the run reached MoE compute and failed at GroupedGEMM because local expert token counts did not match local expert placement. Do not claim true EP until cross-rank expert token dispatch and checkpoint layout are implemented and validated.
 
 ## Stage 7: SmolVLA Finetuning
 

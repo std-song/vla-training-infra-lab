@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="360" viewBox="0 0 920 360">
+  <style>
+    text { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #1f2937; }
+    .title { font-size: 22px; font-weight: 700; }
+    .axis { stroke: #9ca3af; stroke-width: 1; }
+    .grid { stroke: #e5e7eb; stroke-width: 1; }
+    .bar { fill: #7c3aed; }
+    .label { font-size: 13px; }
+    .value { font-size: 13px; font-weight: 600; }
+  </style>
+  <rect width="920" height="360" fill="#ffffff"/>
+  <text x="32" y="36" class="title">4-GPU Peak Sampled Memory</text>
+  <text x="32" y="60" class="label">Maximum sampled GPU memory across ranks during each 4-GPU run.</text>
+  <line x1="130" y1="300" x2="860" y2="300" class="axis"/>
+  <line x1="130" y1="80" x2="130" y2="300" class="axis"/>
+  <line x1="130" y1="247.2" x2="860" y2="247.2" class="grid"/><text x="78" y="252" class="label">500</text>
+  <line x1="130" y1="194.4" x2="860" y2="194.4" class="grid"/><text x="70" y="199" class="label">1000</text>
+  <line x1="130" y1="141.6" x2="860" y2="141.6" class="grid"/><text x="70" y="146" class="label">1500</text>
+  <line x1="130" y1="88.8" x2="860" y2="88.8" class="grid"/><text x="70" y="93" class="label">2000</text>
+  <rect class="bar" x="185" y="55.2" width="100" height="244.8"/><text x="197" y="323" class="label">DP4</text><text x="185" y="48" class="value">2318 MiB</text>
+  <rect class="bar" x="405" y="83.5" width="100" height="216.5"/><text x="393" y="323" class="label">DP2+TP2</text><text x="405" y="76" class="value">2050 MiB</text>
+  <rect class="bar" x="625" y="103.0" width="100" height="197.0"/><text x="613" y="323" class="label">DP2+PP2</text><text x="625" y="96" class="value">1866 MiB</text>
+</svg>

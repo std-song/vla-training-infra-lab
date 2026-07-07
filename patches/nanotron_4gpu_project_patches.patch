@@ -1,0 +1,89 @@
+diff --git a/src/nanotron/logging/base.py b/src/nanotron/logging/base.py
+index 5cde1bb1..59f87339 100644
+--- a/src/nanotron/logging/base.py
++++ b/src/nanotron/logging/base.py
+@@ -32,6 +32,7 @@ from logging import (
+ from typing import TYPE_CHECKING, List, Optional, Union
+ 
+ import torch
++import torch.utils.collect_env
+ from torch import distributed as torch_dist
+ 
+ from nanotron import distributed as dist
+diff --git a/src/nanotron/models/qwen.py b/src/nanotron/models/qwen.py
+index a18ff704..814aaaee 100644
+--- a/src/nanotron/models/qwen.py
++++ b/src/nanotron/models/qwen.py
+@@ -762,8 +762,10 @@ class Qwen2Model(nn.Module):
+     ):
+         output = self.token_position_embeddings(input_ids=input_ids, position_ids=position_ids)
+         # Compute cu_seqlens
+-        cu_seqlens: Optional[Union[torch.Tensor, Dict[str, torch.Tensor]]] = None
+-        if position_ids.numel() > 0:
++        cu_seqlens: Optional[Union[torch.Tensor, Dict[str, torch.Tensor], TensorPointer]] = None
++        if isinstance(position_ids, TensorPointer):
++            cu_seqlens = TensorPointer(group_rank=position_ids.group_rank)
++        elif position_ids.numel() > 0:
+             start_indices = torch.where(position_ids.view(-1) == 0)[0]
+             cu_seqlens = torch.cat(
+                 [start_indices, torch.tensor([position_ids.numel()], dtype=torch.int32, device=start_indices.device)]
+diff --git a/src/nanotron/parallel/context.py b/src/nanotron/parallel/context.py
+index 04fb4c66..61a67a7b 100644
+--- a/src/nanotron/parallel/context.py
++++ b/src/nanotron/parallel/context.py
+@@ -24,8 +24,8 @@ class ParallelContext:
+         local_world_size = int(os.environ.get("LOCAL_WORLD_SIZE", "8")) if world_size > 8 else world_size
+ 
+         assert (
+-            tensor_parallel_size * pipeline_parallel_size * context_parallel_size * data_parallel_size
+-        ) == world_size, f"TP*CP*DP*PP={tensor_parallel_size}*{pipeline_parallel_size}*{context_parallel_size}*{data_parallel_size}={tensor_parallel_size * pipeline_parallel_size * context_parallel_size * data_parallel_size} != WORLD_SIZE={world_size}"
++            tensor_parallel_size * pipeline_parallel_size * context_parallel_size * data_parallel_size * expert_parallel_size
++        ) == world_size, f"TP*CP*DP*PP*EP={tensor_parallel_size}*{context_parallel_size}*{data_parallel_size}*{pipeline_parallel_size}*{expert_parallel_size}={tensor_parallel_size * context_parallel_size * data_parallel_size * pipeline_parallel_size * expert_parallel_size} != WORLD_SIZE={world_size}"
+ 
+         if not dist.is_available():
+             raise ValueError("torch.distributed is not available as a package, please install it.")
+diff --git a/src/nanotron/serialize/metadata.py b/src/nanotron/serialize/metadata.py
+index 18865e96..7824f831 100644
+--- a/src/nanotron/serialize/metadata.py
++++ b/src/nanotron/serialize/metadata.py
+@@ -63,10 +63,16 @@ class TrainingMetadata:
+             self.consumed_train_samples == sum(stage.consumed_train_samples for stage in self.data_stages)
+         ), "Mismatch between the total consumed samples and the sum of consumed samples across stages! Something went wrong in the training."
+ 
++        stage_consumed_tokens_total = sum(stage.consumed_tokens_all_datasets for stage in self.data_stages)
++        # Dummy-data training has no dataset folder, so older Nanotron checkpoints can
++        # have a valid global consumed token count while every per-dataset counter is
++        # empty. Keep the strict check for real datasets and tolerate this smoke-test
++        # metadata shape.
+         if self.consumed_tokens_total is not None:
+-            assert self.consumed_tokens_total == sum(stage.consumed_tokens_all_datasets for stage in self.data_stages), "Mismatch between the total consumed tokens and the sum of consumed tokens across stages! Something went wrong in the training."
++            if stage_consumed_tokens_total != 0:
++                assert self.consumed_tokens_total == stage_consumed_tokens_total, "Mismatch between the total consumed tokens and the sum of consumed tokens across stages! Something went wrong in the training."
+         else:
+-            self.consumed_tokens_total = sum(stage.consumed_tokens_all_datasets for stage in self.data_stages)
++            self.consumed_tokens_total = stage_consumed_tokens_total
+ 
+         # TODO(xrsrke): remove this once we entirely remove non-data-stage training
+         if self.last_stage_idx is not None:
+diff --git a/src/nanotron/trainer.py b/src/nanotron/trainer.py
+index 13ecf497..abfdd55a 100644
+--- a/src/nanotron/trainer.py
++++ b/src/nanotron/trainer.py
+@@ -778,7 +778,6 @@ class DistributedTrainer:
+                 "tokens_per_sec_per_gpu", tokens_per_sec / self.parallel_context.world_pg.size(), "human_format"
+             ),  # , "1.6E"),
+             LogItem("global_batch_size", self.config.global_batch_size_in_tokens, "human_format"),  # , "5d"),
+-            LogItem("lm_loss", loss_avg.item(), "human_format"),  # , "1.6E"),
+             LogItem("lr", lr, "human_format"),  # , ".3E"),
+             LogItem("model_tflops_per_gpu", model_tflops, "human_format"),  # , ".2f"),
+             # LogItem("hardware_tflops_per_gpu", hardware_tflops, "human_format"),  # , ".2f"),
+@@ -845,6 +844,9 @@ class DistributedTrainer:
+ 
+             return cpu_memory_log_entries + swap_memory_log_entries + process_memory_log_entries
+ 
++        if loss_avg is not None:
++            basic_log_entries.insert(6, LogItem("lm_loss", loss_avg.item(), "human_format"))  # , "1.6E"),
++
+         if z_loss_avg is not None:
+             basic_log_entries.insert(6, LogItem("z_loss", z_loss_avg.item(), "human_format"))  # , "1.6E"),
+ 

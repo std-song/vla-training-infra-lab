@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="360" viewBox="0 0 920 360">
+  <style>
+    text { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #1f2937; }
+    .title { font-size: 22px; font-weight: 700; }
+    .axis { stroke: #9ca3af; stroke-width: 1; }
+    .grid { stroke: #e5e7eb; stroke-width: 1; }
+    .bar { fill: #2563eb; }
+    .label { font-size: 13px; }
+    .value { font-size: 13px; font-weight: 600; }
+  </style>
+  <rect width="920" height="360" fill="#ffffff"/>
+  <text x="32" y="36" class="title">Qwen2-MoE Throughput Across RTX 3090 Experiments</text>
+  <text x="32" y="60" class="label">Average tokens/s over steady logged steps. Higher is better.</text>
+  <line x1="120" y1="300" x2="880" y2="300" class="axis"/>
+  <line x1="120" y1="80" x2="120" y2="300" class="axis"/>
+  <line x1="120" y1="244.9" x2="880" y2="244.9" class="grid"/><text x="70" y="249" class="label">5K</text>
+  <line x1="120" y1="189.8" x2="880" y2="189.8" class="grid"/><text x="63" y="194" class="label">10K</text>
+  <line x1="120" y1="134.7" x2="880" y2="134.7" class="grid"/><text x="63" y="139" class="label">15K</text>
+  <line x1="120" y1="79.6" x2="880" y2="79.6" class="grid"/><text x="63" y="84" class="label">20K</text>
+  <rect class="bar" x="145" y="183.8" width="60" height="116.2"/><text x="139" y="323" class="label">1GPU</text><text x="145" y="176" class="value">10.5K</text>
+  <rect class="bar" x="245" y="101.8" width="60" height="198.2"/><text x="239" y="323" class="label">DP2</text><text x="245" y="94" class="value">18.0K</text>
+  <rect class="bar" x="345" y="186.4" width="60" height="113.6"/><text x="337" y="323" class="label">TP2</text><text x="345" y="179" class="value">10.3K</text>
+  <rect class="bar" x="445" y="174.9" width="60" height="125.1"/><text x="437" y="323" class="label">PP2</text><text x="445" y="167" class="value">11.4K</text>
+  <rect class="bar" x="545" y="50.0" width="60" height="250.0"/><text x="535" y="323" class="label">DP4</text><text x="545" y="43" class="value">22.7K</text>
+  <rect class="bar" x="645" y="78.9" width="60" height="221.1"/><text x="613" y="323" class="label">DP2+TP2</text><text x="645" y="71" class="value">20.1K</text>
+  <rect class="bar" x="745" y="74.2" width="60" height="225.8"/><text x="713" y="323" class="label">DP2+PP2</text><text x="745" y="67" class="value">20.5K</text>
+</svg>

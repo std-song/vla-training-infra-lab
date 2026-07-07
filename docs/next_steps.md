@@ -1,42 +1,28 @@
 # Next Steps
 
-The project now has single-GPU correctness/profiling, a 75.5M-parameter baseline, checkpoint resume, activation recomputation A/B, completed 2-GPU DP smoke with resume, completed 2-GPU TP smoke with resume, and completed 2-GPU PP smoke with resume.
+The first Qwen2-MoE training-infrastructure project is complete as a 4xRTX 3090 portfolio artifact.
 
-## Step 1: Package 8-GPU DP/TP/PP Runs
+Completed scope:
 
-The next experiments should compose the validated axes without enabling expert parallelism yet:
+- single-GPU baseline profiling and checkpoint/resume
+- activation recomputation A/B
+- 2-GPU DP, TP, and PP validation with checkpoint/resume
+- 4-GPU DP4, TP2+DP2, and PP2+DP2 composition runs
+- Qwen2-MoE pipeline compatibility patches
+- EP2+DP2 readiness attempt with the next blocker localized
+- GitHub reports, configs, patches, and SVG figures
 
-| Case | GPUs | DP | TP | PP | EP | Purpose |
-| --- | ---: | ---: | ---: | ---: | ---: | --- |
-| dp_8 | 8 | 8 | 1 | 1 | 1 | pure DP scaling baseline |
-| tp2_dp4 | 8 | 4 | 2 | 1 | 1 | DP + TP composition |
-| pp2_dp4 | 8 | 4 | 1 | 2 | 1 | DP + PP composition |
-| tp2_pp2_dp2 | 8 | 2 | 2 | 2 | 1 | combined dense-model parallelism |
+## Remaining Engineering Work
 
-## Step 2: Clean Up PP Compatibility
+True expert parallelism is the main unfinished engineering item. The next implementation plan is:
 
-Before presenting the PP work as upstream-quality, clean up or document these issues:
+1. Make `ParallelContext` consistently account for `expert_parallel_size` in world-size validation and rank reshaping.
+2. Define global-to-local expert id mapping for Qwen2-MoE.
+3. Dispatch routed tokens across `ep_pg` with all-to-all or a verified all-gather path.
+4. Convert global `num_tokens_per_expert` into local expert counts before GroupedGEMM.
+5. Restore token order after expert computation.
+6. Validate router auxiliary loss and checkpoint naming/loading under `expert_parallel_size > 1`.
 
-- Qwen2-MoE PP needs `TensorPointer` handling for `position_ids` and `cu_seqlens`.
-- Trainer logging should skip `lm_loss` on non-loss pipeline stages.
-- The repeated `Timer 'iteration_time' already running` warning should be investigated.
-- The current 4-layer model has an imbalanced PP split; a deeper model would show cleaner pipeline behavior.
+## Resume Bullet Draft
 
-## Step 3: Inspect Expert Parallel Readiness
-
-Do not claim EP until this is verified in code and by experiment.
-
-Checklist:
-
-- `expert_parallel_size > 1` process groups are constructed consistently
-- global expert ids map to local expert ids correctly
-- token dispatch performs real cross-rank all-to-all when experts are placed on different ranks
-- returned tokens are restored to original order
-- router auxiliary loss remains correct across ranks
-- checkpoint naming and loading include expert-parallel rank correctly
-
-If upstream Nanotron does not fully support this path for Qwen2-MoE, this becomes a valuable project contribution: implement and test EP rather than merely running a config.
-
-## Resume Bullet Draft After Current Milestone
-
-Implemented a Nanotron-based Qwen2-MoE training-infra baseline on RTX 3090, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, and profiling of tokens/s, GPU memory, utilization, power, and checkpoint artifacts. Completed single-GPU smoke/resume, 75.5M-parameter 500-step baseline, activation recomputation A/B analysis, 2-GPU DP checkpoint/resume, 2-GPU TP checkpoint/resume, and 2-GPU PP checkpoint/resume; fixed Qwen2-MoE pipeline compatibility issues around `TensorPointer` propagation and loss-stage logging before moving to 8-GPU DP/TP/PP composition.
+Built a Nanotron-based Qwen2-MoE distributed training lab on RTX 3090 GPUs, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, activation recomputation analysis, and throughput/memory profiling. Completed single-GPU, 2-GPU DP/TP/PP, and 4-GPU DP4 / TP2+DP2 / PP2+DP2 runs; debugged Qwen2-MoE pipeline `TensorPointer` handling and loss-stage logging; analyzed EP2+DP2 readiness and localized the next blocker to local expert token accounting before GroupedGEMM.

@@ -10,7 +10,7 @@ The project maps directly to common VLA training-infra requirements:
 
 | Requirement | Project coverage |
 | --- | --- |
-| PyTorch distributed training | Nanotron-based Qwen2-MoE training path, DP=2, TP=2, and PP=2 validated, EP planned |
+| PyTorch distributed training | Nanotron-based Qwen2-MoE training path, DP=2/4, TP=2, PP=2, 4-GPU DP/TP/PP composition, EP readiness analyzed |
 | MoE training | Router top-k, expert token permutation, GroupedGEMM expert MLP, shared expert |
 | Mixed precision | BF16 training on RTX 3090 |
 | Operator acceleration | FlashAttention and fused RMSNorm/rotary paths where available |
@@ -35,6 +35,8 @@ Completed:
 - First 2-GPU data-parallel distributed run completed with checkpoint/resume.
 - First 2-GPU tensor-parallel distributed run completed with checkpoint/resume.
 - First 2-GPU pipeline-parallel distributed run completed with checkpoint/resume after Qwen2-MoE PP compatibility fixes.
+- 4-GPU composition runs completed: DP4, TP2+DP2, and PP2+DP2.
+- EP2+DP2 readiness attempt completed; next blocker localized to MoE local expert accounting before GroupedGEMM.
 - Compatibility patches documented for PyTorch 2.1.2 collect-env behavior and dummy-data resume metadata.
 
 Latest baseline summary:
@@ -57,8 +59,11 @@ Latest baseline summary:
 | TP=2 resume | step 100 -> step 120 |
 | PP=2 throughput | 11,357 tokens/s total, 5,674 tokens/s/GPU |
 | PP=2 resume | step 100 -> step 120 |
+| 4-GPU DP4 throughput | 22,686 tokens/s total, 5,671 tokens/s/GPU |
+| 4-GPU TP2+DP2 throughput | 20,071 tokens/s total, 5,019 tokens/s/GPU |
+| 4-GPU PP2+DP2 throughput | 20,500 tokens/s total, 5,127 tokens/s/GPU |
 
-See the full reports: [`results/qwen2_moe_pp2_2x3090.md`](results/qwen2_moe_pp2_2x3090.md), [`results/qwen2_moe_tp2_2x3090.md`](results/qwen2_moe_tp2_2x3090.md), [`results/qwen2_moe_dp2_2x3090.md`](results/qwen2_moe_dp2_2x3090.md), [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md), and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
+See the full reports: [`results/qwen2_moe_4gpu_composition.md`](results/qwen2_moe_4gpu_composition.md), [`results/qwen2_moe_pp2_2x3090.md`](results/qwen2_moe_pp2_2x3090.md), [`results/qwen2_moe_tp2_2x3090.md`](results/qwen2_moe_tp2_2x3090.md), [`results/qwen2_moe_dp2_2x3090.md`](results/qwen2_moe_dp2_2x3090.md), [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md), and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
 
 ## Repository Layout
 
@@ -97,17 +102,16 @@ CUDA_DEVICE_MAX_CONNECTIONS=1 PYTHONPATH=src torchrun --nproc_per_node=1 \
 
 ## What This Project Can Honestly Claim Today
 
-This project currently validates the single-GPU Qwen2-MoE path and three independent distributed axes: DP=2, TP=2, and PP=2. The covered features include router top-k, expert dispatch inside one rank, GroupedGEMM, FlashAttention, BF16, checkpoint save/resume, 500-step stability, activation recomputation A/B, DP checkpoint/resume, TP checkpoint/resume, PP checkpoint/resume, and coarse profiling.
+This project currently validates the single-GPU Qwen2-MoE path, three independent 2-GPU distributed axes, and 4-GPU DP/TP/PP compositions. The covered features include router top-k, expert dispatch inside one rank, GroupedGEMM, FlashAttention, BF16, checkpoint save/resume, 500-step stability, activation recomputation A/B, DP checkpoint/resume, TP checkpoint/resume, PP checkpoint/resume, and coarse profiling.
 
-It does not yet claim full 8-GPU TP/PP/EP training or true expert parallelism. 8-GPU DP/TP/PP compositions and EP readiness are the next milestones.
+It does not claim true expert-parallel training yet. EP2+DP2 was tested as a readiness experiment and the next blocker was localized to MoE local expert accounting / token dispatch before GroupedGEMM.
+
+## Figures
+
+![Throughput summary](assets/figures/throughput_summary.svg)
+
+![Distributed-axis coverage](assets/figures/coverage_matrix.svg)
 
 ## Next Step
 
-The immediate next experiment should be 8-GPU DP/TP/PP composition without EP:
-
-1. Run `dp=8, tp=1, pp=1, ep=1` as a pure DP scaling baseline.
-2. Run `dp=4, tp=2, pp=1, ep=1` to compose DP and TP.
-3. Run `dp=4, tp=1, pp=2, ep=1` to compose DP and PP.
-4. Inspect and test `expert_parallel_size > 1` only after these dense distributed axes are stable.
-
-The detailed plan is in [`docs/next_steps.md`](docs/next_steps.md) and [`docs/experiment_matrix.md`](docs/experiment_matrix.md).
+The first project is now complete as a 4-GPU training-infrastructure portfolio artifact. The next engineering step would be implementing true EP support: fix EP-aware process-group semantics, map global experts to local experts, dispatch tokens across EP ranks, and feed local expert token counts into GroupedGEMM correctly.

@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="360" viewBox="0 0 920 360">
+  <style>
+    text { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #1f2937; }
+    .title { font-size: 22px; font-weight: 700; }
+    .axis { stroke: #9ca3af; stroke-width: 1; }
+    .grid { stroke: #e5e7eb; stroke-width: 1; }
+    .bar { fill: #059669; }
+    .label { font-size: 13px; }
+    .value { font-size: 13px; font-weight: 600; }
+  </style>
+  <rect width="920" height="360" fill="#ffffff"/>
+  <text x="32" y="36" class="title">Per-GPU Throughput</text>
+  <text x="32" y="60" class="label">Average tokens/s/GPU. Communication-heavy modes trade efficiency for sharding capability.</text>
+  <line x1="120" y1="300" x2="880" y2="300" class="axis"/>
+  <line x1="120" y1="80" x2="120" y2="300" class="axis"/>
+  <line x1="120" y1="247.8" x2="880" y2="247.8" class="grid"/><text x="72" y="252" class="label">2K</text>
+  <line x1="120" y1="195.6" x2="880" y2="195.6" class="grid"/><text x="72" y="200" class="label">4K</text>
+  <line x1="120" y1="143.4" x2="880" y2="143.4" class="grid"/><text x="72" y="148" class="label">6K</text>
+  <line x1="120" y1="91.2" x2="880" y2="91.2" class="grid"/><text x="72" y="96" class="label">8K</text>
+  <rect class="bar" x="145" y="24.7" width="60" height="275.3"/><text x="139" y="323" class="label">1GPU</text><text x="141" y="18" class="value">10.5K</text>
+  <rect class="bar" x="245" y="65.4" width="60" height="234.6"/><text x="239" y="323" class="label">DP2</text><text x="245" y="58" class="value">9.0K</text>
+  <rect class="bar" x="345" y="165.5" width="60" height="134.5"/><text x="337" y="323" class="label">TP2</text><text x="345" y="158" class="value">5.2K</text>
+  <rect class="bar" x="445" y="151.9" width="60" height="148.1"/><text x="437" y="323" class="label">PP2</text><text x="445" y="144" class="value">5.7K</text>
+  <rect class="bar" x="545" y="151.9" width="60" height="148.1"/><text x="535" y="323" class="label">DP4</text><text x="545" y="144" class="value">5.7K</text>
+  <rect class="bar" x="645" y="169.0" width="60" height="131.0"/><text x="613" y="323" class="label">DP2+TP2</text><text x="645" y="162" class="value">5.0K</text>
+  <rect class="bar" x="745" y="166.2" width="60" height="133.8"/><text x="713" y="323" class="label">DP2+PP2</text><text x="745" y="159" class="value">5.1K</text>
+</svg>

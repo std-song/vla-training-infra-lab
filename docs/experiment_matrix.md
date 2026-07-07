@@ -24,10 +24,14 @@ Do not jump directly to `DP/TP/PP/EP=8-way complexity`. Each axis should be vali
 | tp2_resume_120 | 2 | 1 | 2 | 1 | 1 | resume TP checkpoint from step 100 to 120 | done |
 | pp2_100 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel training and checkpoint | done |
 | pp2_resume_120 | 2 | 1 | 1 | 2 | 1 | resume PP checkpoint from step 100 to 120 | done |
+| dp4_4gpu | 4 | 4 | 1 | 1 | 1 | 4-GPU DP composition | done |
+| tp2_dp2_4gpu | 4 | 2 | 2 | 1 | 1 | 4-GPU DP+TP composition | done |
+| pp2_dp2_4gpu | 4 | 2 | 1 | 2 | 1 | 4-GPU DP+PP composition | done |
+| ep2_dp2_4gpu | 4 | 2 | 1 | 1 | 2 | EP readiness attempt | blocked at local expert accounting |
 
 ## Near-Term Experiments
 
-The 2-GPU DP, TP, and PP axes are complete. The near-term work is now 8-GPU composition and EP readiness inspection.
+The 2-GPU DP, TP, and PP axes plus 4-GPU DP/TP/PP compositions are complete. The near-term work is true EP implementation, not more config-only scaling.
 
 ## 8-GPU Target Experiments
 

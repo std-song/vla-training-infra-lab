@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="260" viewBox="0 0 920 260">
+  <style>
+    text { font-family: Inter, Segoe UI, Arial, sans-serif; fill: #1f2937; }
+    .title { font-size: 22px; font-weight: 700; }
+    .cell { stroke: #ffffff; stroke-width: 3; rx: 8; }
+    .done { fill: #10b981; }
+    .partial { fill: #f59e0b; }
+    .todo { fill: #e5e7eb; }
+    .label { font-size: 14px; font-weight: 600; fill: #ffffff; }
+    .dark { fill: #374151; }
+    .note { font-size: 13px; fill: #4b5563; }
+  </style>
+  <rect width="920" height="260" fill="#ffffff"/>
+  <text x="32" y="36" class="title">Distributed-Axis Coverage</text>
+  <text x="32" y="60" class="note">4xRTX 3090 project status after the July 2026 experiments.</text>
+  <rect x="70" y="95" width="150" height="70" class="cell done"/><text x="104" y="126" class="label">DP</text><text x="93" y="148" class="label">DP=4 done</text>
+  <rect x="250" y="95" width="150" height="70" class="cell done"/><text x="284" y="126" class="label">TP</text><text x="267" y="148" class="label">TP2+DP2</text>
+  <rect x="430" y="95" width="150" height="70" class="cell done"/><text x="464" y="126" class="label">PP</text><text x="447" y="148" class="label">PP2+DP2</text>
+  <rect x="610" y="95" width="150" height="70" class="cell partial"/><text x="646" y="126" class="label">EP</text><text x="626" y="148" class="label">gap found</text>
+  <text x="70" y="205" class="note">EP2+DP2 passes process-group initialization after a minimal assert fix, then fails in MoE local expert accounting / GroupedGEMM batch sizes.</text>
+</svg>
