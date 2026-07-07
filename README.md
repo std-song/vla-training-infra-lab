@@ -121,7 +121,12 @@ Start with the integrated report: [`results/project2_final_report.md`](results/p
 
 ![Official SmolVLA DDP tuning](assets/figures/project2_official_smolvla_ddp_tuning.svg)
 
+
+## Project 3: Qwen2 VLA Inference Acceleration
+
+Project 3 has started with a Qwen2-0.5B based VLA-style inference benchmark. The first stage measures prefill latency, decode latency, estimated TTFT, TPOT, decode tokens/s, and GPU memory under PyTorch SDPA + BF16. See [`docs/project3_quickstart.md`](docs/project3_quickstart.md) and [`project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py`](project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py).
+
 ## Next Step
 
-Project 1 is complete as a 4-GPU training-infrastructure portfolio artifact. Project 2's next engineering step is a final integrated report and resume-ready project summary.
+Project 1 and Project 2 are complete as portfolio artifacts. Project 3's next engineering step is to run the Qwen2 prefill/decode SDPA BF16 baseline on the RTX 4080 SUPER instance and turn the CSV into the first inference profiling report.
 
