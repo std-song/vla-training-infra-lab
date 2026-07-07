@@ -124,13 +124,15 @@ Start with the integrated report: [`results/project2_final_report.md`](results/p
 
 ## Project 3: Qwen2 VLA Inference Acceleration
 
-Project 3 has started with a Qwen2-0.5B based VLA-style inference benchmark. The first stages measure prefill latency, decode latency, estimated TTFT, TPOT, decode tokens/s, GPU memory, and no-cache vs KV-cache decode behavior under PyTorch SDPA + BF16. See [`results/project3_qwen2_prefill_decode_baseline.md`](results/project3_qwen2_prefill_decode_baseline.md), [`results/project3_qwen2_kv_cache.md`](results/project3_qwen2_kv_cache.md), [`docs/project3_quickstart.md`](docs/project3_quickstart.md), [`project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py`](project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py), and [`project3_vla_infer/benchmarks/bench_qwen2_kv_cache.py`](project3_vla_infer/benchmarks/bench_qwen2_kv_cache.py).
+Project 3 has started with a Qwen2-0.5B based VLA-style inference benchmark. The first stages measure prefill latency, decode latency, estimated TTFT, TPOT, decode tokens/s, GPU memory, no-cache vs KV-cache decode behavior, and attention backend differences under BF16. See [`results/project3_qwen2_prefill_decode_baseline.md`](results/project3_qwen2_prefill_decode_baseline.md), [`results/project3_qwen2_kv_cache.md`](results/project3_qwen2_kv_cache.md), [`results/project3_qwen2_attention_backends.md`](results/project3_qwen2_attention_backends.md), [`docs/project3_quickstart.md`](docs/project3_quickstart.md), [`project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py`](project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py), and [`project3_vla_infer/benchmarks/bench_qwen2_kv_cache.py`](project3_vla_infer/benchmarks/bench_qwen2_kv_cache.py).
 
 ![Project 3 Qwen2 decode throughput](assets/figures/project3_qwen2_decode_throughput.svg)
 
 ![Project 3 KV cache speedup](assets/figures/project3_qwen2_kv_cache_speedup.svg)
 
+![Project 3 attention backend comparison](assets/figures/project3_qwen2_attention_backends.svg)
+
 ## Next Step
 
-Project 1 and Project 2 are complete as portfolio artifacts. Project 3's next engineering step is attention implementation comparison: SDPA vs eager, then FlashAttention 2 if installation is stable.
+Project 1 and Project 2 are complete as portfolio artifacts. Project 3's next engineering step is a simplified VLA action head plus Triton fused action post-processing kernel.
 

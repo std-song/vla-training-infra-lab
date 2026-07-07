@@ -1,0 +1,52 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="900" height="470" viewBox="0 0 900 470" role="img" aria-labelledby="title desc">
+  <title id="title">Project 3 Qwen2 attention backend comparison</title>
+  <desc id="desc">Comparison of SDPA, eager, and FlashAttention 2 for long-prompt prefill latency and cached decode throughput.</desc>
+  <rect width="900" height="470" fill="#ffffff"/>
+  <text x="42" y="42" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#172033">Attention backend comparison</text>
+  <text x="42" y="68" font-family="Arial, sans-serif" font-size="13" fill="#536174">Qwen2-0.5B, BF16, batch=4, prompt=1024, decode=128</text>
+
+  <text x="130" y="105" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">Prefill latency lower is better</text>
+  <line x1="110" y1="360" x2="390" y2="360" stroke="#d6dbe3"/>
+  <line x1="110" y1="268" x2="390" y2="268" stroke="#eef1f5"/>
+  <line x1="110" y1="176" x2="390" y2="176" stroke="#eef1f5"/>
+  <line x1="110" y1="84" x2="390" y2="84" stroke="#eef1f5"/>
+  <text x="64" y="364" font-family="Arial, sans-serif" font-size="12" fill="#667085">0ms</text>
+  <text x="58" y="272" font-family="Arial, sans-serif" font-size="12" fill="#667085">50ms</text>
+  <text x="51" y="180" font-family="Arial, sans-serif" font-size="12" fill="#667085">100ms</text>
+  <text x="51" y="88" font-family="Arial, sans-serif" font-size="12" fill="#667085">150ms</text>
+  <rect x="130" y="252" width="58" height="108" rx="5" fill="#4f7cff"/>
+  <rect x="220" y="123" width="58" height="237" rx="5" fill="#d76c5b"/>
+  <rect x="310" y="249" width="58" height="111" rx="5" fill="#17a36b"/>
+  <text x="159" y="242" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#172033" text-anchor="middle">58.4</text>
+  <text x="249" y="113" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#172033" text-anchor="middle">128.7</text>
+  <text x="339" y="239" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#172033" text-anchor="middle">60.2</text>
+  <text x="159" y="385" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">SDPA</text>
+  <text x="249" y="385" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">eager</text>
+  <text x="339" y="385" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">FA2</text>
+
+  <text x="520" y="105" font-family="Arial, sans-serif" font-size="15" font-weight="700" fill="#172033">Cached decode throughput higher is better</text>
+  <line x1="500" y1="360" x2="820" y2="360" stroke="#d6dbe3"/>
+  <line x1="500" y1="283" x2="820" y2="283" stroke="#eef1f5"/>
+  <line x1="500" y1="206" x2="820" y2="206" stroke="#eef1f5"/>
+  <line x1="500" y1="129" x2="820" y2="129" stroke="#eef1f5"/>
+  <text x="456" y="364" font-family="Arial, sans-serif" font-size="12" fill="#667085">0</text>
+  <text x="442" y="287" font-family="Arial, sans-serif" font-size="12" fill="#667085">100</text>
+  <text x="442" y="210" font-family="Arial, sans-serif" font-size="12" fill="#667085">200</text>
+  <text x="442" y="133" font-family="Arial, sans-serif" font-size="12" fill="#667085">300</text>
+  <rect x="530" y="109" width="58" height="251" rx="5" fill="#4f7cff"/>
+  <rect x="630" y="119" width="58" height="241" rx="5" fill="#d76c5b"/>
+  <rect x="730" y="225" width="58" height="135" rx="5" fill="#17a36b"/>
+  <text x="559" y="99" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#172033" text-anchor="middle">325.6</text>
+  <text x="659" y="109" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#172033" text-anchor="middle">313.5</text>
+  <text x="759" y="215" font-family="Arial, sans-serif" font-size="12" font-weight="700" fill="#172033" text-anchor="middle">174.7</text>
+  <text x="559" y="385" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">SDPA</text>
+  <text x="659" y="385" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">eager</text>
+  <text x="759" y="385" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">FA2</text>
+
+  <rect x="311" y="424" width="14" height="14" rx="3" fill="#4f7cff"/>
+  <text x="332" y="436" font-family="Arial, sans-serif" font-size="12" fill="#536174">SDPA</text>
+  <rect x="386" y="424" width="14" height="14" rx="3" fill="#d76c5b"/>
+  <text x="407" y="436" font-family="Arial, sans-serif" font-size="12" fill="#536174">eager</text>
+  <rect x="462" y="424" width="14" height="14" rx="3" fill="#17a36b"/>
+  <text x="483" y="436" font-family="Arial, sans-serif" font-size="12" fill="#536174">FlashAttention 2</text>
+</svg>
