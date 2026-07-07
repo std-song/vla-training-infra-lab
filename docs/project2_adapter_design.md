@@ -87,3 +87,21 @@ Implemented components:
 
 This wrapper consumes multi-camera images, robot state, and task text, then predicts a 14-dimensional action target with masked MSE loss. It validates the end-to-end training path before introducing the official SmolVLA model: DataLoader, device transfer, model forward, loss, optimizer, checkpoint save, and checkpoint resume.
 The important training-infra claim is not simply that LeRobot can train SmolVLA. It is that the data schema, shard strategy, batch contract, checkpointing, and profiling path are explicit and reproducible.
+
+## Stage 3b: Nanotron-Style DP Trainer
+
+Implemented components:
+
+- `scripts/train_smolvla_compatible_dp.py`
+
+This trainer adds the distributed surfaces that are needed before moving toward a Nanotron engine integration:
+
+- `torchrun` rank/local-rank/world-size discovery
+- NCCL process-group initialization
+- `DistributedSampler` ownership of LeRobot parquet/video samples
+- `DistributedDataParallel` wrapping
+- all-reduced metrics
+- rank-0 checkpoint save
+- checkpoint resume on 2 GPUs
+
+The current implementation intentionally keeps the lightweight SmolVLA-compatible wrapper so that distributed correctness can be measured without official SmolVLA model complexity. The next comparison step is to run the official LeRobot/SmolVLA DDP fine-tuning entrypoint on the same dataset subset and compare throughput, memory, checkpoint behavior, and DataLoader sensitivity.
