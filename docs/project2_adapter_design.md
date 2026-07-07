@@ -77,4 +77,13 @@ Once batch construction is stable, the Nanotron-facing integration should add:
 - DP smoke training on one node
 - throughput and memory profiling with and without image decode
 
+
+## Stage 3a: SmolVLA-Compatible Wrapper
+
+Implemented components:
+
+- `smolvla_nanotron.models.smolvla_compatible.SmolVLACompatiblePolicy`
+- `scripts/train_smolvla_compatible.py`
+
+This wrapper consumes multi-camera images, robot state, and task text, then predicts a 14-dimensional action target with masked MSE loss. It validates the end-to-end training path before introducing the official SmolVLA model: DataLoader, device transfer, model forward, loss, optimizer, checkpoint save, and checkpoint resume.
 The important training-infra claim is not simply that LeRobot can train SmolVLA. It is that the data schema, shard strategy, batch contract, checkpointing, and profiling path are explicit and reproducible.

@@ -115,10 +115,10 @@ It does not claim true expert-parallel training yet. EP2+DP2 was tested as a rea
 
 ## Project 2: SmolVLA / LeRobot Adapter
 
-Project 2 has started with LeRobot batch dry-runs on `lerobot/aloha_mobile_cabinet`. The first milestones validate local schema discovery, parquet state/action loading, VLA batch collation, task-text mapping, sampled three-camera video decoding, shard-aware video resolution via `meta/episodes`, and a tiny GPU policy smoke train.
+Project 2 has started with LeRobot batch dry-runs on `lerobot/aloha_mobile_cabinet`. The first milestones validate local schema discovery, parquet state/action loading, VLA batch collation, task-text mapping, sampled three-camera video decoding, shard-aware video resolution via `meta/episodes`, a SmolVLA-compatible multimodal policy wrapper, and checkpoint/resume smoke training.
 
-See [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), [`results/project2_lerobot_lowdim_dry_run.md`](results/project2_lerobot_lowdim_dry_run.md), [`results/project2_lerobot_video_dry_run.md`](results/project2_lerobot_video_dry_run.md), [`results/project2_lerobot_dataloader_profile.md`](results/project2_lerobot_dataloader_profile.md), [`results/project2_lerobot_shard_resolver.md`](results/project2_lerobot_shard_resolver.md), and [`results/project2_lerobot_shard_profile.md`](results/project2_lerobot_shard_profile.md).
+See [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), [`results/project2_lerobot_lowdim_dry_run.md`](results/project2_lerobot_lowdim_dry_run.md), [`results/project2_lerobot_video_dry_run.md`](results/project2_lerobot_video_dry_run.md), [`results/project2_lerobot_dataloader_profile.md`](results/project2_lerobot_dataloader_profile.md), [`results/project2_lerobot_shard_resolver.md`](results/project2_lerobot_shard_resolver.md), [`results/project2_lerobot_shard_profile.md`](results/project2_lerobot_shard_profile.md), and [`results/project2_smolvla_compatible_smoke.md`](results/project2_smolvla_compatible_smoke.md).
 
 ## Next Step
 
-Project 1 is complete as a 4-GPU training-infrastructure portfolio artifact. Project 2's next engineering step is introducing a SmolVLA-compatible wrapper on top of the validated LeRobot VLA batch contract.
+Project 1 is complete as a 4-GPU training-infrastructure portfolio artifact. Project 2's next engineering step is replacing the lightweight wrapper with a closer SmolVLA/pretrained-policy integration while preserving the validated data, profiling, and checkpoint surfaces.
