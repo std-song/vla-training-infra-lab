@@ -105,3 +105,15 @@ This trainer adds the distributed surfaces that are needed before moving toward 
 - checkpoint resume on 2 GPUs
 
 The current implementation intentionally keeps the lightweight SmolVLA-compatible wrapper so that distributed correctness can be measured without official SmolVLA model complexity. The next comparison step is to run the official LeRobot/SmolVLA DDP fine-tuning entrypoint on the same dataset subset and compare throughput, memory, checkpoint behavior, and DataLoader sensitivity.
+
+## Stage 3c: Official LeRobot/SmolVLA DDP Baseline
+
+Implemented validation:
+
+- official `lerobot.scripts.lerobot_train` launched with `accelerate launch --num_processes=2 --multi_gpu`
+- local LeRobot snapshot root to avoid Hub metadata lookup during dataset loading
+- `HF_ENDPOINT=https://hf-mirror.com` for the SmolVLM config/processor cache
+- official SmolVLA from scratch with `load_vlm_weights=false`, reduced VLM/expert layers, and default 512x512 image preprocessing
+- checkpoint save at step 2 and official resume to step 3 through checkpoint `train_config.json`
+
+This stage establishes the official baseline that the custom Nanotron-style DP trainer should be compared against. The comparison is infrastructure-level rather than model-quality-level: launcher complexity, data pipeline behavior, checkpoint layout, resume ergonomics, memory, and samples/s after warmup.
