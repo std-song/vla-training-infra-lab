@@ -1,0 +1,41 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" width="820" height="420" viewBox="0 0 820 420" role="img" aria-labelledby="title desc">
+  <title id="title">Official SmolVLA DDP tuning throughput</title>
+  <desc id="desc">Bar chart comparing official SmolVLA DDP throughput with find_unused_parameters enabled and disabled under FP32 and BF16.</desc>
+  <rect width="820" height="420" fill="#ffffff"/>
+  <text x="40" y="40" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#172033">Official SmolVLA DDP tuning</text>
+  <text x="40" y="66" font-family="Arial, sans-serif" font-size="13" fill="#536174">2 GPUs, 50 steps, averaged over logged steps &gt;= 5</text>
+
+  <line x1="82" y1="330" x2="760" y2="330" stroke="#d6dbe3" stroke-width="1"/>
+  <line x1="82" y1="278" x2="760" y2="278" stroke="#eef1f5" stroke-width="1"/>
+  <line x1="82" y1="226" x2="760" y2="226" stroke="#eef1f5" stroke-width="1"/>
+  <line x1="82" y1="174" x2="760" y2="174" stroke="#eef1f5" stroke-width="1"/>
+  <line x1="82" y1="122" x2="760" y2="122" stroke="#eef1f5" stroke-width="1"/>
+  <text x="42" y="334" font-family="Arial, sans-serif" font-size="12" fill="#667085">0</text>
+  <text x="35" y="282" font-family="Arial, sans-serif" font-size="12" fill="#667085">10</text>
+  <text x="35" y="230" font-family="Arial, sans-serif" font-size="12" fill="#667085">20</text>
+  <text x="35" y="178" font-family="Arial, sans-serif" font-size="12" fill="#667085">30</text>
+  <text x="35" y="126" font-family="Arial, sans-serif" font-size="12" fill="#667085">40</text>
+  <text x="82" y="98" font-family="Arial, sans-serif" font-size="12" fill="#667085">samples/s</text>
+
+  <rect x="126" y="207.1" width="104" height="122.9" rx="6" fill="#4f7cff"/>
+  <rect x="252" y="193.0" width="104" height="137.0" rx="6" fill="#17a36b"/>
+  <rect x="464" y="202.0" width="104" height="128.0" rx="6" fill="#4f7cff"/>
+  <rect x="590" y="205.0" width="104" height="125.0" rx="6" fill="#17a36b"/>
+
+  <text x="178" y="197" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">23.63</text>
+  <text x="304" y="183" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">26.35</text>
+  <text x="516" y="192" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">24.61</text>
+  <text x="642" y="195" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#172033" text-anchor="middle">24.04</text>
+
+  <text x="241" y="365" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033" text-anchor="middle">FP32</text>
+  <text x="579" y="365" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#172033" text-anchor="middle">BF16</text>
+  <text x="178" y="348" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">enabled</text>
+  <text x="304" y="348" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">disabled</text>
+  <text x="516" y="348" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">enabled</text>
+  <text x="642" y="348" font-family="Arial, sans-serif" font-size="12" fill="#536174" text-anchor="middle">disabled</text>
+
+  <rect x="522" y="35" width="14" height="14" rx="3" fill="#4f7cff"/>
+  <text x="543" y="47" font-family="Arial, sans-serif" font-size="12" fill="#536174">find_unused_parameters=True</text>
+  <rect x="522" y="58" width="14" height="14" rx="3" fill="#17a36b"/>
+  <text x="543" y="70" font-family="Arial, sans-serif" font-size="12" fill="#536174">find_unused_parameters=False</text>
+</svg>
