@@ -36,6 +36,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Profile LeRobot DataLoader throughput.")
     parser.add_argument("--cache-root", type=Path, required=True)
     parser.add_argument("--repo-id", default="lerobot/aloha_mobile_cabinet")
+    parser.add_argument("--start-index", type=int, default=0)
     parser.add_argument("--limit", type=int, default=256)
     parser.add_argument("--batch-size", type=int, default=4)
     parser.add_argument("--workers", type=int, nargs="+", default=[0, 1, 2, 4])
@@ -75,6 +76,7 @@ def make_loader(args: argparse.Namespace, workers: int) -> DataLoader:
         args.cache_root,
         repo_id=args.repo_id,
         limit=args.limit,
+        start_index=args.start_index,
         include_images=args.include_images,
         image_size=args.image_size if args.include_images else None,
     )

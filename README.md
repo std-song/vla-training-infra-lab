@@ -115,10 +115,10 @@ It does not claim true expert-parallel training yet. EP2+DP2 was tested as a rea
 
 ## Project 2: SmolVLA / LeRobot Adapter
 
-Project 2 has started with LeRobot batch dry-runs on `lerobot/aloha_mobile_cabinet`. The first milestones validate local schema discovery, parquet state/action loading, VLA batch collation, task-text mapping, sampled three-camera video decoding, and a tiny GPU policy smoke train.
+Project 2 has started with LeRobot batch dry-runs on `lerobot/aloha_mobile_cabinet`. The first milestones validate local schema discovery, parquet state/action loading, VLA batch collation, task-text mapping, sampled three-camera video decoding, shard-aware video resolution via `meta/episodes`, and a tiny GPU policy smoke train.
 
-See [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), [`results/project2_lerobot_lowdim_dry_run.md`](results/project2_lerobot_lowdim_dry_run.md), [`results/project2_lerobot_video_dry_run.md`](results/project2_lerobot_video_dry_run.md), and [`results/project2_lerobot_dataloader_profile.md`](results/project2_lerobot_dataloader_profile.md).
+See [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), [`results/project2_lerobot_lowdim_dry_run.md`](results/project2_lerobot_lowdim_dry_run.md), [`results/project2_lerobot_video_dry_run.md`](results/project2_lerobot_video_dry_run.md), [`results/project2_lerobot_dataloader_profile.md`](results/project2_lerobot_dataloader_profile.md), and [`results/project2_lerobot_shard_resolver.md`](results/project2_lerobot_shard_resolver.md).
 
 ## Next Step
 
-Project 1 is complete as a 4-GPU training-infrastructure portfolio artifact. Project 2's next engineering step is replacing the sampled-video resolver with a full `meta/episodes` shard resolver, then benchmarking dataloader workers/prefetching before introducing a SmolVLA-compatible wrapper.
+Project 1 is complete as a 4-GPU training-infrastructure portfolio artifact. Project 2's next engineering step is benchmarking the shard-aware resolver under DataLoader workers/prefetching, then introducing a SmolVLA-compatible wrapper.

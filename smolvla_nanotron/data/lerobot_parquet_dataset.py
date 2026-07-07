@@ -106,37 +106,78 @@ def camera_features(schema: LeRobotSchema) -> list[str]:
     return [name for name, feature in schema.features.items() if feature.get("dtype") == "video"]
 
 
-class VideoFrameDecoder:
-    """Lazy TorchCodec decoder wrapper for sampled LeRobot video frames."""
+def _frame_tensor(frame: Any) -> torch.Tensor:
+    if isinstance(frame, torch.Tensor):
+        return frame
+    data = getattr(frame, "data", None)
+    if isinstance(data, torch.Tensor):
+        return data
+    raise TypeError(f"Unsupported TorchCodec frame type: {type(frame)!r}")
 
-    def __init__(self, snapshot_dir: Path, cameras: list[str], image_size: int | None = None):
-        self.snapshot_dir = snapshot_dir
+
+@dataclass(frozen=True)
+class VideoFrameRef:
+    camera: str
+    chunk_index: int
+    file_index: int
+    video_timestamp: float
+    video_path: Path
+
+
+class VideoShardResolver:
+    """Resolve LeRobot episode/frame rows to camera video shards."""
+
+    def __init__(self, paths: LeRobotCachePaths, cameras: list[str]):
+        if paths.episodes_path is None:
+            raise FileNotFoundError("Missing meta/episodes parquet; cannot resolve video shards.")
+        self.snapshot_dir = paths.snapshot_dir
+        self.cameras = cameras
+        episode_df = pd.read_parquet(paths.episodes_path)
+        self.episode_by_index = {int(row["episode_index"]): row for _, row in episode_df.iterrows()}
+
+    def resolve(self, camera: str, episode_index: int, timestamp: float) -> VideoFrameRef:
+        row = self.episode_by_index[episode_index]
+        prefix = f"videos/{camera}"
+        chunk_index = int(row[f"{prefix}/chunk_index"])
+        file_index = int(row[f"{prefix}/file_index"])
+        from_timestamp = float(row[f"{prefix}/from_timestamp"])
+        video_timestamp = from_timestamp + timestamp
+        video_path = self.snapshot_dir / "videos" / camera / f"chunk-{chunk_index:03d}" / f"file-{file_index:03d}.mp4"
+        if not video_path.exists():
+            raise FileNotFoundError(
+                f"Missing video shard for {camera}: {video_path}. "
+                "Download the required LeRobot video file before enabling images."
+            )
+        return VideoFrameRef(
+            camera=camera,
+            chunk_index=chunk_index,
+            file_index=file_index,
+            video_timestamp=video_timestamp,
+            video_path=video_path,
+        )
+
+
+class VideoFrameDecoder:
+    """Lazy TorchCodec decoder wrapper for LeRobot video shards."""
+
+    def __init__(self, paths: LeRobotCachePaths, cameras: list[str], image_size: int | None = None):
+        self.resolver = VideoShardResolver(paths, cameras)
         self.cameras = cameras
         self.image_size = image_size
-        self._decoders: dict[str, Any] = {}
+        self._decoders: dict[Path, Any] = {}
 
-    def _video_path(self, camera: str) -> Path:
-        # This sampled adapter intentionally targets file-000.mp4. The metadata
-        # resolver for arbitrary episode/file shards is a later pipeline step.
-        path = self.snapshot_dir / "videos" / camera / "chunk-000" / "file-000.mp4"
-        if not path.exists():
-            raise FileNotFoundError(
-                f"Missing sampled video shard for {camera}: {path}. "
-                "Download videos/*/chunk-000/file-000.mp4 first."
-            )
-        return path
-
-    def _decoder(self, camera: str) -> Any:
-        if camera not in self._decoders:
+    def _decoder(self, video_path: Path) -> Any:
+        if video_path not in self._decoders:
             from torchcodec.decoders import VideoDecoder
 
-            self._decoders[camera] = VideoDecoder(str(self._video_path(camera)))
-        return self._decoders[camera]
+            self._decoders[video_path] = VideoDecoder(str(video_path))
+        return self._decoders[video_path]
 
-    def decode(self, frame_index: int) -> dict[str, torch.Tensor]:
+    def decode(self, episode_index: int, timestamp: float) -> dict[str, torch.Tensor]:
         images: dict[str, torch.Tensor] = {}
         for camera in self.cameras:
-            frame = self._decoder(camera)[frame_index]
+            ref = self.resolver.resolve(camera, episode_index, timestamp)
+            frame = _frame_tensor(self._decoder(ref.video_path).get_frame_played_at(ref.video_timestamp))
             if self.image_size is not None:
                 frame = F.interpolate(
                     frame.unsqueeze(0).float(),
@@ -152,7 +193,7 @@ class LeRobotParquetDataset(Dataset):
     """LeRobot parquet dataset view for adapter smoke tests.
 
     By default this reads only low-dimensional state/action/task columns.
-    Set `include_images=True` to decode sampled RGB frames from local video shards.
+    Set `include_images=True` to resolve video shards from `meta/episodes` and decode RGB frames.
     """
 
     def __init__(
@@ -160,21 +201,20 @@ class LeRobotParquetDataset(Dataset):
         cache_root: str | Path,
         repo_id: str = "lerobot/aloha_mobile_cabinet",
         limit: int | None = None,
+        start_index: int = 0,
         include_images: bool = False,
         cameras: list[str] | None = None,
         image_size: int | None = None,
     ):
         self.paths = find_lerobot_snapshot(cache_root, repo_id)
         self.schema = load_schema(self.paths, repo_id)
-        self.frame_df = pd.read_parquet(self.paths.data_path)
-        if limit is not None:
-            self.frame_df = self.frame_df.iloc[:limit].reset_index(drop=True)
+        frame_df = pd.read_parquet(self.paths.data_path)
+        stop_index = None if limit is None else start_index + limit
+        self.frame_df = frame_df.iloc[start_index:stop_index].reset_index(drop=True)
 
         self.include_images = include_images
         self.cameras = cameras or camera_features(self.schema)
-        self.video_decoder = (
-            VideoFrameDecoder(self.paths.snapshot_dir, self.cameras, image_size=image_size) if include_images else None
-        )
+        self.video_decoder = VideoFrameDecoder(self.paths, self.cameras, image_size=image_size) if include_images else None
 
     def __len__(self) -> int:
         return len(self.frame_df)
@@ -182,19 +222,21 @@ class LeRobotParquetDataset(Dataset):
     def __getitem__(self, index: int) -> dict[str, Any]:
         row = self.frame_df.iloc[index]
         task_index = int(row["task_index"])
+        episode_index = int(row["episode_index"])
         frame_index = int(row["frame_index"])
+        timestamp = float(row["timestamp"])
         sample = {
             "state": torch.as_tensor(np.asarray(row["observation.state"]).copy(), dtype=torch.float32),
             "effort": torch.as_tensor(np.asarray(row["observation.effort"]).copy(), dtype=torch.float32),
             "action": torch.as_tensor(np.asarray(row["action"]).copy(), dtype=torch.float32),
-            "episode_index": int(row["episode_index"]),
+            "episode_index": episode_index,
             "frame_index": frame_index,
-            "timestamp": float(row["timestamp"]),
+            "timestamp": timestamp,
             "done": bool(row["next.done"]),
             "index": int(row["index"]),
             "task_index": task_index,
             "task_text": self.schema.task_by_index.get(task_index, ""),
         }
         if self.video_decoder is not None:
-            sample["images"] = self.video_decoder.decode(frame_index)
+            sample["images"] = self.video_decoder.decode(episode_index, timestamp)
         return sample

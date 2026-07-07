@@ -46,10 +46,20 @@ images.cam_right_wrist: float32 or uint8 [B, C, H, W]
 
 4. Measure first-batch decode time and training-loop throughput separately from low-dimensional parquet loading.
 
-Current limitation: this adapter intentionally targets `file-000.mp4` for a small sampled validation. A full production adapter should resolve arbitrary episode/file shards from `meta/episodes`.
+The sampled adapter has been upgraded to a `meta/episodes` shard-aware resolver that maps `episode_index + timestamp` to camera-specific `chunk_index`, `file_index`, and video-local timestamp.
 
 
-## Stage 2b: DataLoader Profiling
+
+## Stage 2b: Shard-Aware Video Resolver
+
+Implemented components:
+
+- `VideoShardResolver`
+- `VideoFrameRef`
+- `LeRobotParquetDataset(start_index=...)`
+
+The resolver uses `meta/episodes` to map each sample to the correct camera video shard. Validation covered both `file-000.mp4` and `file-001.mp4` regions using `start_index=0` and `start_index=99000`.
+## Stage 2c: DataLoader Profiling
 
 Implemented components:
 
@@ -57,6 +67,7 @@ Implemented components:
 - `VLABatch.pin_memory()` for custom-batch pinned memory support
 
 The profiling separates parquet-only loading from sampled three-camera video decoding. On vGPU-32GB, parquet-only loading is fastest with `num_workers=0`, while sampled video decoding improves strongly with worker parallelism and prefetching.
+
 ## Stage 3: SmolVLA / Nanotron Integration
 
 Once batch construction is stable, the Nanotron-facing integration should add:

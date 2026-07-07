@@ -17,6 +17,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--cache-root", type=Path, required=True)
     parser.add_argument("--repo-id", default="lerobot/aloha_mobile_cabinet")
     parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--start-index", type=int, default=0)
     parser.add_argument("--limit", type=int, default=512)
     parser.add_argument("--train-steps", type=int, default=5)
     parser.add_argument("--device", default="cuda" if torch.cuda.is_available() else "cpu")
@@ -46,6 +47,7 @@ def main() -> None:
         args.cache_root,
         repo_id=args.repo_id,
         limit=args.limit,
+        start_index=args.start_index,
         include_images=args.include_images,
         cameras=args.cameras,
         image_size=args.image_size,
