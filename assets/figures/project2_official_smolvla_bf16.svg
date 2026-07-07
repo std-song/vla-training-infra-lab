@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" role="img" aria-label="Official SmolVLA BF16 mixed precision profile">
+  <rect width="760" height="420" fill="#ffffff"/>
+  <text x="40" y="42" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#1f2937">Official SmolVLA DDP: BF16 Mixed Precision</text>
+  <text x="40" y="68" font-family="Arial, sans-serif" font-size="13" fill="#4b5563">2 GPUs, global batch 2, workers=1, 512x512 images</text>
+
+  <line x1="90" y1="330" x2="700" y2="330" stroke="#374151" stroke-width="1.5"/>
+  <line x1="90" y1="100" x2="90" y2="330" stroke="#374151" stroke-width="1.5"/>
+
+  <text x="52" y="334" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">20</text>
+  <text x="52" y="276" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">22</text>
+  <text x="52" y="219" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">24</text>
+  <text x="52" y="161" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">26</text>
+  <text x="52" y="104" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">28</text>
+
+  <line x1="90" y1="272.5" x2="700" y2="272.5" stroke="#e5e7eb"/>
+  <line x1="90" y1="215" x2="700" y2="215" stroke="#e5e7eb"/>
+  <line x1="90" y1="157.5" x2="700" y2="157.5" stroke="#e5e7eb"/>
+  <line x1="90" y1="100" x2="700" y2="100" stroke="#e5e7eb"/>
+
+  <text x="28" y="94" font-family="Arial, sans-serif" font-size="12" fill="#374151" transform="rotate(-90 28,94)">samples/s</text>
+
+  <rect x="150" y="225.6" width="70" height="104.4" rx="4" fill="#64748b"/>
+  <rect x="245" y="197.4" width="70" height="132.6" rx="4" fill="#16a34a"/>
+  <text x="145" y="216" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">23.63</text>
+  <text x="240" y="188" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">24.61</text>
+  <text x="147" y="352" font-family="Arial, sans-serif" font-size="13" fill="#111827">fp32</text>
+  <text x="244" y="352" font-family="Arial, sans-serif" font-size="13" fill="#111827">bf16</text>
+  <text x="167" y="383" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#374151">steps &gt;= 5</text>
+
+  <rect x="445" y="236.0" width="70" height="94.0" rx="4" fill="#64748b"/>
+  <rect x="540" y="115.8" width="70" height="214.2" rx="4" fill="#16a34a"/>
+  <text x="440" y="226" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">23.27</text>
+  <text x="535" y="106" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">27.45</text>
+  <text x="442" y="352" font-family="Arial, sans-serif" font-size="13" fill="#111827">fp32</text>
+  <text x="539" y="352" font-family="Arial, sans-serif" font-size="13" fill="#111827">bf16</text>
+  <text x="462" y="383" font-family="Arial, sans-serif" font-size="14" font-weight="700" fill="#374151">steps &gt;= 40</text>
+
+  <rect x="88" y="396" width="14" height="14" fill="#64748b"/>
+  <text x="108" y="408" font-family="Arial, sans-serif" font-size="13" fill="#374151">fp32/no AMP</text>
+  <rect x="220" y="396" width="14" height="14" fill="#16a34a"/>
+  <text x="240" y="408" font-family="Arial, sans-serif" font-size="13" fill="#374151">Accelerate bf16</text>
+</svg>
