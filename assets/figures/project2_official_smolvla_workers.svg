@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="420" viewBox="0 0 760 420" role="img" aria-label="Official SmolVLA DDP DataLoader worker profile">
+  <rect width="760" height="420" fill="#ffffff"/>
+  <text x="40" y="42" font-family="Arial, sans-serif" font-size="22" font-weight="700" fill="#1f2937">Official SmolVLA DDP: DataLoader Worker Profile</text>
+  <text x="40" y="68" font-family="Arial, sans-serif" font-size="13" fill="#4b5563">2 GPUs, global batch 2, 512x512 images, averaged over steps &gt;= 5</text>
+
+  <line x1="80" y1="330" x2="700" y2="330" stroke="#374151" stroke-width="1.5"/>
+  <line x1="80" y1="100" x2="80" y2="330" stroke="#374151" stroke-width="1.5"/>
+
+  <text x="44" y="334" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">0</text>
+  <text x="38" y="288" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">5</text>
+  <text x="32" y="242" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">10</text>
+  <text x="32" y="196" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">15</text>
+  <text x="32" y="150" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">20</text>
+  <text x="32" y="104" font-family="Arial, sans-serif" font-size="12" fill="#6b7280">25</text>
+
+  <line x1="80" y1="284" x2="700" y2="284" stroke="#e5e7eb"/>
+  <line x1="80" y1="238" x2="700" y2="238" stroke="#e5e7eb"/>
+  <line x1="80" y1="192" x2="700" y2="192" stroke="#e5e7eb"/>
+  <line x1="80" y1="146" x2="700" y2="146" stroke="#e5e7eb"/>
+  <line x1="80" y1="100" x2="700" y2="100" stroke="#e5e7eb"/>
+
+  <text x="90" y="370" font-family="Arial, sans-serif" font-size="13" fill="#374151">num_workers</text>
+  <text x="20" y="93" font-family="Arial, sans-serif" font-size="12" fill="#374151" transform="rotate(-90 20,93)">samples/s</text>
+
+  <rect x="140" y="171.76" width="70" height="158.24" rx="4" fill="#2563eb"/>
+  <rect x="280" y="112.60" width="70" height="217.40" rx="4" fill="#16a34a"/>
+  <rect x="420" y="116.83" width="70" height="213.17" rx="4" fill="#0f766e"/>
+  <rect x="560" y="121.43" width="70" height="208.57" rx="4" fill="#7c3aed"/>
+
+  <text x="158" y="350" font-family="Arial, sans-serif" font-size="14" fill="#111827">0</text>
+  <text x="298" y="350" font-family="Arial, sans-serif" font-size="14" fill="#111827">1</text>
+  <text x="438" y="350" font-family="Arial, sans-serif" font-size="14" fill="#111827">2</text>
+  <text x="578" y="350" font-family="Arial, sans-serif" font-size="14" fill="#111827">4</text>
+
+  <text x="137" y="162" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">17.20</text>
+  <text x="277" y="103" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">23.63</text>
+  <text x="417" y="107" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">23.17</text>
+  <text x="557" y="112" font-family="Arial, sans-serif" font-size="13" font-weight="700" fill="#1f2937">22.67</text>
+
+  <rect x="86" y="382" width="14" height="14" fill="#2563eb"/>
+  <text x="108" y="394" font-family="Arial, sans-serif" font-size="13" fill="#374151">Avg samples/s after warmup</text>
+  <text x="330" y="394" font-family="Arial, sans-serif" font-size="13" fill="#4b5563">data_s: 31.4 ms at workers=0, about 2 ms with workers &gt;=1</text>
+</svg>
