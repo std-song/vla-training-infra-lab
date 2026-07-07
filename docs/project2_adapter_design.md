@@ -66,7 +66,7 @@ Implemented components:
 - `scripts/profile_lerobot_dataloader.py`
 - `VLABatch.pin_memory()` for custom-batch pinned memory support
 
-The profiling separates parquet-only loading from sampled three-camera video decoding. On vGPU-32GB, parquet-only loading is fastest with `num_workers=0`, while sampled video decoding improves strongly with worker parallelism and prefetching.
+The profiling separates parquet-only loading, sampled three-camera video decoding, and the shard-aware resolver with `start_index=0` and `start_index=99000`. On vGPU-32GB, parquet-only loading is fastest with `num_workers=0`, while video decoding improves strongly with worker parallelism and prefetching.
 
 ## Stage 3: SmolVLA / Nanotron Integration
 
