@@ -124,7 +124,9 @@ Start with the integrated report: [`results/project2_final_report.md`](results/p
 
 ## Project 3: Qwen2 VLA Inference Acceleration
 
-Project 3 has started with a Qwen2-0.5B based VLA-style inference benchmark. The first stage measures prefill latency, decode latency, estimated TTFT, TPOT, decode tokens/s, and GPU memory under PyTorch SDPA + BF16. See [`docs/project3_quickstart.md`](docs/project3_quickstart.md) and [`project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py`](project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py).
+Project 3 has started with a Qwen2-0.5B based VLA-style inference benchmark. The first stage measures prefill latency, decode latency, estimated TTFT, TPOT, decode tokens/s, and GPU memory under PyTorch SDPA + BF16. See [`results/project3_qwen2_prefill_decode_baseline.md`](results/project3_qwen2_prefill_decode_baseline.md), [`docs/project3_quickstart.md`](docs/project3_quickstart.md), and [`project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py`](project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py).
+
+![Project 3 Qwen2 decode throughput](assets/figures/project3_qwen2_decode_throughput.svg)
 
 ## Next Step
 
