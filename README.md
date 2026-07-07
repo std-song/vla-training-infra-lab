@@ -117,7 +117,7 @@ It does not claim true expert-parallel training yet. EP2+DP2 was tested as a rea
 
 Project 2 has started with LeRobot batch dry-runs on `lerobot/aloha_mobile_cabinet`. The first milestones validate local schema discovery, parquet state/action loading, VLA batch collation, task-text mapping, sampled three-camera video decoding, and a tiny GPU policy smoke train.
 
-See [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), [`results/project2_lerobot_lowdim_dry_run.md`](results/project2_lerobot_lowdim_dry_run.md), and [`results/project2_lerobot_video_dry_run.md`](results/project2_lerobot_video_dry_run.md).
+See [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), [`results/project2_lerobot_lowdim_dry_run.md`](results/project2_lerobot_lowdim_dry_run.md), [`results/project2_lerobot_video_dry_run.md`](results/project2_lerobot_video_dry_run.md), and [`results/project2_lerobot_dataloader_profile.md`](results/project2_lerobot_dataloader_profile.md).
 
 ## Next Step
 

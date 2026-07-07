@@ -20,6 +20,24 @@ class VLABatch:
     task_text: list[str]
     images: dict[str, torch.Tensor] | None = None
 
+    def pin_memory(self) -> "VLABatch":
+        images = None
+        if self.images is not None:
+            images = {camera: tensor.pin_memory() for camera, tensor in self.images.items()}
+        return VLABatch(
+            state=self.state.pin_memory(),
+            effort=self.effort.pin_memory(),
+            action=self.action.pin_memory(),
+            action_mask=self.action_mask.pin_memory(),
+            episode_index=self.episode_index.pin_memory(),
+            frame_index=self.frame_index.pin_memory(),
+            timestamp=self.timestamp.pin_memory(),
+            done=self.done.pin_memory(),
+            task_index=self.task_index.pin_memory(),
+            task_text=self.task_text,
+            images=images,
+        )
+
 
 def collate_lerobot_lowdim(samples: list[dict[str, Any]]) -> VLABatch:
     state = torch.stack([sample["state"] for sample in samples], dim=0)

@@ -48,6 +48,15 @@ images.cam_right_wrist: float32 or uint8 [B, C, H, W]
 
 Current limitation: this adapter intentionally targets `file-000.mp4` for a small sampled validation. A full production adapter should resolve arbitrary episode/file shards from `meta/episodes`.
 
+
+## Stage 2b: DataLoader Profiling
+
+Implemented components:
+
+- `scripts/profile_lerobot_dataloader.py`
+- `VLABatch.pin_memory()` for custom-batch pinned memory support
+
+The profiling separates parquet-only loading from sampled three-camera video decoding. On vGPU-32GB, parquet-only loading is fastest with `num_workers=0`, while sampled video decoding improves strongly with worker parallelism and prefetching.
 ## Stage 3: SmolVLA / Nanotron Integration
 
 Once batch construction is stable, the Nanotron-facing integration should add:
