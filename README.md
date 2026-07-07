@@ -115,10 +115,10 @@ It does not claim true expert-parallel training yet. EP2+DP2 was tested as a rea
 
 ## Project 2: SmolVLA / LeRobot Adapter
 
-Project 2 has started with a LeRobot low-dimensional batch dry-run on `lerobot/aloha_mobile_cabinet`. The first milestone validates local schema discovery, parquet state/action loading, VLA batch collation, task-text mapping, and a tiny GPU policy smoke train without downloading the full video payload.
+Project 2 has started with LeRobot batch dry-runs on `lerobot/aloha_mobile_cabinet`. The first milestones validate local schema discovery, parquet state/action loading, VLA batch collation, task-text mapping, sampled three-camera video decoding, and a tiny GPU policy smoke train.
 
-See [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), and [`results/project2_lerobot_lowdim_dry_run.md`](results/project2_lerobot_lowdim_dry_run.md).
+See [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), [`results/project2_lerobot_lowdim_dry_run.md`](results/project2_lerobot_lowdim_dry_run.md), and [`results/project2_lerobot_video_dry_run.md`](results/project2_lerobot_video_dry_run.md).
 
 ## Next Step
 
-Project 1 is complete as a 4-GPU training-infrastructure portfolio artifact. Project 2's next engineering step is adding sampled video decoding and image batch collation, then measuring dataloader throughput before replacing the tiny policy with a SmolVLA-compatible wrapper.
+Project 1 is complete as a 4-GPU training-infrastructure portfolio artifact. Project 2's next engineering step is replacing the sampled-video resolver with a full `meta/episodes` shard resolver, then benchmarking dataloader workers/prefetching before introducing a SmolVLA-compatible wrapper.

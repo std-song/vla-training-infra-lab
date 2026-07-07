@@ -8,6 +8,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 import torch
+import torch.nn.functional as F
 from torch.utils.data import Dataset
 
 
@@ -101,19 +102,79 @@ def load_schema(paths: LeRobotCachePaths, repo_id: str) -> LeRobotSchema:
     )
 
 
-class LeRobotParquetDataset(Dataset):
-    """Low-dimensional LeRobot dataset view for adapter smoke tests.
+def camera_features(schema: LeRobotSchema) -> list[str]:
+    return [name for name, feature in schema.features.items() if feature.get("dtype") == "video"]
 
-    This intentionally reads only parquet columns such as state/action/task metadata.
-    Video decoding is left for a later image pipeline stage.
+
+class VideoFrameDecoder:
+    """Lazy TorchCodec decoder wrapper for sampled LeRobot video frames."""
+
+    def __init__(self, snapshot_dir: Path, cameras: list[str], image_size: int | None = None):
+        self.snapshot_dir = snapshot_dir
+        self.cameras = cameras
+        self.image_size = image_size
+        self._decoders: dict[str, Any] = {}
+
+    def _video_path(self, camera: str) -> Path:
+        # This sampled adapter intentionally targets file-000.mp4. The metadata
+        # resolver for arbitrary episode/file shards is a later pipeline step.
+        path = self.snapshot_dir / "videos" / camera / "chunk-000" / "file-000.mp4"
+        if not path.exists():
+            raise FileNotFoundError(
+                f"Missing sampled video shard for {camera}: {path}. "
+                "Download videos/*/chunk-000/file-000.mp4 first."
+            )
+        return path
+
+    def _decoder(self, camera: str) -> Any:
+        if camera not in self._decoders:
+            from torchcodec.decoders import VideoDecoder
+
+            self._decoders[camera] = VideoDecoder(str(self._video_path(camera)))
+        return self._decoders[camera]
+
+    def decode(self, frame_index: int) -> dict[str, torch.Tensor]:
+        images: dict[str, torch.Tensor] = {}
+        for camera in self.cameras:
+            frame = self._decoder(camera)[frame_index]
+            if self.image_size is not None:
+                frame = F.interpolate(
+                    frame.unsqueeze(0).float(),
+                    size=(self.image_size, self.image_size),
+                    mode="bilinear",
+                    align_corners=False,
+                ).squeeze(0).to(torch.uint8)
+            images[camera] = frame.contiguous()
+        return images
+
+
+class LeRobotParquetDataset(Dataset):
+    """LeRobot parquet dataset view for adapter smoke tests.
+
+    By default this reads only low-dimensional state/action/task columns.
+    Set `include_images=True` to decode sampled RGB frames from local video shards.
     """
 
-    def __init__(self, cache_root: str | Path, repo_id: str = "lerobot/aloha_mobile_cabinet", limit: int | None = None):
+    def __init__(
+        self,
+        cache_root: str | Path,
+        repo_id: str = "lerobot/aloha_mobile_cabinet",
+        limit: int | None = None,
+        include_images: bool = False,
+        cameras: list[str] | None = None,
+        image_size: int | None = None,
+    ):
         self.paths = find_lerobot_snapshot(cache_root, repo_id)
         self.schema = load_schema(self.paths, repo_id)
         self.frame_df = pd.read_parquet(self.paths.data_path)
         if limit is not None:
             self.frame_df = self.frame_df.iloc[:limit].reset_index(drop=True)
+
+        self.include_images = include_images
+        self.cameras = cameras or camera_features(self.schema)
+        self.video_decoder = (
+            VideoFrameDecoder(self.paths.snapshot_dir, self.cameras, image_size=image_size) if include_images else None
+        )
 
     def __len__(self) -> int:
         return len(self.frame_df)
@@ -121,16 +182,19 @@ class LeRobotParquetDataset(Dataset):
     def __getitem__(self, index: int) -> dict[str, Any]:
         row = self.frame_df.iloc[index]
         task_index = int(row["task_index"])
-        return {
+        frame_index = int(row["frame_index"])
+        sample = {
             "state": torch.as_tensor(np.asarray(row["observation.state"]).copy(), dtype=torch.float32),
             "effort": torch.as_tensor(np.asarray(row["observation.effort"]).copy(), dtype=torch.float32),
             "action": torch.as_tensor(np.asarray(row["action"]).copy(), dtype=torch.float32),
             "episode_index": int(row["episode_index"]),
-            "frame_index": int(row["frame_index"]),
+            "frame_index": frame_index,
             "timestamp": float(row["timestamp"]),
             "done": bool(row["next.done"]),
             "index": int(row["index"]),
             "task_index": task_index,
             "task_text": self.schema.task_by_index.get(task_index, ""),
         }
-
+        if self.video_decoder is not None:
+            sample["images"] = self.video_decoder.decode(frame_index)
+        return sample

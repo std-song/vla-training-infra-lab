@@ -18,12 +18,19 @@ class VLABatch:
     done: torch.Tensor
     task_index: torch.Tensor
     task_text: list[str]
+    images: dict[str, torch.Tensor] | None = None
 
 
 def collate_lerobot_lowdim(samples: list[dict[str, Any]]) -> VLABatch:
     state = torch.stack([sample["state"] for sample in samples], dim=0)
     effort = torch.stack([sample["effort"] for sample in samples], dim=0)
     action = torch.stack([sample["action"] for sample in samples], dim=0)
+
+    images = None
+    if "images" in samples[0]:
+        cameras = samples[0]["images"].keys()
+        images = {camera: torch.stack([sample["images"][camera] for sample in samples], dim=0) for camera in cameras}
+
     return VLABatch(
         state=state,
         effort=effort,
@@ -35,6 +42,7 @@ def collate_lerobot_lowdim(samples: list[dict[str, Any]]) -> VLABatch:
         done=torch.tensor([sample["done"] for sample in samples], dtype=torch.bool),
         task_index=torch.tensor([sample["task_index"] for sample in samples], dtype=torch.long),
         task_text=[sample["task_text"] for sample in samples],
+        images=images,
     )
 
 
@@ -51,6 +59,9 @@ def describe_batch(batch: VLABatch) -> str:
         f"  done={tuple(batch.done.shape)} {batch.done.dtype}",
         f"  task_index={tuple(batch.task_index.shape)} {batch.task_index.dtype}",
         f"  task_text[0]={batch.task_text[0] if batch.task_text else ''!r}",
-        ")",
     ]
+    if batch.images is not None:
+        for camera, image_batch in batch.images.items():
+            lines.append(f"  images[{camera}]={tuple(image_batch.shape)} {image_batch.dtype}")
+    lines.append(")")
     return "\n".join(lines)

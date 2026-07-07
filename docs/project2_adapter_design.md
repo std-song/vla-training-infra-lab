@@ -32,10 +32,10 @@ The tiny policy is not intended to be SmolVLA. It is a cheap trainable target us
 
 ## Stage 2: Image Batch Adapter
 
-Next step after the low-dimensional path is stable:
+Implemented as a sampled-video path after the low-dimensional path became stable:
 
-1. Resolve per-frame video path and timestamp from `meta/episodes`.
-2. Decode a small sampled subset of RGB frames with TorchCodec.
+1. Decode sampled `videos/*/chunk-000/file-000.mp4` shards with TorchCodec.
+2. Resize sampled frames to a fixed square size for batch validation.
 3. Add image tensors to the batch contract:
 
 ```text
@@ -44,7 +44,9 @@ images.cam_left_wrist:  float32 or uint8 [B, C, H, W]
 images.cam_right_wrist: float32 or uint8 [B, C, H, W]
 ```
 
-4. Measure decode throughput separately from model throughput.
+4. Measure first-batch decode time and training-loop throughput separately from low-dimensional parquet loading.
+
+Current limitation: this adapter intentionally targets `file-000.mp4` for a small sampled validation. A full production adapter should resolve arbitrary episode/file shards from `meta/episodes`.
 
 ## Stage 3: SmolVLA / Nanotron Integration
 
