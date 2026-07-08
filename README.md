@@ -124,7 +124,7 @@ Start with the integrated report: [`results/project2_final_report.md`](results/p
 
 ## Project 3: Qwen2 VLA Inference Acceleration
 
-Project 3 has started with a Qwen2-0.5B based VLA-style inference benchmark. The completed stages measure prefill latency, decode latency, estimated TTFT, TPOT, decode tokens/s, GPU memory, no-cache vs KV-cache decode behavior, attention backend differences, and a VLA-specific Triton fused action post-processing kernel under BF16. See [`results/project3_qwen2_prefill_decode_baseline.md`](results/project3_qwen2_prefill_decode_baseline.md), [`results/project3_qwen2_kv_cache.md`](results/project3_qwen2_kv_cache.md), [`results/project3_qwen2_attention_backends.md`](results/project3_qwen2_attention_backends.md), [`results/project3_vla_action_triton.md`](results/project3_vla_action_triton.md), [`docs/project3_quickstart.md`](docs/project3_quickstart.md), and [`project3_vla_infer/benchmarks`](project3_vla_infer/benchmarks).
+Project 3 is a Qwen2-0.5B based VLA-style inference acceleration lab. It measures prefill/decode latency, estimated TTFT, TPOT, decode tokens/s, GPU memory, no-cache vs KV-cache behavior, attention backend differences, and a VLA-specific Triton fused action post-processing kernel under BF16. Start with [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md). Supporting reports include [`results/project3_qwen2_prefill_decode_baseline.md`](results/project3_qwen2_prefill_decode_baseline.md), [`results/project3_qwen2_kv_cache.md`](results/project3_qwen2_kv_cache.md), [`results/project3_qwen2_attention_backends.md`](results/project3_qwen2_attention_backends.md), and [`results/project3_vla_action_triton.md`](results/project3_vla_action_triton.md).
 
 ![Project 3 Qwen2 decode throughput](assets/figures/project3_qwen2_decode_throughput.svg)
 
@@ -136,5 +136,5 @@ Project 3 has started with a Qwen2-0.5B based VLA-style inference benchmark. The
 
 ## Next Step
 
-Project 1 and Project 2 are complete as portfolio artifacts. Project 3's next engineering step is a final integrated report and resume-ready project summary.
+Projects 1-3 are complete as portfolio artifacts. The next step is to consolidate the three projects into resume project entries and an interview narrative for VLA training infrastructure roles.
 
