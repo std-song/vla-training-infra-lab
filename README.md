@@ -122,17 +122,17 @@ Start with the integrated report: [`results/project2_final_report.md`](results/p
 ![Official SmolVLA DDP tuning](assets/figures/project2_official_smolvla_ddp_tuning.svg)
 
 
-## Project 3: Qwen2.5-VL VLA-Style Inference Profiling
+## Project 3: Qwen2.5-VL VLA-Style Serving Prototype
 
-Project 3 is now a Qwen2.5-VL-3B based VLA-style inference profiling lab with real image inputs and visual tokens. It measures image preprocessing, multimodal prefill, estimated TTFT, TPOT, decode throughput, GPU memory, visual-token scaling under single-camera and three-camera inputs, plus a Qwen3 language-backbone subtest for KV-cache and attention-backend behavior. Start with [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md), and reproduction commands are in [`docs/project3_quickstart.md`](docs/project3_quickstart.md).
+Project 3 is now a Qwen2.5-VL-3B based VLA-style serving prototype with real image inputs and visual tokens. It measures image preprocessing, multimodal prefill, estimated TTFT, TPOT, decode throughput, GPU memory, visual-token scaling under single-camera and three-camera inputs, and implements visual input cache, same-shape microbatching, and KV cache footprint accounting. It also keeps a Qwen3 language-backbone subtest for KV-cache and attention-backend behavior, plus a Triton fused action post-processing kernel. Start with [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md), and reproduction commands are in [`docs/project3_quickstart.md`](docs/project3_quickstart.md).
+
+![Project 3 Qwen2.5-VL serving throughput](assets/figures/project3_qwen25vl_serving_throughput.svg)
+
+![Project 3 Qwen2.5-VL serving speedup](assets/figures/project3_qwen25vl_serving_speedup.svg)
 
 ![Project 3 Qwen2.5-VL visual tokens](assets/figures/project3_qwen25vl_visual_tokens.svg)
 
-![Project 3 Qwen2.5-VL prefill latency](assets/figures/project3_qwen25vl_prefill_latency.svg)
-
-![Project 3 Qwen2.5-VL TTFT](assets/figures/project3_qwen25vl_ttft.svg)
-
-![Project 3 Qwen3 KV cache speedup](assets/figures/project3_qwen3_kv_cache_speedup.svg)
+![Project 3 Qwen2.5-VL KV footprint](assets/figures/project3_qwen25vl_kv_footprint.svg)
 
 ![Project 3 action Triton speedup](assets/figures/project3_qwen3_vla_action_triton.svg)
 

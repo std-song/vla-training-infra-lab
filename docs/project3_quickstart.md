@@ -1,6 +1,6 @@
-﻿# Project 3 Quick Start: Qwen2.5-VL VLA-Style Inference Profiling
+﻿# Project 3 Quick Start: Qwen2.5-VL VLA-Style Serving Prototype
 
-Project 3 studies VLA-style inference with real image inputs through Qwen2.5-VL-3B, plus a Qwen3 language-backbone subtest for KV-cache and attention backend behavior.
+Project 3 studies VLA-style serving with real image inputs through Qwen2.5-VL-3B. It includes visual-token profiling, a lightweight serving prototype with visual input cache and same-shape microbatching, a Qwen3 language-backbone subtest for KV-cache and attention backend behavior, and a Triton fused action post-processing kernel.
 
 ## Environment
 
@@ -18,22 +18,7 @@ Validated on AutoDL with:
 export MODEL_DIR=/root/autodl-tmp/vla-infra-project3/modelscope/models/Qwen--Qwen2.5-VL-3B-Instruct/snapshots/master
 ```
 
-## Visual-token smoke
-
-```bash
-python project3_vla_infer/benchmarks/bench_qwen25vl_visual_tokens.py \
-  --model-dir "$MODEL_DIR" \
-  --image-sizes 224 \
-  --image-counts 1 \
-  --decode-lengths 4 \
-  --repeat 1 \
-  --warmup-decode 1 \
-  --dtype bf16 \
-  --attn-implementation sdpa \
-  --out project3_vla_infer/results/qwen25vl_visual_tokens_smoke.csv
-```
-
-## Dynamic visual-token profiling
+## Visual-token profiling
 
 ```bash
 python project3_vla_infer/benchmarks/bench_qwen25vl_visual_tokens.py \
@@ -50,15 +35,62 @@ python project3_vla_infer/benchmarks/bench_qwen25vl_visual_tokens.py \
   --out project3_vla_infer/results/qwen25vl_visual_tokens_dynamic_pixels_sdpa_bf16.csv
 ```
 
-The VLM script measures:
+## Serving prototype
 
-- image preprocessing time;
-- CPU-to-GPU tensor transfer time;
-- multimodal prefill latency;
-- estimated TTFT;
-- estimated decode TPOT from `generate(max_new_tokens) - prefill`;
-- input token count and visual marker token count;
-- CUDA peak memory.
+Smoke:
+
+```bash
+python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
+  --model-dir "$MODEL_DIR" \
+  --request-count 2 \
+  --image-count 1 \
+  --image-size 224 \
+  --decode-len 8 \
+  --repeat 1 \
+  --min-pixels 3136 \
+  --max-pixels 802816 \
+  --dtype bf16 \
+  --attn-implementation sdpa \
+  --out project3_vla_infer/results/qwen25vl_serving_prototype_smoke.csv
+```
+
+8-request three-camera benchmark:
+
+```bash
+python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
+  --model-dir "$MODEL_DIR" \
+  --request-count 8 \
+  --image-count 3 \
+  --image-size 224 \
+  --decode-len 32 \
+  --repeat 3 \
+  --min-pixels 3136 \
+  --max-pixels 802816 \
+  --dtype bf16 \
+  --attn-implementation sdpa \
+  --out project3_vla_infer/results/qwen25vl_serving_prototype_8req_3x224_d32.csv
+
+python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
+  --model-dir "$MODEL_DIR" \
+  --request-count 8 \
+  --image-count 3 \
+  --image-size 448 \
+  --decode-len 32 \
+  --repeat 3 \
+  --min-pixels 3136 \
+  --max-pixels 802816 \
+  --dtype bf16 \
+  --attn-implementation sdpa \
+  --out project3_vla_infer/results/qwen25vl_serving_prototype_8req_3x448_d32.csv
+```
+
+The serving prototype compares:
+
+- cold serial requests;
+- visual-input-cache serial generation;
+- visual-input-cache plus same-shape microbatching.
+
+It reports requests/s, per-request latency, speedup, peak memory, and estimated KV cache footprint.
 
 ## Qwen3 language-backbone subtest
 
@@ -88,5 +120,6 @@ python project3_vla_infer/benchmarks/bench_vla_action_head_triton.py \
 
 ```bash
 python scripts/make_project3_qwen25vl_figures.py
+python scripts/make_project3_serving_figures.py
 python scripts/make_project3_qwen3_figures.py
 ```

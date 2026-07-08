@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440">
+<rect width="100%" height="100%" fill="#fbfbf8"/>
+<text x="450.0" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700">Qwen2.5-VL Per-Request Latency, 8 Requests</text>
+<line x1="86" y1="350" x2="870" y2="350" stroke="#333"/>
+<line x1="86" y1="60" x2="86" y2="350" stroke="#333"/>
+<text x="22" y="205.0" transform="rotate(-90 22 205.0)" text-anchor="middle" font-family="Arial" font-size="13">ms/request</text>
+<line x1="82" y1="350.0" x2="870" y2="350.0" stroke="#ddd"/>
+<text x="76" y="354.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">0.0</text>
+<line x1="82" y1="277.5" x2="870" y2="277.5" stroke="#ddd"/>
+<text x="76" y="281.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">229.4</text>
+<line x1="82" y1="205.0" x2="870" y2="205.0" stroke="#ddd"/>
+<text x="76" y="209.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">458.8</text>
+<line x1="82" y1="132.5" x2="870" y2="132.5" stroke="#ddd"/>
+<text x="76" y="136.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">688.1</text>
+<line x1="82" y1="60.0" x2="870" y2="60.0" stroke="#ddd"/>
+<text x="76" y="64.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">917.5</text>
+<rect x="113.4" y="148.6" width="75.8" height="201.4" rx="3" fill="#2f6f73"/>
+<text x="151.3" y="140.6" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">637.30</text>
+<text x="151.3" y="374" text-anchor="middle" font-family="Arial" font-size="10">3x224\ncold</text>
+<rect x="244.1" y="160.1" width="75.8" height="189.9" rx="3" fill="#c55f36"/>
+<text x="282.0" y="152.1" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">600.70</text>
+<text x="282.0" y="374" text-anchor="middle" font-family="Arial" font-size="10">3x224\ncache</text>
+<rect x="374.8" y="314.2" width="75.8" height="35.8" rx="3" fill="#455a8a"/>
+<text x="412.7" y="306.2" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">113.39</text>
+<text x="412.7" y="374" text-anchor="middle" font-family="Arial" font-size="10">3x224\nmicrobatch</text>
+<rect x="505.4" y="104.2" width="75.8" height="245.8" rx="3" fill="#8b6f2f"/>
+<text x="543.3" y="96.2" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">777.54</text>
+<text x="543.3" y="374" text-anchor="middle" font-family="Arial" font-size="10">3x448\ncold</text>
+<rect x="636.1" y="125.0" width="75.8" height="225.0" rx="3" fill="#5c7f3b"/>
+<text x="674.0" y="117.0" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">711.85</text>
+<text x="674.0" y="374" text-anchor="middle" font-family="Arial" font-size="10">3x448\ncache</text>
+<rect x="766.8" y="273.5" width="75.8" height="76.5" rx="3" fill="#7a4f86"/>
+<text x="804.7" y="265.5" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">242.09</text>
+<text x="804.7" y="374" text-anchor="middle" font-family="Arial" font-size="10">3x448\nmicrobatch</text>
+</svg>
