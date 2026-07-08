@@ -92,6 +92,44 @@ The serving prototype compares:
 
 It reports requests/s, per-request latency, speedup, peak memory, and estimated KV cache footprint.
 
+
+## Paged KV and continuous batching simulator
+
+```bash
+python project3_vla_infer/simulators/paged_kv_continuous_batching.py \
+  --request-count 128 \
+  --mean-arrival-ms 90 \
+  --kv-budget-mib 512 \
+  --max-active 16 \
+  --block-size 16 \
+  --out project3_vla_infer/results/qwen25vl_paged_kv_continuous_batching.csv
+
+python project3_vla_infer/simulators/paged_kv_continuous_batching.py \
+  --request-count 128 \
+  --mean-arrival-ms 90 \
+  --kv-budget-mib 256 \
+  --max-active 16 \
+  --block-size 16 \
+  --out project3_vla_infer/results/qwen25vl_paged_kv_budget256.csv
+```
+
+The simulator compares serial execution, continuous batching with static KV reservation, naive paged KV, and guarded paged KV admission.
+
+
+## Bucketed scheduler and prefix-cache simulator
+
+```bash
+python project3_vla_infer/simulators/bucketed_prefix_cache.py \
+  --request-count 256 \
+  --mean-arrival-ms 70 \
+  --max-batch-tokens 4096 \
+  --max-batch-requests 16 \
+  --prefix-pool 32 \
+  --out project3_vla_infer/results/qwen25vl_bucketed_prefix_cache_sim.csv
+```
+
+The simulator compares FCFS, shape-aware buckets, token-budget buckets, and prefix-cache hits for repeated VLA visual/task prefixes.
+
 ## Qwen3 language-backbone subtest
 
 ```bash
@@ -121,5 +159,7 @@ python project3_vla_infer/benchmarks/bench_vla_action_head_triton.py \
 ```bash
 python scripts/make_project3_qwen25vl_figures.py
 python scripts/make_project3_serving_figures.py
+python scripts/make_project3_paged_kv_figures.py
+python scripts/make_project3_bucketed_scheduler_figures.py
 python scripts/make_project3_qwen3_figures.py
 ```

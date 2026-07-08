@@ -124,7 +124,7 @@ Start with the integrated report: [`results/project2_final_report.md`](results/p
 
 ## Project 3: Qwen2.5-VL VLA-Style Serving Prototype
 
-Project 3 is now a Qwen2.5-VL-3B based VLA-style serving prototype with real image inputs and visual tokens. It measures image preprocessing, multimodal prefill, estimated TTFT, TPOT, decode throughput, GPU memory, visual-token scaling under single-camera and three-camera inputs, and implements visual input cache, same-shape microbatching, and KV cache footprint accounting. It also keeps a Qwen3 language-backbone subtest for KV-cache and attention-backend behavior, plus a Triton fused action post-processing kernel. Start with [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md), and reproduction commands are in [`docs/project3_quickstart.md`](docs/project3_quickstart.md).
+Project 3 is now a Qwen2.5-VL-3B based VLA-style serving prototype with real image inputs and visual tokens. It measures image preprocessing, multimodal prefill, estimated TTFT, TPOT, decode throughput, GPU memory, visual-token scaling under single-camera and three-camera inputs, and implements visual input cache, same-shape microbatching, KV cache footprint accounting, and a PagedAttention-style KV block / continuous batching simulator, shape-aware batching, and prefix-cache simulation. It also keeps a Qwen3 language-backbone subtest for KV-cache and attention-backend behavior, plus a Triton fused action post-processing kernel. Start with [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md), and reproduction commands are in [`docs/project3_quickstart.md`](docs/project3_quickstart.md).
 
 ![Project 3 Qwen2.5-VL serving throughput](assets/figures/project3_qwen25vl_serving_throughput.svg)
 
@@ -133,6 +133,14 @@ Project 3 is now a Qwen2.5-VL-3B based VLA-style serving prototype with real ima
 ![Project 3 Qwen2.5-VL visual tokens](assets/figures/project3_qwen25vl_visual_tokens.svg)
 
 ![Project 3 Qwen2.5-VL KV footprint](assets/figures/project3_qwen25vl_kv_footprint.svg)
+
+![Project 3 paged KV throughput](assets/figures/project3_paged_kv_throughput.svg)
+
+![Project 3 paged KV budget sweep](assets/figures/project3_paged_kv_budget_sweep_throughput.svg)
+
+![Project 3 bucketed scheduler throughput](assets/figures/project3_bucketed_scheduler_throughput.svg)
+
+![Project 3 bucketed scheduler padding waste](assets/figures/project3_bucketed_scheduler_padding_waste.svg)
 
 ![Project 3 action Triton speedup](assets/figures/project3_qwen3_vla_action_triton.svg)
 

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440">
+<rect width="100%" height="100%" fill="#fbfbf8"/>
+<text x="450.0" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700">Bucketed Scheduler P95 Latency</text>
+<line x1="86" y1="350" x2="870" y2="350" stroke="#333"/>
+<line x1="86" y1="60" x2="86" y2="350" stroke="#333"/>
+<text x="22" y="205.0" transform="rotate(-90 22 205.0)" text-anchor="middle" font-family="Arial" font-size="13">P95 latency ms</text>
+<line x1="82" y1="350.0" x2="870" y2="350.0" stroke="#ddd"/>
+<text x="76" y="354.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">0.0</text>
+<line x1="82" y1="277.5" x2="870" y2="277.5" stroke="#ddd"/>
+<text x="76" y="281.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">10435.2</text>
+<line x1="82" y1="205.0" x2="870" y2="205.0" stroke="#ddd"/>
+<text x="76" y="209.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">20870.5</text>
+<line x1="82" y1="132.5" x2="870" y2="132.5" stroke="#ddd"/>
+<text x="76" y="136.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">31305.7</text>
+<line x1="82" y1="60.0" x2="870" y2="60.0" stroke="#ddd"/>
+<text x="76" y="64.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">41741.0</text>
+<rect x="113.4" y="104.2" width="75.8" height="245.8" rx="3" fill="#2f6f73"/>
+<text x="151.3" y="96.2" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">35373.73</text>
+<text x="151.3" y="374" text-anchor="middle" font-family="Arial" font-size="10">fcfs\ncache=0</text>
+<rect x="244.1" y="130.7" width="75.8" height="219.3" rx="3" fill="#c55f36"/>
+<text x="282.0" y="122.7" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">31566.09</text>
+<text x="282.0" y="374" text-anchor="middle" font-family="Arial" font-size="10">fcfs\ncache=1</text>
+<rect x="374.8" y="186.3" width="75.8" height="163.7" rx="3" fill="#455a8a"/>
+<text x="412.7" y="178.3" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">23569.11</text>
+<text x="412.7" y="374" text-anchor="middle" font-family="Arial" font-size="10">shape\ncache=0</text>
+<rect x="505.4" y="206.2" width="75.8" height="143.8" rx="3" fill="#8b6f2f"/>
+<text x="543.3" y="198.2" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">20690.81</text>
+<text x="543.3" y="374" text-anchor="middle" font-family="Arial" font-size="10">shape\ncache=1</text>
+<rect x="636.1" y="155.1" width="75.8" height="194.9" rx="3" fill="#5c7f3b"/>
+<text x="674.0" y="147.1" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">28050.60</text>
+<text x="674.0" y="374" text-anchor="middle" font-family="Arial" font-size="10">token_budget\ncache=0</text>
+<rect x="766.8" y="169.1" width="75.8" height="180.9" rx="3" fill="#7a4f86"/>
+<text x="804.7" y="161.1" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">26042.69</text>
+<text x="804.7" y="374" text-anchor="middle" font-family="Arial" font-size="10">token_budget\ncache=1</text>
+</svg>

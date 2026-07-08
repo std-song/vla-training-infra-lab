@@ -18,6 +18,8 @@ The project is not a full robot policy and does not claim real control quality. 
 | Visual input | synthetic single-camera and three-camera image inputs |
 | Visual-token profiling | image count / image size / pixel budget vs input tokens, prefill latency, TTFT, memory |
 | Serving prototype | visual input cache, shape-aware microbatching, KV cache memory accounting |
+| Paged KV simulator | block manager, continuous batching, guarded paged admission, KV budget sweep |
+| VLA scheduling | shape-aware batching, token-budget batching, prefix-cache simulation, padding waste analysis |
 | Language decode subtest | Qwen3-0.6B prefill/decode, KV-cache, attention backend comparison |
 | VLA action path | simplified hidden-state-to-action head |
 | Triton kernel | fused action denormalization, clamp, and mask select |
@@ -96,7 +98,58 @@ The benchmark compares three scenarios for 8 requests with 3 camera images and `
 
 Main observation: visual input cache alone gives a modest 1.06-1.09x because generation dominates latency. The large win comes from batching same-shape VLA requests: 5.62x on `3x224` and 3.21x on `3x448`. The heavier visual prefix reduces batching gain and increases estimated KV footprint from 75.7 MiB to 237.7 MiB for 8 requests.
 
-## Stage 3: Qwen3 Language-Backbone Decode Subtest
+## Stage 3: Paged KV and Continuous Batching Simulator
+
+The next stage adds a vLLM-style scheduler and memory-management simulator. It does not implement CUDA PagedAttention kernels, but it does implement the core serving concepts needed to reason about VLA workloads:
+
+- paged KV block allocation with `block_size=16` tokens;
+- append/free lifecycle during autoregressive decode;
+- continuous batching over streaming requests;
+- static full KV reservation vs paged append allocation;
+- guarded paged admission to avoid decode-time block starvation;
+- KV budget sweep under visual-token-heavy request mixes.
+
+Default workload: 128 requests, mean arrival interval 90 ms, max active requests 16, 512 MiB KV budget. Request profiles are sampled from the measured Qwen2.5-VL visual-token CSV.
+
+| Scenario | Throughput | Mean latency | P95 latency | Peak KV | Speedup |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| serial no batch | 1.40 req/s | 40,901.6 ms | 78,171.5 ms | 30.9 MiB | 1.00x |
+| continuous static KV | 10.44 req/s | 1,904.7 ms | 3,220.3 ms | 341.4 MiB | 7.45x |
+| continuous paged KV | 10.44 req/s | 1,904.7 ms | 3,220.3 ms | 330.8 MiB | 7.45x |
+| continuous paged KV guarded | 10.44 req/s | 1,904.7 ms | 3,220.3 ms | 330.8 MiB | 7.45x |
+
+![Paged KV throughput](../assets/figures/project3_paged_kv_throughput.svg)
+
+![Paged KV P95 latency](../assets/figures/project3_paged_kv_p95_latency.svg)
+
+Under a tight 256 MiB KV budget, naive paged allocation over-admits prompt KV and later stalls during decode append. Adding a decode-block watermark recovers throughput from 7.42 req/s to 9.76 req/s. This is the main systems lesson: PagedAttention-style memory management must be paired with admission control and token-budget scheduling.
+
+![Paged KV budget sweep throughput](../assets/figures/project3_paged_kv_budget_sweep_throughput.svg)
+
+![Paged KV budget sweep memory](../assets/figures/project3_paged_kv_budget_sweep_memory.svg)
+
+## Stage 4: Bucketed Scheduling and Prefix Cache Simulation
+
+VLA requests have highly variable visual-token lengths. This stage compares FCFS batching, shape-aware batching, and token-budget batching using the measured Qwen2.5-VL token profiles. It also models repeated task/image prefixes with a prefix cache hit ratio. This is a simulator, not a claim that Qwen2.5-VL `past_key_values` are injected into model forward.
+
+| Policy | Prefix cache | Throughput | P95 latency | Padding waste | Prefix hit rate |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| FCFS | no | 4.56 req/s | 35,373.7 ms | 33.3% | 0.00 |
+| FCFS | yes | 4.93 req/s | 31,566.1 ms | 33.3% | 0.88 |
+| shape bucket | no | 6.01 req/s | 23,569.1 ms | 5.7% | 0.00 |
+| shape bucket | yes | 6.45 req/s | 20,690.8 ms | 3.9% | 0.88 |
+| token-budget bucket | no | 5.51 req/s | 28,050.6 ms | 9.5% | 0.00 |
+| token-budget bucket | yes | 5.86 req/s | 26,042.7 ms | 12.0% | 0.88 |
+
+![Bucketed scheduler throughput](../assets/figures/project3_bucketed_scheduler_throughput.svg)
+
+![Bucketed scheduler P95](../assets/figures/project3_bucketed_scheduler_p95.svg)
+
+![Bucketed scheduler padding waste](../assets/figures/project3_bucketed_scheduler_padding_waste.svg)
+
+Main observation: shape-aware batching is the strongest policy in this synthetic VLA workload. It raises throughput from 4.56 to 6.01 req/s without prefix cache and cuts padding waste from 33.3% to 5.7%. Prefix cache helps, but it does not replace shape-aware scheduling.
+
+## Stage 5: Qwen3 Language-Backbone Decode Subtest
 
 The Qwen3-0.6B subtest isolates language decode behavior without image input. It is kept as a serving-infra control experiment for KV cache and attention backend behavior.
 
@@ -127,7 +180,7 @@ Attention backend comparison at `batch=4, prompt=1024, decode=128`:
 
 Main observation: the language-only subtest explains serving-side tradeoffs, but it is not by itself VLA. The Qwen2.5-VL stage above is what adds real visual tokens.
 
-## Stage 4: VLA Action Post-processing with Triton
+## Stage 6: VLA Action Post-processing with Triton
 
 The action stage models a common VLA output path:
 
@@ -157,8 +210,10 @@ Main observation: the median speedup across tested shapes is 1.43x. Larger actio
 1. Real VLA-style inference must account for visual tokens. In this benchmark, moving from one 224 image to three 448 images increases visual marker tokens from 66 to 774 and prefill from 40.3 ms to 166.4 ms.
 2. Multimodal prefill and language decode should be measured separately. Image count/resolution mostly shifts TTFT, while decode TPOT is dominated by the autoregressive language path.
 3. Serving acceleration comes primarily from scheduler-level batching in this setup. Visual input cache helps modestly, while shape-aware microbatching improves 8-request throughput by 5.62x on `3x224` and 3.21x on `3x448`.
-4. KV footprint grows with visual prefix length. Estimated KV cache for 8 requests rises from 75.7 MiB at `3x224` to 237.7 MiB at `3x448`, motivating paged KV/cache management in a production engine.
-5. Action post-processing is small but real. Fusing action denorm/clamp/mask can reduce launch overhead, especially for batched control or simulation.
+4. Continuous batching and paged KV management are coupled problems. In simulation, continuous batching improves throughput by 7.45x, while guarded paged admission avoids decode-time KV block starvation under tight memory budgets.
+5. VLA batching should be visual-shape-aware. Shape buckets reduce padding waste from 33.3% to 5.7% and improve throughput from 4.56 to 6.01 req/s before prefix cache.
+6. KV footprint grows with visual prefix length. Estimated KV cache for 8 measured requests rises from 75.7 MiB at `3x224` to 237.7 MiB at `3x448`, motivating paged KV/cache management in a production engine.
+7. Action post-processing is small but real. Fusing action denorm/clamp/mask can reduce launch overhead, especially for batched control or simulation.
 
 ## Honest Boundaries
 
@@ -166,7 +221,7 @@ This project does not claim:
 
 - a trained robot policy;
 - full SmolVLA serving deployment;
-- PagedAttention or a production continuous-batching engine;
+- CUDA PagedAttention kernels or a production continuous-batching engine;
 - policy quality improvement.
 
 It does claim:
@@ -174,9 +229,11 @@ It does claim:
 - real Qwen2.5-VL image-to-token multimodal inference profiling;
 - visual-token / prefill / TTFT / memory analysis under single-camera and three-camera inputs;
 - a lightweight serving prototype with visual input cache, same-shape microbatching, and KV footprint accounting;
+- a paged KV / continuous batching simulator with block manager, budget sweep, and guarded admission;
+- bucketed scheduling and prefix-cache simulation for visual-token-heavy VLA workloads;
 - Qwen3 language decode sub-analysis for KV cache and attention backend tradeoffs;
 - a working Triton fused action post-processing kernel tied to VLA action semantics.
 
 ## Resume-Worthy Claim
 
-Built a Qwen2.5-VL-3B based VLA-style serving prototype on RTX 4080 SUPER, adding real image inputs, visual tokens, visual input cache, same-shape microbatching, and KV footprint accounting. Measured image preprocessing, multimodal prefill, estimated TTFT, decode TPOT, visual-token count, and GPU memory; found visual marker tokens increase from 66 to 774 and prefill from 40.3 ms to 166.4 ms from `1x224` to `3x448`. For 8 three-camera requests, microbatching improves throughput by 5.62x at 224 resolution and 3.21x at 448 resolution, with estimated KV footprint rising from 75.7 MiB to 237.7 MiB. Complemented this with Qwen3 language-backbone KV-cache/attention-backend profiling and implemented a Triton fused action post-processing kernel with 1.43x median speedup and up to 14.24x on larger action tensors.
+Built a Qwen2.5-VL-3B based VLA-style serving prototype on RTX 4080 SUPER, adding real image inputs, visual tokens, visual input cache, same-shape microbatching, KV footprint accounting, a paged-KV continuous batching simulator, shape-aware bucket scheduler, and prefix-cache simulator. Measured image preprocessing, multimodal prefill, estimated TTFT, decode TPOT, visual-token count, and GPU memory; found visual marker tokens increase from 66 to 774 and prefill from 40.3 ms to 166.4 ms from `1x224` to `3x448`. For 8 three-camera requests, microbatching improves throughput by 5.62x at 224 resolution and 3.21x at 448 resolution, with estimated KV footprint rising from 75.7 MiB to 237.7 MiB. In a 128-request simulator, continuous batching improves throughput by 7.45x and guarded paged admission avoids decode-block starvation under tight KV budgets. In a 256-request scheduling simulator, shape-aware batching improves throughput from 4.56 to 6.01 req/s and reduces visual-token padding waste from 33.3% to 5.7%; prefix cache further reaches 6.45 req/s. Complemented this with Qwen3 language-backbone KV-cache/attention-backend profiling and implemented a Triton fused action post-processing kernel with 1.43x median speedup and up to 14.24x on larger action tensors.

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440">
+<rect width="100%" height="100%" fill="#fbfbf8"/>
+<text x="450.0" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700">Bucketed Scheduler Throughput</text>
+<line x1="86" y1="350" x2="870" y2="350" stroke="#333"/>
+<line x1="86" y1="60" x2="86" y2="350" stroke="#333"/>
+<text x="22" y="205.0" transform="rotate(-90 22 205.0)" text-anchor="middle" font-family="Arial" font-size="13">requests/s</text>
+<line x1="82" y1="350.0" x2="870" y2="350.0" stroke="#ddd"/>
+<text x="76" y="354.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">0.0</text>
+<line x1="82" y1="277.5" x2="870" y2="277.5" stroke="#ddd"/>
+<text x="76" y="281.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">1.9</text>
+<line x1="82" y1="205.0" x2="870" y2="205.0" stroke="#ddd"/>
+<text x="76" y="209.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">3.8</text>
+<line x1="82" y1="132.5" x2="870" y2="132.5" stroke="#ddd"/>
+<text x="76" y="136.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">5.7</text>
+<line x1="82" y1="60.0" x2="870" y2="60.0" stroke="#ddd"/>
+<text x="76" y="64.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">7.6</text>
+<rect x="113.4" y="176.1" width="75.8" height="173.9" rx="3" fill="#2f6f73"/>
+<text x="151.3" y="168.1" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">4.56</text>
+<text x="151.3" y="374" text-anchor="middle" font-family="Arial" font-size="10">fcfs\ncache=0</text>
+<rect x="244.1" y="162.0" width="75.8" height="188.0" rx="3" fill="#c55f36"/>
+<text x="282.0" y="154.0" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">4.93</text>
+<text x="282.0" y="374" text-anchor="middle" font-family="Arial" font-size="10">fcfs\ncache=1</text>
+<rect x="374.8" y="121.0" width="75.8" height="229.0" rx="3" fill="#455a8a"/>
+<text x="412.7" y="113.0" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">6.01</text>
+<text x="412.7" y="374" text-anchor="middle" font-family="Arial" font-size="10">shape\ncache=0</text>
+<rect x="505.4" y="104.2" width="75.8" height="245.8" rx="3" fill="#8b6f2f"/>
+<text x="543.3" y="96.2" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">6.45</text>
+<text x="543.3" y="374" text-anchor="middle" font-family="Arial" font-size="10">shape\ncache=1</text>
+<rect x="636.1" y="139.8" width="75.8" height="210.2" rx="3" fill="#5c7f3b"/>
+<text x="674.0" y="131.8" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">5.51</text>
+<text x="674.0" y="374" text-anchor="middle" font-family="Arial" font-size="10">token_budget\ncache=0</text>
+<rect x="766.8" y="126.7" width="75.8" height="223.3" rx="3" fill="#7a4f86"/>
+<text x="804.7" y="118.7" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">5.86</text>
+<text x="804.7" y="374" text-anchor="middle" font-family="Arial" font-size="10">token_budget\ncache=1</text>
+</svg>
