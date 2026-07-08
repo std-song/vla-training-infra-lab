@@ -1,0 +1,2 @@
+dtype,attn_implementation,min_pixels,max_pixels,image_size,image_count,input_tokens,visual_marker_tokens,decode_len,preprocess_ms,transfer_ms,prefill_ms,decode_ms,ttft_est_ms,tpot_ms,decode_tokens_per_s,max_memory_mib
+bf16,sdpa,200704,1003520,224,1,297,258,4,8.745354018174112,1.1301779886707664,73.57935409527272,59.25188888795674,98.26785832410678,14.812972221989185,67.50839635785891,7323.087890625

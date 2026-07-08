@@ -1,21 +1,22 @@
-﻿# Project 3 Resume Bullets: Qwen3 VLA Inference Profiling
+﻿# Project 3 Resume Bullets: VLM/VLA-Style Inference Profiling
 
 ## 中文简历版本
 
-**Qwen3 VLA 推理链路分析与 Triton 算子优化**
+**Qwen2.5-VL 多模态推理链路分析与 Triton 动作后处理优化**
 
-- 基于 Qwen3-0.6B 构建 VLA-style 推理 profiling 框架，在 RTX 4080 SUPER 上拆分 prompt prefill 与逐 token decode，统计 TTFT、TPOT、tokens/s 和显存，分析 batch、上下文长度和生成长度对延迟/显存的影响。
-- 对比无缓存重算与 KV cache 解码，发现 KV cache 并非小 shape 下必然加速；在 `batch=4, prompt=512, decode=64` 下达到 2.40x，而在小 batch/短 prompt 下可能因缓存管理开销变慢。
-- 对比 SDPA、eager attention 与 FlashAttention 2 后端：在 `batch=4, prompt=1024, decode=128` 下 SDPA 达到 220.9 tokens/s，eager 长 prefill 明显变慢，FlashAttention 2 在该 Hugging Face cached-decode 路径下 decode 较慢，形成按阶段选择 attention backend 的分析结论。
-- 实现 Triton 融合动作后处理 kernel，将动作反归一化、clamp 和 mask select 合并为单个算子；在 Qwen3 hidden size 1024 的 action head benchmark 中取得 1.43x median speedup，大 action tensor shape 下最高 14.24x。
+- 基于 Qwen2.5-VL-3B 构建 VLA-style 多模态推理 profiling 框架，接入真实图像输入与 visual tokens，拆分 image preprocessing、multimodal prefill、decode、TTFT、TPOT 和显存指标。
+- 在 RTX 4080 SUPER 上对单相机/三相机、224/448 分辨率输入做 profiling；从 `1x224` 到 `3x448`，visual marker tokens 从 66 增至 774，multimodal prefill 从 40.3 ms 增至 166.4 ms，显存从约 7.2 GiB 增至 7.6 GiB。
+- 保留 Qwen3-0.6B language-backbone 子实验，分析 KV cache、SDPA/eager/FlashAttention2 在不同 batch/prompt/decode shape 下的阶段性性能边界；KV cache 在 `batch=4, prompt=512, decode=64` 下达到 2.40x，但小 shape 可能退化。
+- 实现 Triton 融合动作后处理 kernel，将动作反归一化、clamp 和 mask select 合并为单个算子；在 action post-processing benchmark 中取得 1.43x median speedup，大 action tensor shape 下最高 14.24x。
 
 ## 更短版本
 
-基于 Qwen3-0.6B 构建 VLA-style 推理 profiling 与 kernel 优化实验，拆分 prefill/decode 并统计 TTFT、TPOT、tokens/s、KV cache 和显存；在 RTX 4080 SUPER 上验证 KV cache 最高 2.40x 加速但小 shape 可能退化，分析 SDPA/eager/FlashAttention2 的阶段性性能差异，并实现 Triton 融合动作后处理 kernel，median 1.43x、最高 14.24x 加速。
+基于 Qwen2.5-VL-3B 构建 VLA-style 多模态推理 profiling 实验，接入真实图像输入和 visual tokens，拆分 image preprocessing、multimodal prefill、decode、TTFT/TPOT 和显存；在 RTX 4080 SUPER 上分析单/三相机输入下视觉 token 对 prefill 的影响，并结合 Qwen3 language decode 子实验分析 KV cache/attention backend，另实现 Triton 融合动作后处理 kernel，median 1.43x、最高 14.24x 加速。
 
 ## 面试展开点
 
-- 为什么 KV cache 在小 batch/短 prompt 下可能比 no-cache 更慢？
-- 为什么 FlashAttention 2 长 prefill 接近 SDPA，但 cached decode 反而慢？
-- VLA action 后处理为什么值得单独做 kernel fusion？什么 shape 下不值得？
-- 这个项目和完整 vLLM/PagedAttention 的边界在哪里？下一步如何扩展到 paged KV cache、continuous batching 或真实 SmolVLA action head？
+- 为什么 Qwen3 language-only profiling 不能单独称为 VLA？Qwen2.5-VL 补上了哪些链路？
+- visual token 数量为什么主要影响 TTFT 和 prefill，而不是每个 decode token 的 TPOT？
+- 三相机输入在 serving 系统里会带来哪些 batching、KV cache 和显存管理问题？
+- 为什么 Qwen2.5-VL 的 cached generation 不能直接复用纯 CausalLM 的手写 decode loop？
+- VLA action post-processing 哪些 shape 值得做 Triton fusion，哪些 shape 不值得？

@@ -1,6 +1,6 @@
-﻿# Project 3 Quick Start: Qwen3 VLA Inference Profiling
+﻿# Project 3 Quick Start: Qwen2.5-VL VLA-Style Inference Profiling
 
-Project 3 studies VLA-style inference with Qwen3-0.6B, KV-cache profiling, attention backend comparison, and a Triton fused action post-processing kernel.
+Project 3 studies VLA-style inference with real image inputs through Qwen2.5-VL-3B, plus a Qwen3 language-backbone subtest for KV-cache and attention backend behavior.
 
 ## Environment
 
@@ -12,31 +12,61 @@ Validated on AutoDL with:
 - flash-attn 2.8.3
 - RTX 4080 SUPER 32 GiB
 
-## Model
+## Qwen2.5-VL model
 
 ```bash
-export MODEL_DIR=/root/autodl-tmp/vla-infra-project3/modelscope/models/Qwen--Qwen3-0.6B/snapshots/master
+export MODEL_DIR=/root/autodl-tmp/vla-infra-project3/modelscope/models/Qwen--Qwen2.5-VL-3B-Instruct/snapshots/master
 ```
 
-## Smoke
+## Visual-token smoke
 
 ```bash
-python project3_vla_infer/benchmarks/bench_causallm_prefill_decode.py \
+python project3_vla_infer/benchmarks/bench_qwen25vl_visual_tokens.py \
   --model-dir "$MODEL_DIR" \
-  --batch-sizes 1 \
-  --prompt-lengths 128 \
-  --decode-lengths 16 \
+  --image-sizes 224 \
+  --image-counts 1 \
+  --decode-lengths 4 \
   --repeat 1 \
+  --warmup-decode 1 \
   --dtype bf16 \
   --attn-implementation sdpa \
-  --out project3_vla_infer/results/qwen3_prefill_decode_smoke.csv
+  --out project3_vla_infer/results/qwen25vl_visual_tokens_smoke.csv
 ```
 
-## Full baseline
+## Dynamic visual-token profiling
 
 ```bash
-python project3_vla_infer/benchmarks/bench_causallm_prefill_decode.py \
+python project3_vla_infer/benchmarks/bench_qwen25vl_visual_tokens.py \
   --model-dir "$MODEL_DIR" \
+  --image-sizes 224,448 \
+  --image-counts 1,3 \
+  --decode-lengths 16,64 \
+  --repeat 3 \
+  --warmup-decode 4 \
+  --min-pixels 3136 \
+  --max-pixels 802816 \
+  --dtype bf16 \
+  --attn-implementation sdpa \
+  --out project3_vla_infer/results/qwen25vl_visual_tokens_dynamic_pixels_sdpa_bf16.csv
+```
+
+The VLM script measures:
+
+- image preprocessing time;
+- CPU-to-GPU tensor transfer time;
+- multimodal prefill latency;
+- estimated TTFT;
+- estimated decode TPOT from `generate(max_new_tokens) - prefill`;
+- input token count and visual marker token count;
+- CUDA peak memory.
+
+## Qwen3 language-backbone subtest
+
+```bash
+export QWEN3_DIR=/root/autodl-tmp/vla-infra-project3/modelscope/models/Qwen--Qwen3-0.6B/snapshots/master
+
+python project3_vla_infer/benchmarks/bench_causallm_prefill_decode.py \
+  --model-dir "$QWEN3_DIR" \
   --batch-sizes 1,2,4 \
   --prompt-lengths 128,512,1024 \
   --decode-lengths 32,128 \
@@ -46,47 +76,7 @@ python project3_vla_infer/benchmarks/bench_causallm_prefill_decode.py \
   --out project3_vla_infer/results/qwen3_prefill_decode_sdpa_bf16.csv
 ```
 
-## KV cache comparison
-
-```bash
-python project3_vla_infer/benchmarks/bench_causallm_kv_cache.py \
-  --model-dir "$MODEL_DIR" \
-  --batch-sizes 1,2,4 \
-  --prompt-lengths 128,512 \
-  --decode-lengths 16,32,64 \
-  --repeat 3 \
-  --dtype bf16 \
-  --attn-implementation sdpa \
-  --out project3_vla_infer/results/qwen3_kv_cache_compare_sdpa_bf16.csv
-```
-
-## Attention backend comparison
-
-```bash
-python project3_vla_infer/benchmarks/bench_causallm_prefill_decode.py \
-  --model-dir "$MODEL_DIR" \
-  --batch-sizes 1,4 \
-  --prompt-lengths 128,1024 \
-  --decode-lengths 32,128 \
-  --repeat 3 \
-  --dtype bf16 \
-  --attn-implementation eager \
-  --out project3_vla_infer/results/qwen3_prefill_decode_eager_bf16_selected.csv
-
-python project3_vla_infer/benchmarks/bench_causallm_prefill_decode.py \
-  --model-dir "$MODEL_DIR" \
-  --batch-sizes 1,4 \
-  --prompt-lengths 128,1024 \
-  --decode-lengths 32,128 \
-  --repeat 3 \
-  --dtype bf16 \
-  --attn-implementation flash_attention_2 \
-  --out project3_vla_infer/results/qwen3_prefill_decode_flashattn2_bf16_selected.csv
-```
-
 ## Triton action post-processing
-
-Qwen3-0.6B uses hidden size 1024.
 
 ```bash
 python project3_vla_infer/benchmarks/bench_vla_action_head_triton.py \
@@ -97,6 +87,6 @@ python project3_vla_infer/benchmarks/bench_vla_action_head_triton.py \
 ## Figures
 
 ```bash
+python scripts/make_project3_qwen25vl_figures.py
 python scripts/make_project3_qwen3_figures.py
 ```
-

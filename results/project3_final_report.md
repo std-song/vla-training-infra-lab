@@ -1,20 +1,24 @@
-﻿# Project 3 Final Report: Qwen3-Based VLA Inference Profiling and Triton Kernel
+﻿# Project 3 Final Report: VLM/VLA-Style Inference Profiling and Triton Kernel
 
 Date: 2026-07-08
 
-Project 3 builds a compact VLA-style inference profiling lab around `Qwen/Qwen3-0.6B`. The goal is not to fork vLLM or claim a production serving engine. The goal is to make the serving path measurable: split prefill and decode, report TTFT/TPOT/tokens/s/memory, compare KV-cache behavior, inspect attention backend choices, and add one VLA-specific fused action post-processing kernel.
+Project 3 now uses `Qwen/Qwen2.5-VL-3B-Instruct` to add real image input and visual tokens to the inference path. The earlier `Qwen/Qwen3-0.6B` benchmark is retained as a language-backbone decode sub-experiment, but the main VLA-style claim is now grounded in a VLM path:
 
-This project complements the first two portfolio modules: Project 1 studies distributed MoE training, Project 2 studies VLA data and fine-tuning infrastructure, and Project 3 studies inference-side latency and kernel tradeoffs.
+```text
+camera image(s) -> Qwen2.5-VL processor -> visual tokens + task text -> multimodal prefill -> decode -> action post-processing
+```
+
+The project is not a full robot policy and does not claim real control quality. It is an inference-infrastructure lab for measuring multimodal prefill, visual-token cost, cached generation behavior, attention backend choices, GPU memory, and VLA-style action post-processing.
 
 ## Completed Scope
 
 | Area | Completed work |
 | --- | --- |
-| Language backbone | Qwen3-0.6B BF16 inference benchmark |
-| Serving metrics | prefill latency, estimated TTFT, TPOT, decode tokens/s, max GPU memory |
-| KV cache | cached decode vs full-prefix recompute across batch/prompt/decode shapes |
-| Attention backend | SDPA vs eager vs FlashAttention 2 on selected prefill/decode shapes |
-| VLA action path | simplified hidden-state-to-action head with Qwen3 hidden size 1024 |
+| VLM backbone | Qwen2.5-VL-3B-Instruct BF16 multimodal inference benchmark |
+| Visual input | synthetic single-camera and three-camera image inputs |
+| Visual-token profiling | image count / image size / pixel budget vs input tokens, prefill latency, TTFT, memory |
+| Language decode subtest | Qwen3-0.6B prefill/decode, KV-cache, attention backend comparison |
+| VLA action path | simplified hidden-state-to-action head |
 | Triton kernel | fused action denormalization, clamp, and mask select |
 | Reporting | raw CSVs, SVG figures, final summary, resume bullets |
 
@@ -27,47 +31,61 @@ This project complements the first two portfolio modules: Project 1 studies dist
 | PyTorch | 2.8.0+cu128 |
 | CUDA runtime | 12.8 |
 | flash-attn | 2.8.3 |
-| Model | `Qwen/Qwen3-0.6B` |
+| VLM model | `Qwen/Qwen2.5-VL-3B-Instruct` |
+| Language subtest model | `Qwen/Qwen3-0.6B` |
 | dtype | BF16 |
 | Model source | ModelScope cache |
 
-## Stage 1: Prefill / Decode Baseline
+## Stage 1: Qwen2.5-VL Visual Token Profiling
 
-The baseline uses Hugging Face generation primitives with PyTorch SDPA and `past_key_values`. The benchmark separates prompt prefill from autoregressive decode.
+The benchmark generates synthetic camera images and sends them through the real Qwen2.5-VL processor/model path. For this stage, `prefill_ms` is measured with a direct forward pass. `decode_ms` is estimated from `model.generate(max_new_tokens=N) - prefill_ms`, because Qwen2.5-VL generation uses model-specific multimodal cache/RoPE state that should not be replaced by the pure CausalLM decode loop.
+
+Dynamic pixel budget:
+
+```text
+min_pixels = 4 * 28 * 28 = 3,136
+max_pixels = 1024 * 28 * 28 = 802,816
+```
+
+Selected results with `decode_len=64`:
+
+| Images | Size | Input tokens | Visual marker tokens | Preprocess | Prefill | Estimated TTFT | TPOT | Max memory |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 224 | 105 | 66 | 4.2 ms | 40.3 ms | 62.7 ms | 17.76 ms | 7,219 MiB |
+| 3 | 224 | 237 | 198 | 6.7 ms | 57.1 ms | 82.2 ms | 17.78 ms | 7,289 MiB |
+| 1 | 448 | 297 | 258 | 7.1 ms | 88.6 ms | 107.3 ms | 10.60 ms | 7,324 MiB |
+| 3 | 448 | 813 | 774 | 13.9 ms | 166.4 ms | 201.7 ms | 18.36 ms | 7,606 MiB |
+
+![Qwen2.5-VL visual tokens](../assets/figures/project3_qwen25vl_visual_tokens.svg)
+
+![Qwen2.5-VL prefill latency](../assets/figures/project3_qwen25vl_prefill_latency.svg)
+
+![Qwen2.5-VL TTFT](../assets/figures/project3_qwen25vl_ttft.svg)
+
+![Qwen2.5-VL memory](../assets/figures/project3_qwen25vl_memory.svg)
+
+Main observation: adding cameras and increasing image resolution mostly hurts multimodal prefill and TTFT. The `3 images x 448` case produces 774 visual marker tokens and raises prefill to 166.4 ms, while GPU memory rises modestly from about 7.2 GiB to 7.6 GiB on this 3B VLM.
+
+## Stage 2: Qwen3 Language-Backbone Decode Subtest
+
+The Qwen3-0.6B subtest isolates language decode behavior without image input. It is kept as a serving-infra control experiment for KV cache and attention backend behavior.
+
+Selected SDPA baseline:
 
 | Batch | Prompt | Decode | Prefill | Estimated TTFT | TPOT | Decode tokens/s | Max memory |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
 | 1 | 128 | 128 | 19.9 ms | 39.0 ms | 19.18 ms | 52.1 | 1,313 MiB |
 | 2 | 128 | 128 | 19.2 ms | 38.1 ms | 18.82 ms | 106.3 | 1,481 MiB |
 | 4 | 128 | 128 | 19.1 ms | 37.0 ms | 17.96 ms | 222.8 | 1,841 MiB |
-| 4 | 512 | 128 | 38.6 ms | 56.8 ms | 18.24 ms | 219.3 | 3,672 MiB |
 | 4 | 1024 | 128 | 81.4 ms | 99.5 ms | 18.10 ms | 220.9 | 6,125 MiB |
 
 ![Qwen3 decode throughput](../assets/figures/project3_qwen3_decode_throughput.svg)
 
-![Qwen3 prefill memory](../assets/figures/project3_qwen3_prefill_memory.svg)
-
-Main observation: decode TPOT stays around 18-19 ms/token for these shapes, while longer prompts mainly increase prefill latency and KV-cache memory. At `batch=4, prompt=1024, decode=128`, max memory is about 6.1 GiB, leaving substantial room on a 32 GiB 4080 SUPER for larger batch or longer context experiments.
-
-## Stage 2: KV Cache vs Full Recompute
-
-The KV-cache result is intentionally not a blanket speedup claim. For small shapes, cache bookkeeping can cost more than recomputing the short prefix. It becomes useful when batch size and prompt length make full-prefix recompute expensive.
-
-| Batch | Prompt | Decode | Cached TPOT | No-cache TPOT | Cache speedup |
-| ---: | ---: | ---: | ---: | ---: | ---: |
-| 1 | 128 | 64 | 17.25 ms | 15.46 ms | 0.90x |
-| 1 | 512 | 64 | 17.35 ms | 16.51 ms | 0.95x |
-| 2 | 512 | 64 | 17.57 ms | 22.51 ms | 1.28x |
-| 4 | 128 | 64 | 17.38 ms | 17.08 ms | 0.98x |
-| 4 | 512 | 64 | 17.44 ms | 41.78 ms | 2.40x |
+KV cache comparison showed shape-dependent value: at `batch=4, prompt=512, decode=64`, cache reached 2.40x speedup, while small shapes could be slower than no-cache recompute.
 
 ![Qwen3 KV cache speedup](../assets/figures/project3_qwen3_kv_cache_speedup.svg)
 
-Main observation: KV cache reaches 2.40x speedup at `batch=4, prompt=512, decode=64`, but loses on smaller shapes. This is the serving-system lesson: cache policy, batching policy, cache layout, and scheduler decisions should be shape-aware.
-
-## Stage 3: Attention Backend Comparison
-
-The selected backend comparison uses `batch=4, prompt=1024, decode=128`.
+Attention backend comparison at `batch=4, prompt=1024, decode=128`:
 
 | Backend | Prefill | TPOT | Decode tokens/s |
 | --- | ---: | ---: | ---: |
@@ -77,25 +95,20 @@ The selected backend comparison uses `batch=4, prompt=1024, decode=128`.
 
 ![Qwen3 attention backend comparison](../assets/figures/project3_qwen3_attention_backends.svg)
 
-Main observation: SDPA is the best default for this Hugging Face Qwen3 path. Eager attention is much slower on long prefill. FlashAttention 2 is close to SDPA on long prefill, but significantly slower on one-token cached decode in this setup. The practical conclusion is not "FlashAttention is bad"; it is that backend choice should be phase-specific and benchmarked under the actual framework/cache layout.
+Main observation: the language-only subtest explains serving-side tradeoffs, but it is not by itself VLA. The Qwen2.5-VL stage above is what adds real visual tokens.
 
-## Stage 4: VLA Action Post-processing with Triton
+## Stage 3: VLA Action Post-processing with Triton
 
-The VLA-specific part attaches a simplified action output path to Qwen3 hidden states:
-
-```text
-hidden[B, 1024] -> MLP action head -> action[B, horizon, action_dim]
-```
-
-The post-processing pattern is common in robot policies:
+The action stage models a common VLA output path:
 
 ```text
+hidden -> MLP action head -> action[B, horizon, action_dim]
 action = pred * std + mean
 action = clamp(action, low, high)
 action = where(mask, action, previous_action)
 ```
 
-The Triton kernel fuses these elementwise steps into one launch.
+The Triton kernel fuses denormalization, clamp, and mask select into one launch.
 
 | Batch | Horizon | Action dim | Action head | PyTorch post | Triton post | Speedup |
 | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -107,31 +120,31 @@ The Triton kernel fuses these elementwise steps into one launch.
 
 ![Qwen3 VLA action Triton speedup](../assets/figures/project3_qwen3_vla_action_triton.svg)
 
-Main observation: the median speedup across tested shapes is 1.43x. Some large `action_dim=64` shapes show much larger wins because the PyTorch baseline launches multiple elementwise ops and materializes intermediates. Some tiny or awkward shapes can still lose, so the correct engineering stance is to fuse only after measuring the target shapes.
+Main observation: the median speedup across tested shapes is 1.43x. Larger action tensors can benefit much more because PyTorch launches multiple elementwise kernels and materializes intermediates.
 
 ## Integrated Interpretation
 
-1. Prefill and decode are different phases. Prompt length mainly affects prefill latency and memory, while cached decode TPOT is more stable.
-2. KV cache is necessary for larger batched serving, but not automatically faster for tiny requests.
-3. Attention backend choice is shape- and phase-dependent. SDPA is the best default in this measured Qwen3 path.
-4. VLA action outputs have their own latency surface. Even small post-processing logic can matter for high-frequency control or batched simulation, but kernel fusion must be validated across shapes.
+1. Real VLA-style inference must account for visual tokens. In this benchmark, moving from one 224 image to three 448 images increases visual marker tokens from 66 to 774 and prefill from 40.3 ms to 166.4 ms.
+2. Multimodal prefill and language decode should be measured separately. Image count/resolution mostly shifts TTFT, while decode TPOT is dominated by the autoregressive language path.
+3. KV cache and attention backend behavior remains shape-dependent. Language-only Qwen3 isolates those serving tradeoffs, but the VLM benchmark is needed to understand visual prefix cost.
+4. Action post-processing is small but real. Fusing action denorm/clamp/mask can reduce launch overhead, especially for batched control or simulation.
 
 ## Honest Boundaries
 
 This project does not claim:
 
-- a production vLLM-compatible serving engine;
-- PagedAttention implementation;
+- a trained robot policy;
 - full SmolVLA serving deployment;
-- robot policy quality improvement.
+- PagedAttention or continuous batching;
+- policy quality improvement.
 
 It does claim:
 
-- reproducible Qwen3-0.6B inference profiling;
-- vLLM-inspired TTFT/TPOT/KV-cache analysis;
-- attention backend comparison with real measurements;
+- real Qwen2.5-VL image-to-token multimodal inference profiling;
+- visual-token / prefill / TTFT / memory analysis under single-camera and three-camera inputs;
+- Qwen3 language decode sub-analysis for KV cache and attention backend tradeoffs;
 - a working Triton fused action post-processing kernel tied to VLA action semantics.
 
 ## Resume-Worthy Claim
 
-Built a Qwen3-0.6B based VLA-style inference profiling lab on RTX 4080 SUPER, separating prefill/decode and measuring TTFT, TPOT, decode throughput, KV-cache behavior, attention backend choices, and GPU memory. Found KV cache to be shape-dependent, reaching 2.40x speedup at `batch=4, prompt=512, decode=64` while losing on small shapes; found SDPA to be the best default for this Hugging Face cached-decode path; implemented a Triton fused action post-processing kernel with 1.43x median speedup and up to 14.24x on larger action tensors.
+Built a Qwen2.5-VL-3B based VLA-style inference profiling lab on RTX 4080 SUPER, adding real image inputs and visual tokens to the inference path. Measured image preprocessing, multimodal prefill, estimated TTFT, decode TPOT, visual-token count, and GPU memory under single-camera and three-camera inputs; found visual marker tokens increase from 66 to 774 and prefill from 40.3 ms to 166.4 ms from `1x224` to `3x448`. Complemented this with Qwen3 language-backbone KV-cache/attention-backend profiling and implemented a Triton fused action post-processing kernel with 1.43x median speedup and up to 14.24x on larger action tensors.

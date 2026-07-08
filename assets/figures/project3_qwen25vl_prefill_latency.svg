@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="820" height="430" viewBox="0 0 820 430">
+<rect width="100%" height="100%" fill="#fbfbf8"/>
+<text x="410.0" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700">Qwen2.5-VL Multimodal Prefill Latency</text>
+<line x1="82" y1="350" x2="790" y2="350" stroke="#333"/>
+<line x1="82" y1="60" x2="82" y2="350" stroke="#333"/>
+<text x="22" y="205.0" transform="rotate(-90 22 205.0)" text-anchor="middle" font-family="Arial" font-size="13">prefill ms</text>
+<line x1="78" y1="350.0" x2="790" y2="350.0" stroke="#ddd"/>
+<text x="72" y="354.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">0</text>
+<line x1="78" y1="277.5" x2="790" y2="277.5" stroke="#ddd"/>
+<text x="72" y="281.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">49</text>
+<line x1="78" y1="205.0" x2="790" y2="205.0" stroke="#ddd"/>
+<text x="72" y="209.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">98</text>
+<line x1="78" y1="132.5" x2="790" y2="132.5" stroke="#ddd"/>
+<text x="72" y="136.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">147</text>
+<line x1="78" y1="60.0" x2="790" y2="60.0" stroke="#ddd"/>
+<text x="72" y="64.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">196</text>
+<rect x="119.2" y="290.4" width="102.7" height="59.6" rx="3" fill="#2f6f73"/>
+<text x="170.5" y="282.4" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">40.3</text>
+<text x="170.5" y="374" text-anchor="middle" font-family="Arial" font-size="11">1img\n224p</text>
+<rect x="296.2" y="219.1" width="102.7" height="130.9" rx="3" fill="#c55f36"/>
+<text x="347.5" y="211.1" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">88.6</text>
+<text x="347.5" y="374" text-anchor="middle" font-family="Arial" font-size="11">1img\n448p</text>
+<rect x="473.2" y="265.7" width="102.7" height="84.3" rx="3" fill="#455a8a"/>
+<text x="524.5" y="257.7" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">57.1</text>
+<text x="524.5" y="374" text-anchor="middle" font-family="Arial" font-size="11">3img\n224p</text>
+<rect x="650.2" y="104.2" width="102.7" height="245.8" rx="3" fill="#8b6f2f"/>
+<text x="701.5" y="96.2" text-anchor="middle" font-family="Arial" font-size="12" font-weight="700">166.4</text>
+<text x="701.5" y="374" text-anchor="middle" font-family="Arial" font-size="11">3img\n448p</text>
+</svg>
