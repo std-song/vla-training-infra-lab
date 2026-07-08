@@ -1,0 +1,2 @@
+full_model_calls,full_avg_ms,full_p50_ms,queue_pops,queue_avg_ms,queue_p50_ms,peak_mem_mib
+2,92.773,92.773,58,3.467,3.494,7142.29

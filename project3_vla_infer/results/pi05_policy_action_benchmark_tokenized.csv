@@ -1,0 +1,2 @@
+batch_size,action_shape,cold_ms,warm_avg_ms,warm_p50_ms,warm_min_ms,warm_max_ms,chunk_size,action_dim,amortized_ms_per_action,peak_mem_mib
+1,"(1, 50, 7)",32026.605,87.65,87.767,86.402,89.224,50,7,1.753,7278.11

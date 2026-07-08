@@ -1,25 +1,36 @@
-﻿# Project 3 Resume Bullets: VLM/VLA Serving Prototype
+# Project 3 Resume Bullets: Multimodal VLM/VLA Inference Acceleration
 
-## 中文简历版本
+## Resume Title
 
-**Qwen2.5-VL VLA-style 推理服务原型与 Triton 动作后处理优化**
+**Multimodal VLM/VLA Inference Acceleration and Edge-Deployment Analysis**
 
-- 基于 Qwen2.5-VL-3B 构建轻量 VLA-style serving prototype，接入真实图像输入与 visual tokens，实现 visual input cache、同形状 micro-batching scheduler、Paged KV block manager / continuous batching simulator、shape-aware batching、prefix-cache simulation 和 KV cache footprint accounting，并拆分 image preprocessing、multimodal prefill、decode、TTFT/TPOT 和显存指标。
-- 在 RTX 4080 SUPER 上对单相机/三相机、224/448 分辨率输入做 profiling；从 `1x224` 到 `3x448`，visual marker tokens 从 66 增至 774，multimodal prefill 从 40.3 ms 增至 166.4 ms，显存从约 7.2 GiB 增至 7.6 GiB。
-- 对 8 个三相机 VLA-style 请求验证 serving 侧加速：`3x224, decode=32` 下 microbatching 将吞吐从 1.58 req/s 提升到 8.82 req/s，达到 5.62x；`3x448` 下从 1.29 req/s 提升到 4.13 req/s，达到 3.21x，并估算 KV footprint 从 75.7 MiB 增至 237.7 MiB。
-- 实现 PagedAttention-style KV block manager 与 continuous batching simulator，在 128 请求 workload 上将吞吐从 1.40 req/s 提升到 10.44 req/s（7.45x），并通过 guarded paged admission 解决紧 KV budget 下 naive paged allocation 的 decode-block starvation。
-- 实现 bucketed scheduler 与 prefix-cache simulator，比较 FCFS、shape-aware bucket、token-budget bucket；shape-aware batching 将 padding waste 从 33.3% 降至 5.7%，吞吐从 4.56 提升到 6.01 req/s，叠加 prefix cache 后达到 6.45 req/s。
-- 实现 Triton 融合动作后处理 kernel，将动作反归一化、clamp 和 mask select 合并为单个算子；在 action post-processing benchmark 中取得 1.43x median speedup，大 action tensor shape 下最高 14.24x。
+## Current Completed Scope
 
-## 更短版本
+- Built a multimodal serving baseline covering Qwen3-VL-4B through vLLM and Qwen2.5-VL-3B through Hugging Face. The benchmarks separate image preprocessing, multimodal prefill, estimated TTFT, decode TPOT, visual-token count, request throughput, GPU memory, and KV-cache footprint.
+- Profiled single-camera and three-camera inputs on an RTX 4080 SUPER. From `1x224` to `3x448`, visual marker tokens increased from 66 to 774, multimodal prefill increased from 40.3 ms to 166.4 ms, and GPU memory increased from about 7.2 GiB to 7.6 GiB.
+- Implemented visual input cache, same-shape microbatching, and KV footprint accounting. For 8 three-camera requests, `3x224, decode=32` improved from 1.58 req/s to 8.82 req/s, reaching 5.62x throughput; `3x448` improved from 1.29 req/s to 4.13 req/s, reaching 3.21x.
+- Implemented a PagedAttention-style KV block manager and continuous-batching simulator. On a 128-request workload, throughput improved from 1.40 req/s to 10.44 req/s, reaching 7.45x. Guarded paged admission was used to analyze decode-block starvation under tight KV budgets.
+- Implemented a shape-aware scheduler and prefix-cache simulator. Shape-aware batching reduced padding waste from 33.3% to 5.7% and improved throughput from 4.56 req/s to 6.01 req/s; adding modeled prefix cache reached 6.45 req/s.
+- Implemented a Triton fused action post-processing kernel that combines action denormalization, clamp, and mask select into one kernel. The benchmark reached 1.43x median speedup and up to 14.24x on larger action tensor shapes.
 
-基于 Qwen2.5-VL-3B 构建轻量 VLA-style 推理服务原型，接入真实图像输入和 visual tokens，实现 visual input cache、同形状 micro-batching、Paged KV block manager、continuous batching simulator、shape-aware batching、prefix-cache simulation、KV cache footprint accounting 与 Triton 动作后处理 kernel；在 RTX 4080 SUPER 上对 8 个三相机请求验证 microbatching 最高 5.62x 吞吐提升，并在 128 请求模拟 workload 上验证 continuous batching 7.45x 吞吐提升。
+## Upgraded Target Scope
 
-## 面试展开点
+- Added a Qwen3-VL-4B vLLM serving track on a 32 GiB GPU. The default vLLM path reached 10.08 req/s for 224px images and 8.73 req/s for 448px images at concurrency 8, with about 21.3 GiB peak memory. Compared with eager mode, default vLLM improved concurrent throughput by 18-41% across most tested shapes.
+- Added a Pi0.5 / LeRobot real VLA action-inference track. On a 32 GiB vGPU, `predict_action_chunk` produced `(1, 50, 7)` actions with 87.7 ms warm latency and 7.3 GiB peak memory; `select_action` showed chunk-queue behavior with full model calls around 92.8 ms and queue pops around 3.47 ms.
+- Added a VLASH-inspired async control-loop simulator grounded in the measured Pi0.5 latency. Under a 30 Hz loop, future-state async refill reduced reaction latency from 266.7 ms to 166.7 ms versus naive async refill, while action quantization ratio 2 halved modeled control-side action overhead from 1237.7 ms to 618.9 ms.
+- Keep the existing Qwen2.5-VL serving prototype, scheduler simulator, KV-memory analysis, Pi0.5 action queue benchmark, and Triton action kernel as supporting systems experiments, while explicitly avoiding claims about robot task success or policy quality.
 
-- 为什么完整 vLLM 很复杂？这个 prototype 覆盖了哪些核心思想，哪些没有覆盖？
-- 为什么 visual input cache 单独收益小，而 microbatching 收益大？
-- visual token 数量如何影响 prefill、TTFT、KV footprint 和 batch capacity？
-- 为什么 shape-aware batching 比单纯 token-budget batching 更适合这个 VLA workload？
-- 为什么 Qwen2.5-VL 的 true prefill KV cache 注入比纯 CausalLM 难？
-- 如果继续扩展，如何做 CUDA PagedAttention、prefix cache、continuous batching 和异步 request scheduler？
+## Target Short Version
+
+Built a multimodal VLM/VLA inference-acceleration lab covering three layers: Qwen3-VL/Qwen2.5-VL VLM serving, Pi0.5 real VLA action inference, and VLASH-inspired async control-loop serving. The project profiles visual tokens, multimodal prefill/decode, KV-cache memory, batching, concurrency, Pi0.5 action chunk latency, action queue amortization, state staleness, future-state queue refill, action quantization, and action post-processing. It also implements shape-aware batching, KV-memory accounting, continuous-batching simulation, and a Triton fused action post-processing kernel to compare VLM serving bottlenecks with VLA control-loop bottlenecks.
+
+## Interview Talking Points
+
+- Why VLM serving and VLA action inference have different bottlenecks.
+- How visual-token count affects prefill, TTFT, KV footprint, memory, and batch capacity.
+- Why Qwen3-VL is a better path for vLLM serving analysis, while Pi0.5 is a better path for real VLA policy inference.
+- Why Pi0.5 action chunk inference changes the serving problem from per-token decode to queue refill, state staleness, and control-loop scheduling.
+- Why visual input cache alone helps less than microbatching in the measured Qwen2.5-VL path.
+- Why shape-aware batching can beat naive token-budget batching for multimodal VLA-like workloads.
+- How VLASH-style async inference, future-state awareness, and action quantization fit into a VLA serving stack.
+- Which parts are real model experiments, which parts are simulators, and which claims should not be overstated.

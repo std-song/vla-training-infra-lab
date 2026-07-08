@@ -1,4 +1,4 @@
-﻿__pycache__/
+__pycache__/
 *.pyc
 .env
 *.log
@@ -16,3 +16,7 @@ outputs/
 profiling_logs/
 results/raw/
 .autodl/
+# Curated Project 3 result tables kept for reproducibility.
+!project3_vla_infer/results/qwen3vl_vllm_*.csv
+!project3_vla_infer/results/pi05_*.csv
+!project3_vla_infer/results/vlash_async_control_loop_*.csv

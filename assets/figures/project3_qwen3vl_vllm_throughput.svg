@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="440" viewBox="0 0 900 440">
+<rect width="100%" height="100%" fill="#fbfbf8"/>
+<text x="450.0" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700">Qwen3-VL-4B vLLM Default Throughput</text>
+<line x1="88" y1="348" x2="870" y2="348" stroke="#333"/>
+<line x1="88" y1="62" x2="88" y2="348" stroke="#333"/>
+<text x="24" y="205.0" transform="rotate(-90 24 205.0)" text-anchor="middle" font-family="Arial" font-size="13">requests/s</text>
+<line x1="84" y1="348.0" x2="870" y2="348.0" stroke="#ddd"/>
+<text x="78" y="352.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">0.0</text>
+<line x1="84" y1="276.5" x2="870" y2="276.5" stroke="#ddd"/>
+<text x="78" y="280.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">3.0</text>
+<line x1="84" y1="205.0" x2="870" y2="205.0" stroke="#ddd"/>
+<text x="78" y="209.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">5.9</text>
+<line x1="84" y1="133.5" x2="870" y2="133.5" stroke="#ddd"/>
+<text x="78" y="137.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">8.9</text>
+<line x1="84" y1="62.0" x2="870" y2="62.0" stroke="#ddd"/>
+<text x="78" y="66.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">11.9</text>
+<rect x="109.5" y="317.4" width="54.7" height="30.6" rx="3" fill="#2f6f73"/>
+<text x="136.9" y="310.4" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">1.27</text>
+<text x="136.9" y="371" text-anchor="middle" font-family="Arial" font-size="10">224p
+c1</text>
+<rect x="207.3" y="286.4" width="54.7" height="61.6" rx="3" fill="#c55f36"/>
+<text x="234.6" y="279.4" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">2.56</text>
+<text x="234.6" y="371" text-anchor="middle" font-family="Arial" font-size="10">224p
+c2</text>
+<rect x="305.0" y="225.2" width="54.7" height="122.8" rx="3" fill="#455a8a"/>
+<text x="332.4" y="218.2" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">5.11</text>
+<text x="332.4" y="371" text-anchor="middle" font-family="Arial" font-size="10">224p
+c4</text>
+<rect x="402.8" y="105.6" width="54.7" height="242.4" rx="3" fill="#8b6f2f"/>
+<text x="430.1" y="98.6" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">10.08</text>
+<text x="430.1" y="371" text-anchor="middle" font-family="Arial" font-size="10">224p
+c8</text>
+<rect x="500.5" y="315.9" width="54.7" height="32.1" rx="3" fill="#5c7f3b"/>
+<text x="527.9" y="308.9" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">1.34</text>
+<text x="527.9" y="371" text-anchor="middle" font-family="Arial" font-size="10">448p
+c1</text>
+<rect x="598.3" y="285.3" width="54.7" height="62.7" rx="3" fill="#7a4f86"/>
+<text x="625.6" y="278.3" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">2.61</text>
+<text x="625.6" y="371" text-anchor="middle" font-family="Arial" font-size="10">448p
+c2</text>
+<rect x="696.0" y="236.6" width="54.7" height="111.4" rx="3" fill="#2f6f73"/>
+<text x="723.4" y="229.6" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">4.63</text>
+<text x="723.4" y="371" text-anchor="middle" font-family="Arial" font-size="10">448p
+c4</text>
+<rect x="793.8" y="138.2" width="54.7" height="209.8" rx="3" fill="#c55f36"/>
+<text x="821.1" y="131.2" text-anchor="middle" font-family="Arial" font-size="11" font-weight="700">8.73</text>
+<text x="821.1" y="371" text-anchor="middle" font-family="Arial" font-size="10">448p
+c8</text>
+</svg>

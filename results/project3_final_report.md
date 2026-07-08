@@ -1,4 +1,4 @@
-﻿# Project 3 Final Report: VLM/VLA-Style Inference Profiling and Triton Kernel
+# Project 3 Final Report: VLM/VLA-Style Inference Profiling and Triton Kernel
 
 Date: 2026-07-08
 
@@ -21,7 +21,8 @@ The project is not a full robot policy and does not claim real control quality. 
 | Paged KV simulator | block manager, continuous batching, guarded paged admission, KV budget sweep |
 | VLA scheduling | shape-aware batching, token-budget batching, prefix-cache simulation, padding waste analysis |
 | Language decode subtest | Qwen3-0.6B prefill/decode, KV-cache, attention backend comparison |
-| VLA action path | simplified hidden-state-to-action head |
+| VLA action path | simplified hidden-state-to-action head plus Pi0.5 real action chunk inference |
+| VLA control loop | VLASH-inspired async action-queue simulator with future-state refill and action quantization |
 | Triton kernel | fused action denormalization, clamp, and mask select |
 | Reporting | raw CSVs, SVG figures, final summary, resume bullets |
 
@@ -83,7 +84,7 @@ The benchmark compares three scenarios for 8 requests with 3 camera images and `
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
 | 3x224 | cold serial | 1.58 | 637.3 ms | 1.00x | 7,212 MiB | 75.7 MiB |
 | 3x224 | visual input cache, serial generate | 1.66 | 600.7 ms | 1.06x | 7,237 MiB | 75.7 MiB |
-| 3x224 | visual input cache + microbatch | 8.82 | 113.4 ms | 5.62x | 7,515 MiB | 75.7 MiB |
+| 3x224 | visual input cache + microbatch | 8.82 | 113.47 ms | 5.62x | 7,515 MiB | 75.7 MiB |
 | 3x448 | cold serial | 1.29 | 777.5 ms | 1.00x | 7,342 MiB | 237.7 MiB |
 | 3x448 | visual input cache, serial generate | 1.40 | 711.8 ms | 1.09x | 7,440 MiB | 237.7 MiB |
 | 3x448 | visual input cache + microbatch | 4.13 | 242.1 ms | 3.21x | 8,534 MiB | 237.7 MiB |
@@ -174,7 +175,7 @@ Attention backend comparison at `batch=4, prompt=1024, decode=128`:
 | --- | ---: | ---: | ---: |
 | SDPA | 81.4 ms | 18.10 ms | 220.9 |
 | eager | 178.6 ms | 18.49 ms | 216.3 |
-| FlashAttention 2 | 85.0 ms | 29.60 ms | 135.1 |
+| FlashAttention 2 | 92.8 ms | 29.60 ms | 135.1 |
 
 ![Qwen3 attention backend comparison](../assets/figures/project3_qwen3_attention_backends.svg)
 
@@ -205,6 +206,45 @@ The Triton kernel fuses denormalization, clamp, and mask select into one launch.
 
 Main observation: the median speedup across tested shapes is 1.43x. Larger action tensors can benefit much more because PyTorch launches multiple elementwise kernels and materializes intermediates.
 
+
+## Stage 7: Pi0.5 Real VLA Action Inference
+
+Project 3 now includes a real VLA policy compute path with LeRobot Pi0.5. This stage loads `lerobot/pi05_libero_finetuned_v044` and runs the action inference path from camera tensors, language tokens, and robot state to a 50-step, 7-DoF action chunk. The benchmark uses synthetic observations and real PaliGemma-tokenized task text, so it is a systems benchmark of action inference latency rather than a robot-success claim.
+
+| Benchmark | Result |
+| --- | ---: |
+| Action chunk shape | `(1, 50, 7)` |
+| Warm full action chunk latency | 87.7 ms avg / 87.8 ms p50 |
+| Amortized latency | 1.75 ms/action |
+| `select_action` full model call | 92.8 ms avg |
+| `select_action` queue pop | 3.47 ms avg / 3.49 ms p50 |
+| Peak memory | 7.1-7.3 GiB |
+
+![Pi0.5 queue latency](../assets/figures/project3_pi05_queue_latency.svg)
+
+Key lesson: Pi0.5 is chunk-based. The model does not need to run for every control tick; `select_action` runs the full model when the action queue is empty and then serves subsequent actions from the queue. This makes cold-start warmup, action queue management, stale-action handling, and async control-loop scheduling central inference-infra concerns.
+
+Using `PI05Policy`, the checkpoint matches 812/812 checkpoint tensors. `strict=False` is still used because the loader reports one missing tied/shared language embedding key, while all checkpoint tensors are shape-matched and loaded. Details are in [`project3_pi05_vla_action_inference.md`](project3_pi05_vla_action_inference.md).
+## Stage 8: VLASH-Inspired Async Control Loop
+
+The final layer connects measured Pi0.5 action latency to robot control-loop scheduling. It is inspired by VLASH's async VLA inference ideas, but implemented as a small independent simulator so the assumptions are transparent.
+
+The simulator compares synchronous chunk execution, naive async action queue refill, future-state-aware async refill, and future-state async with action quantization ratio 2. It uses the measured Pi0.5 warm action-chunk latency of 87.7 ms, a 50-step action chunk, and a 30 Hz control loop.
+
+| Scenario | Mean error | Reaction latency | Stall ratio | Mean state staleness | Control overhead |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| sync chunk blocking | 0.054 | 0.0 ms | 5.8% | 895.6 ms | 1175.3 ms |
+| async naive queue | 0.093 | 266.7 ms | 0.8% | 1045.9 ms | 1237.7 ms |
+| async future-state queue | 0.075 | 166.7 ms | 0.8% | 945.9 ms | 1237.7 ms |
+| async future-state quantized q2 | 0.074 | 166.7 ms | 0.8% | 945.9 ms | 618.9 ms |
+
+![VLASH-inspired async error](../assets/figures/project3_vlash_async_error.svg)
+
+![VLASH-inspired async trace](../assets/figures/project3_vlash_async_trace.svg)
+
+Main observation: the VLA serving problem is not only model throughput. Once a policy emits action chunks, queue refill timing, state staleness, and control-loop blocking become first-class inference-infra metrics. In this simulator, future-state refill keeps the low async stall ratio while reducing reaction latency from 266.7 ms to 166.7 ms. Action quantization ratio 2 halves modeled control-side action overhead in this setup.
+
+Details are in [`project3_vlash_async_control_loop.md`](project3_vlash_async_control_loop.md).
 ## Integrated Interpretation
 
 1. Real VLA-style inference must account for visual tokens. In this benchmark, moving from one 224 image to three 448 images increases visual marker tokens from 66 to 774 and prefill from 40.3 ms to 166.4 ms.
@@ -214,6 +254,7 @@ Main observation: the median speedup across tested shapes is 1.43x. Larger actio
 5. VLA batching should be visual-shape-aware. Shape buckets reduce padding waste from 33.3% to 5.7% and improve throughput from 4.56 to 6.01 req/s before prefix cache.
 6. KV footprint grows with visual prefix length. Estimated KV cache for 8 measured requests rises from 75.7 MiB at `3x224` to 237.7 MiB at `3x448`, motivating paged KV/cache management in a production engine.
 7. Action post-processing is small but real. Fusing action denorm/clamp/mask can reduce launch overhead, especially for batched control or simulation.
+8. Real VLA serving needs control-loop metrics. Pi0.5 chunk inference is slower than a 30 Hz tick but faster than its action horizon, so async queue refill and future-state estimation are the important systems levers.
 
 ## Honest Boundaries
 
@@ -222,11 +263,15 @@ This project does not claim:
 - a trained robot policy;
 - full SmolVLA serving deployment;
 - CUDA PagedAttention kernels or a production continuous-batching engine;
-- policy quality improvement.
+- a full VLASH implementation or real robot async deployment;
+- policy quality improvement;
+- fully validated Pi0.5 LIBERO policy quality, because the current run uses synthetic zero images/state and does not evaluate robot task success.
 
 It does claim:
 
 - real Qwen2.5-VL image-to-token multimodal inference profiling;
+- Pi0.5 action chunk inference profiling with action queue latency and memory analysis;
+- a VLASH-inspired async control-loop simulator grounded in measured Pi0.5 latency;
 - visual-token / prefill / TTFT / memory analysis under single-camera and three-camera inputs;
 - a lightweight serving prototype with visual input cache, same-shape microbatching, and KV footprint accounting;
 - a paged KV / continuous batching simulator with block manager, budget sweep, and guarded admission;
@@ -236,4 +281,15 @@ It does claim:
 
 ## Resume-Worthy Claim
 
-Built a Qwen2.5-VL-3B based VLA-style serving prototype on RTX 4080 SUPER, adding real image inputs, visual tokens, visual input cache, same-shape microbatching, KV footprint accounting, a paged-KV continuous batching simulator, shape-aware bucket scheduler, and prefix-cache simulator. Measured image preprocessing, multimodal prefill, estimated TTFT, decode TPOT, visual-token count, and GPU memory; found visual marker tokens increase from 66 to 774 and prefill from 40.3 ms to 166.4 ms from `1x224` to `3x448`. For 8 three-camera requests, microbatching improves throughput by 5.62x at 224 resolution and 3.21x at 448 resolution, with estimated KV footprint rising from 75.7 MiB to 237.7 MiB. In a 128-request simulator, continuous batching improves throughput by 7.45x and guarded paged admission avoids decode-block starvation under tight KV budgets. In a 256-request scheduling simulator, shape-aware batching improves throughput from 4.56 to 6.01 req/s and reduces visual-token padding waste from 33.3% to 5.7%; prefix cache further reaches 6.45 req/s. Complemented this with Qwen3 language-backbone KV-cache/attention-backend profiling and implemented a Triton fused action post-processing kernel with 1.43x median speedup and up to 14.24x on larger action tensors.
+Built a Qwen2.5-VL/Qwen3-VL and Pi0.5 based VLM/VLA inference-infra lab, adding real image inputs, visual tokens, vLLM serving, visual input cache, same-shape microbatching, KV footprint accounting, paged-KV continuous batching simulation, shape-aware scheduling, Pi0.5 action-chunk profiling, and a VLASH-inspired async control-loop simulator. Measured image preprocessing, multimodal prefill, estimated TTFT, decode TPOT, visual-token count, GPU memory, action queue latency, and state-staleness metrics. Found visual marker tokens increase from 66 to 774 and prefill from 40.3 ms to 166.4 ms from `1x224` to `3x448`; Qwen3-VL vLLM reaches 10.08 req/s at concurrency 8 for 224px prompts; Pi0.5 emits `(1, 50, 7)` action chunks with 87.7 ms warm latency and 3.47 ms queue-pop latency. In simulations, continuous batching improves throughput by 7.45x, shape-aware scheduling improves throughput from 4.56 to 6.01 req/s, and future-state async refill reduces reaction latency from 266.7 ms to 166.7 ms under a 30 Hz control loop. Complemented this with a Triton fused action post-processing kernel with 1.43x median speedup and up to 14.24x on larger action tensors.
+## Addendum: Qwen3-VL vLLM Serving Baseline
+
+After the initial Qwen2.5-VL serving prototype, Project 3 added a real vLLM baseline with `Qwen/Qwen3-VL-4B-Instruct`. This strengthens the VLM serving layer of the project and separates it from the later Pi0.5 VLA action-inference layer.
+
+The default vLLM path was validated on a 32 GiB AutoDL GPU with Python 3.12, PyTorch 2.8.0 + CUDA 12.8, and vLLM 0.24.0. At concurrency 8, it reached **10.08 req/s** for 224px single-image prompts and **8.73 req/s** for 448px prompts. Peak memory from `nvidia-smi` sampling was about **21.3 GiB**. Compared with the eager fallback, default vLLM improved concurrent throughput by 18-41% across most tested shapes while using similar peak memory.
+
+Detailed results are in [`project3_qwen3vl_vllm_serving.md`](project3_qwen3vl_vllm_serving.md).
+
+![Qwen3-VL vLLM throughput](../assets/figures/project3_qwen3vl_vllm_throughput.svg)
+
+![Qwen3-VL vLLM eager vs default](../assets/figures/project3_qwen3vl_vllm_eager_vs_default.svg)

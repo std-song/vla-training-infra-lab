@@ -1,0 +1,14 @@
+Pi0.5 first action inference smoke result
+
+actions shape: (1, 50, 7)
+actions dtype: torch.float32
+actions device: cuda:0
+actions min/max: -4.473573684692383 4.327032566070557
+latency_ms: [17760.05, 86.98, 83.16, 82.96, 82.83]
+avg_latency_ms: 3619.19
+peak_mem_mib: 6909.58
+
+Notes:
+- First call includes cold-start overhead such as Triton matmul autotune / kernel compilation.
+- Steady-state predict_action_chunk latency is approximately 83-87 ms for a 50-step, 7-DoF action chunk.
+- Amortized model latency is approximately 1.7 ms/action if the 50-step chunk is consumed sequentially.

@@ -1,0 +1,3 @@
+mode,peak_memory_mib,notes
+eager,21833,nvidia-smi peak memory from 200ms sampling; torch max_memory_allocated in parent process is not valid for vLLM worker processes
+default,21801,nvidia-smi peak memory from 200ms sampling; torch max_memory_allocated in parent process is not valid for vLLM worker processes

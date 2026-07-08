@@ -122,10 +122,13 @@ Start with the integrated report: [`results/project2_final_report.md`](results/p
 ![Official SmolVLA DDP tuning](assets/figures/project2_official_smolvla_ddp_tuning.svg)
 
 
-## Project 3: Qwen2.5-VL VLA-Style Serving Prototype
+## Project 3: Multimodal VLM/VLA Inference Acceleration
 
-Project 3 is now a Qwen2.5-VL-3B based VLA-style serving prototype with real image inputs and visual tokens. It measures image preprocessing, multimodal prefill, estimated TTFT, TPOT, decode throughput, GPU memory, visual-token scaling under single-camera and three-camera inputs, and implements visual input cache, same-shape microbatching, KV cache footprint accounting, and a PagedAttention-style KV block / continuous batching simulator, shape-aware batching, and prefix-cache simulation. It also keeps a Qwen3 language-backbone subtest for KV-cache and attention-backend behavior, plus a Triton fused action post-processing kernel. Start with [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md), and reproduction commands are in [`docs/project3_quickstart.md`](docs/project3_quickstart.md).
+Project 3 is a three-layer multimodal inference-infra project. The VLM serving layer covers Qwen3-VL / Qwen2.5-VL with vLLM-style metrics, visual-token profiling, batching, KV-memory accounting, concurrency curves, and scheduler simulation. The real VLA policy layer adds Pi0.5 / LeRobot action inference, measuring 50-step action chunk latency, `select_action` queue amortization, cold-start behavior, and GPU memory. The control-loop layer adds a VLASH-inspired async action-queue simulator, connecting measured Pi0.5 latency to future-state refill, state staleness, blocking, and action quantization. Start with [`docs/project3_vlm_vla_upgrade_plan.md`](docs/project3_vlm_vla_upgrade_plan.md), [`results/project3_qwen3vl_vllm_serving.md`](results/project3_qwen3vl_vllm_serving.md), [`results/project3_pi05_vla_action_inference.md`](results/project3_pi05_vla_action_inference.md), [`results/project3_vlash_async_control_loop.md`](results/project3_vlash_async_control_loop.md), then [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md), and reproduction commands are in [`docs/project3_quickstart.md`](docs/project3_quickstart.md).
 
+![Project 3 Qwen3-VL vLLM throughput](assets/figures/project3_qwen3vl_vllm_throughput.svg)
+
+![Project 3 Qwen3-VL vLLM eager vs default](assets/figures/project3_qwen3vl_vllm_eager_vs_default.svg)
 ![Project 3 Qwen2.5-VL serving throughput](assets/figures/project3_qwen25vl_serving_throughput.svg)
 
 ![Project 3 Qwen2.5-VL serving speedup](assets/figures/project3_qwen25vl_serving_speedup.svg)
@@ -142,9 +145,12 @@ Project 3 is now a Qwen2.5-VL-3B based VLA-style serving prototype with real ima
 
 ![Project 3 bucketed scheduler padding waste](assets/figures/project3_bucketed_scheduler_padding_waste.svg)
 
+![Project 3 Pi0.5 async control-loop error](assets/figures/project3_vlash_async_error.svg)
+
+![Project 3 Pi0.5 async control-loop trace](assets/figures/project3_vlash_async_trace.svg)
+
 ![Project 3 action Triton speedup](assets/figures/project3_qwen3_vla_action_triton.svg)
 
 ## Next Step
 
-Projects 1-3 are complete as portfolio artifacts. The next step is to consolidate the three projects into resume project entries and an interview narrative for VLA training infrastructure roles.
-
+Projects 1-2 are complete as portfolio artifacts. Project 3 now includes Qwen3-VL vLLM serving, Qwen2.5-VL visual-token profiling, scheduler/KV simulations, Triton action post-processing, Pi0.5 LeRobot action-inference profiling, and a VLASH-inspired async control-loop simulator. The next useful improvement is connecting this control-loop layer to real dataset observations or a robot simulator rollout.
