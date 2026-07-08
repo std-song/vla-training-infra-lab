@@ -4,6 +4,8 @@ A practical training-infrastructure lab for Vision-Language-Action (VLA) model t
 
 This repository is organized as a portfolio project for VLA training infrastructure roles. The emphasis is training-system correctness, distributed behavior, memory and throughput measurement, checkpoint reliability, and practical debugging under limited hardware rather than benchmark model quality.
 
+For resume and interview use, start with [docs/xiaomi_vla_infra_application_pack.md](docs/xiaomi_vla_infra_application_pack.md). It condenses the three projects into resume bullets, a 3-5 minute project narrative, technical Q&A, and a GitHub reading path.
+
 ## Target Role Alignment
 
 The project maps directly to common VLA training-infra requirements:
