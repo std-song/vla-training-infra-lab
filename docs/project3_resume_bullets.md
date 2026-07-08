@@ -1,22 +1,21 @@
-﻿# Project 3 Resume Bullets: Qwen2 VLA Inference Acceleration
+﻿# Project 3 Resume Bullets: Qwen3 VLA Inference Profiling
 
-Use one of the following versions depending on resume space.
+## 中文简历版本
 
-## Strong 3-Bullet Version
+**Qwen3 VLA 推理链路分析与 Triton 算子优化**
 
-- Built a Qwen2-0.5B based VLA inference acceleration lab on RTX 4080 SUPER, separating prefill/decode phases and reporting serving metrics including estimated TTFT, TPOT, decode tokens/s, KV-cache memory, and shape-dependent throughput under BF16.
-- Benchmarked no-cache vs KV-cache decode and SDPA/eager/FlashAttention2 attention backends; observed KV-cache speedups up to 2.55x only for larger prompt/batch shapes and found SDPA to be the best default for this Hugging Face cached-decode path.
-- Implemented a Triton fused VLA action post-processing kernel for action denormalization, clamp, and mask selection; achieved 1.44x average speedup and up to 1.81x over PyTorch elementwise ops while documenting small-shape overhead and BF16 correctness.
+- 基于 Qwen3-0.6B 构建 VLA-style 推理 profiling 框架，在 RTX 4080 SUPER 上拆分 prompt prefill 与逐 token decode，统计 TTFT、TPOT、tokens/s 和显存，分析 batch、上下文长度和生成长度对延迟/显存的影响。
+- 对比无缓存重算与 KV cache 解码，发现 KV cache 并非小 shape 下必然加速；在 `batch=4, prompt=512, decode=64` 下达到 2.40x，而在小 batch/短 prompt 下可能因缓存管理开销变慢。
+- 对比 SDPA、eager attention 与 FlashAttention 2 后端：在 `batch=4, prompt=1024, decode=128` 下 SDPA 达到 220.9 tokens/s，eager 长 prefill 明显变慢，FlashAttention 2 在该 Hugging Face cached-decode 路径下 decode 较慢，形成按阶段选择 attention backend 的分析结论。
+- 实现 Triton 融合动作后处理 kernel，将动作反归一化、clamp 和 mask select 合并为单个算子；在 Qwen3 hidden size 1024 的 action head benchmark 中取得 1.43x median speedup，大 action tensor shape 下最高 14.24x。
 
-## Compact 2-Bullet Version
+## 更短版本
 
-- Developed a Qwen2-based VLA-style inference benchmark with vLLM-inspired prefill/decode, TTFT/TPOT, KV-cache, attention backend, throughput, and memory profiling on RTX 4080 SUPER.
-- Added a simplified VLA action head and Triton fused action post-processing kernel, achieving up to 1.81x speedup over PyTorch for action denorm/clamp/mask while documenting shape-dependent tradeoffs.
+基于 Qwen3-0.6B 构建 VLA-style 推理 profiling 与 kernel 优化实验，拆分 prefill/decode 并统计 TTFT、TPOT、tokens/s、KV cache 和显存；在 RTX 4080 SUPER 上验证 KV cache 最高 2.40x 加速但小 shape 可能退化，分析 SDPA/eager/FlashAttention2 的阶段性性能差异，并实现 Triton 融合动作后处理 kernel，median 1.43x、最高 14.24x 加速。
 
-## One-Line Version
+## 面试展开点
 
-Built a Qwen2-based VLA inference acceleration lab covering prefill/decode profiling, KV-cache analysis, SDPA/eager/FlashAttention2 comparison, and a Triton fused action post-processing kernel with up to 1.81x speedup.
-
-## Interview Boundary
-
-This is not a production vLLM fork or full SmolVLA serving engine. It is a controlled VLA inference-infra lab that demonstrates measurement discipline, backend tradeoff analysis, and a working VLA-specific Triton kernel.
+- 为什么 KV cache 在小 batch/短 prompt 下可能比 no-cache 更慢？
+- 为什么 FlashAttention 2 长 prefill 接近 SDPA，但 cached decode 反而慢？
+- VLA action 后处理为什么值得单独做 kernel fusion？什么 shape 下不值得？
+- 这个项目和完整 vLLM/PagedAttention 的边界在哪里？下一步如何扩展到 paged KV cache、continuous batching 或真实 SmolVLA action head？

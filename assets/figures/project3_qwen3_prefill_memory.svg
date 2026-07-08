@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="780" height="420" viewBox="0 0 780 420">
+<rect width="100%" height="100%" fill="#fbfbf8"/>
+<text x="390.0" y="30" text-anchor="middle" font-family="Arial" font-size="18" font-weight="700">Qwen3-0.6B KV Cache Memory by Prompt</text>
+<line x1="76" y1="352" x2="652" y2="352" stroke="#333" stroke-width="1"/>
+<line x1="76" y1="58" x2="76" y2="352" stroke="#333" stroke-width="1"/>
+<text x="20" y="205.0" transform="rotate(-90 20 205.0)" text-anchor="middle" font-family="Arial" font-size="13">max memory MiB</text>
+<text x="364.0" y="400" text-anchor="middle" font-family="Arial" font-size="13">Prompt length</text>
+<text x="76.0" y="374" text-anchor="middle" font-family="Arial" font-size="11">128</text>
+<text x="322.9" y="374" text-anchor="middle" font-family="Arial" font-size="11">512</text>
+<text x="652.0" y="374" text-anchor="middle" font-family="Arial" font-size="11">1024</text>
+<line x1="72" y1="352.0" x2="652" y2="352.0" stroke="#ddd" stroke-width="1"/>
+<text x="66" y="356.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">0</text>
+<line x1="72" y1="278.5" x2="652" y2="278.5" stroke="#ddd" stroke-width="1"/>
+<text x="66" y="282.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">1761</text>
+<line x1="72" y1="205.0" x2="652" y2="205.0" stroke="#ddd" stroke-width="1"/>
+<text x="66" y="209.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">3522</text>
+<line x1="72" y1="131.5" x2="652" y2="131.5" stroke="#ddd" stroke-width="1"/>
+<text x="66" y="135.5" text-anchor="end" font-family="Arial" font-size="11" fill="#555">5283</text>
+<line x1="72" y1="58.0" x2="652" y2="58.0" stroke="#ddd" stroke-width="1"/>
+<text x="66" y="62.0" text-anchor="end" font-family="Arial" font-size="11" fill="#555">7044</text>
+<polyline points="76.0,297.2 322.9,277.7 652.0,252.3" fill="none" stroke="#2f6f73" stroke-width="2.5"/>
+<circle cx="76.0" cy="297.2" r="4" fill="#2f6f73"/>
+<circle cx="322.9" cy="277.7" r="4" fill="#2f6f73"/>
+<circle cx="652.0" cy="252.3" r="4" fill="#2f6f73"/>
+<rect x="680" y="64" width="14" height="14" fill="#2f6f73"/>
+<text x="702" y="76" font-family="Arial" font-size="12">B1</text>
+<polyline points="76.0,290.2 322.9,251.6 652.0,200.3" fill="none" stroke="#c55f36" stroke-width="2.5"/>
+<circle cx="76.0" cy="290.2" r="4" fill="#c55f36"/>
+<circle cx="322.9" cy="251.6" r="4" fill="#c55f36"/>
+<circle cx="652.0" cy="200.3" r="4" fill="#c55f36"/>
+<rect x="680" y="88" width="14" height="14" fill="#c55f36"/>
+<text x="702" y="100" font-family="Arial" font-size="12">B2</text>
+<polyline points="76.0,275.2 322.9,198.8 652.0,96.3" fill="none" stroke="#455a8a" stroke-width="2.5"/>
+<circle cx="76.0" cy="275.2" r="4" fill="#455a8a"/>
+<circle cx="322.9" cy="198.8" r="4" fill="#455a8a"/>
+<circle cx="652.0" cy="96.3" r="4" fill="#455a8a"/>
+<rect x="680" y="112" width="14" height="14" fill="#455a8a"/>
+<text x="702" y="124" font-family="Arial" font-size="12">B4</text>
+</svg>

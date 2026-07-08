@@ -1,0 +1,2 @@
+dtype,attn_implementation,batch_size,prompt_len,decode_len,prefill_ms,decode_ms,ttft_est_ms,tpot_ms,decode_tokens_per_s,max_memory_mib
+bf16,sdpa,1,128,16,17.962560057640076,277.3800879949704,35.298815557325725,17.33625549968565,57.6825831863249,1251.32568359375

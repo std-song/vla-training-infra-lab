@@ -122,17 +122,17 @@ Start with the integrated report: [`results/project2_final_report.md`](results/p
 ![Official SmolVLA DDP tuning](assets/figures/project2_official_smolvla_ddp_tuning.svg)
 
 
-## Project 3: Qwen2 VLA Inference Acceleration
+## Project 3: Qwen3 VLA Inference Profiling and Triton Kernel
 
-Project 3 is a Qwen2-0.5B based VLA-style inference acceleration lab. It measures prefill/decode latency, estimated TTFT, TPOT, decode tokens/s, GPU memory, no-cache vs KV-cache behavior, attention backend differences, and a VLA-specific Triton fused action post-processing kernel under BF16. Start with [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md). Supporting reports include [`results/project3_qwen2_prefill_decode_baseline.md`](results/project3_qwen2_prefill_decode_baseline.md), [`results/project3_qwen2_kv_cache.md`](results/project3_qwen2_kv_cache.md), [`results/project3_qwen2_attention_backends.md`](results/project3_qwen2_attention_backends.md), and [`results/project3_vla_action_triton.md`](results/project3_vla_action_triton.md).
+Project 3 is a Qwen3-0.6B based VLA-style inference profiling lab. It measures prefill/decode latency, estimated TTFT, TPOT, decode tokens/s, GPU memory, no-cache vs KV-cache behavior, attention backend differences, and a VLA-specific Triton fused action post-processing kernel under BF16. Start with [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md), and reproduction commands are in [`docs/project3_quickstart.md`](docs/project3_quickstart.md). Earlier Qwen2 reports are retained as historical validation material under `results/project3_qwen2_*`.
 
-![Project 3 Qwen2 decode throughput](assets/figures/project3_qwen2_decode_throughput.svg)
+![Project 3 Qwen3 decode throughput](assets/figures/project3_qwen3_decode_throughput.svg)
 
-![Project 3 KV cache speedup](assets/figures/project3_qwen2_kv_cache_speedup.svg)
+![Project 3 Qwen3 KV cache speedup](assets/figures/project3_qwen3_kv_cache_speedup.svg)
 
-![Project 3 attention backend comparison](assets/figures/project3_qwen2_attention_backends.svg)
+![Project 3 Qwen3 attention backend comparison](assets/figures/project3_qwen3_attention_backends.svg)
 
-![Project 3 VLA action Triton speedup](assets/figures/project3_vla_action_triton.svg)
+![Project 3 Qwen3 VLA action Triton speedup](assets/figures/project3_qwen3_vla_action_triton.svg)
 
 ## Next Step
 
