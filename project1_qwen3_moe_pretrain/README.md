@@ -38,10 +38,20 @@ Earlier 75.5M Qwen2-MoE 4-GPU profiling:
 
 - Final report: [`results/project1_qwen3_moe_pretrain_infra_report.md`](results/project1_qwen3_moe_pretrain_infra_report.md)
 - Qwen3 distributed validation: [`results/qwen3_moe_style_distributed_validation.md`](results/qwen3_moe_style_distributed_validation.md)
-- EP dispatch note: [`results/qwen3_moe_style_ep_alltoall_dispatch.md`](results/qwen3_moe_style_ep_alltoall_dispatch.md)
+- EP All-to-All dispatch validation: [`results/qwen3_moe_style_ep_alltoall_dispatch.md`](results/qwen3_moe_style_ep_alltoall_dispatch.md)
 - 4-GPU composition: [`results/qwen2_moe_4gpu_composition.md`](results/qwen2_moe_4gpu_composition.md)
 - Scaling analysis: [`docs/scaling_analysis.md`](docs/scaling_analysis.md)
 - Resume bullets: [`docs/project1_resume_bullets.md`](docs/project1_resume_bullets.md)
+
+## EP2 All-to-All Validation
+
+The EP2 path now includes a correctness-oriented token dispatcher:
+
+```text
+router top-k -> expert-owner dispatch -> local expert buffer coalesce -> GroupedGEMM -> return dispatch -> scatter-add -> replicated output
+```
+
+On 2026-07-10 it completed a fresh 5-step validation on 2 x RTX 3090 with checkpoint save. Warm throughput averaged 6,162.5 tokens/s total, peak reserved memory was 1,302 MiB/GPU, and the warm EP dispatcher averaged 2.847 ms per MoE layer call.
 
 ## Reproduction Skeleton
 

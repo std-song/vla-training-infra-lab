@@ -68,8 +68,28 @@ Warm average excludes the first four initialization-heavy steps.
 - DP2 gives the highest total throughput but only reaches about 1.56x single-GPU throughput because this small model is dominated by launch, optimizer, logging, and synchronization overheads.
 - TP2 reduces memory relative to single-GPU training but introduces tensor collective overhead at every transformer block.
 - PP2 required a real runtime fix: only the last pipeline stage owns the actual loss, so non-final stages must not construct `lm_loss = loss_avg.item()` during logging. After this fix, PP2 passed 20-step training, checkpoint save, and a separate resume run.
-- EP2 has the lowest peak reserved memory because experts are sharded. Its throughput is lower because all-to-all token dispatch and return aggregation dominate at this small token count.
+- EP2 has the lowest peak reserved memory because experts are sharded. The current path now performs real token All-to-All dispatch: token-owner ranks send routed token copies to expert-owner ranks, received tokens are coalesced by local expert id before GroupedGEMM, and results are returned to token owners before a compatibility all-reduce.
 - Single-rank torchrun needed a shutdown fix: skip unnecessary distributed barrier when world size is 1 to avoid post-checkpoint teardown SIGSEGV on the AutoDL image.
+
+## EP2 All-to-All Revalidation
+
+On 2026-07-10, EP2 was revalidated on a freshly rented 2 x RTX 3090 host with `NANO_QWEN_MOE_EP_PROFILE=1`.
+
+| Metric | Value |
+| --- | ---: |
+| train steps | 5 |
+| warm avg throughput | 6,162.5 tokens/s |
+| warm avg throughput/GPU | 3,081 tokens/s/GPU |
+| peak reserved memory | 1,302 MiB/GPU |
+| warm EP dispatcher avg | 2.847 ms |
+| route pack + count exchange | 0.667 ms |
+| dispatch all-to-all | 0.186 ms |
+| expert buffer coalesce | 0.225 ms |
+| GroupedGEMM expert compute | 1.024 ms |
+| return all-to-all | 0.226 ms |
+| final replication all-reduce | 0.242 ms |
+
+This validates EP correctness and exposes the next optimization boundary: remove or move the final replication all-reduce, then overlap token dispatch with local expert compute.
 
 ## Resume Validation
 

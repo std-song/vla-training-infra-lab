@@ -64,6 +64,45 @@ Resume result:
 - Checkpoint saved at `checkpoints/qwen3_moe_style_100m_ep2_resume/7`.
 - Exit code: 0.
 
+## 2026-07-10 Revalidation
+
+The EP2 All-to-All dispatcher was revalidated on a freshly rented 2 x RTX 3090 AutoDL host.
+
+Command shape:
+
+```bash
+NANO_QWEN_MOE_EP_PROFILE=1 NANO_QWEN_MOE_EP_PROFILE_CALLS=8 \
+CUDA_DEVICE_MAX_CONNECTIONS=1 PYTHONPATH=src /root/miniconda3/bin/torchrun --nproc_per_node=2 \
+  run_train.py --config-file examples/smoke/config_qwen3_moe_style_100m_ep2_validation_0710.yaml
+```
+
+Result:
+
+- EP2 completed 5 training steps.
+- Checkpoint saved at `checkpoints/qwen3_moe_style_100m_ep2_validation_0710/5`.
+- Warm-step average throughput, excluding step 1: **6,162.5 tokens/s total**, about **3,081 tokens/s/GPU**.
+- Warm-step throughput values: 5.72K, 6.69K, 5.51K, 6.73K tokens/s.
+- Peak reserved memory: **1,302 MiB/GPU**.
+
+Warm EP dispatcher profile, averaged over calls after the first cold call:
+
+| Segment | Avg latency |
+| --- | ---: |
+| full EP dispatcher | 2.847 ms |
+| route pack + count exchange | 0.667 ms |
+| token hidden/state dispatch all-to-all | 0.186 ms |
+| expert buffer coalesce | 0.225 ms |
+| GroupedGEMM expert compute | 1.024 ms |
+| return all-to-all | 0.226 ms |
+| scatter-add restore | 0.064 ms |
+| final replication all-reduce | 0.242 ms |
+
+Interpretation:
+
+- The correctness path now performs real cross-rank token movement rather than local-only expert execution.
+- The dominant warm segment at this tiny shape is still expert compute plus routing/count overhead; the raw hidden-state all-to-all itself is small because each layer only moves hundreds of token copies.
+- The final all-reduce is intentionally retained as a compatibility boundary so the surrounding non-EP Qwen stack can remain replicated. Removing that boundary is the next meaningful systems optimization.
+
 ## Performance Interpretation
 
 This is still a small-shape validation, not a throughput-optimized EP benchmark. Sequence length is 128 and micro-batch size is 2, so communication latency, routing metadata exchange, token sorting, and launch overhead dominate. The point of this stage is correctness and system integration rather than speedup.
