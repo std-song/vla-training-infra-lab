@@ -1,0 +1,5 @@
+micro_batch,tokens_per_step,warm_tokens_s,warm_tokens_s_per_gpu,avg_step_ms,step_ge10_tokens_s,peak_reserved_mib,final_loss,routed_tokens_per_layer,dispatcher_avg_ms,dispatcher_median_ms,avg_recv_tokens,route_count_ms,dispatch_a2a_ms,coalesce_ms,grouped_gemm_ms,return_a2a_ms,scatter_ms,final_allreduce_ms
+mbs2,256,5658.75,2828.75,45.87,5325.45,1302,9.91,256,2.847,2.144,258.8,0.667,0.186,0.225,1.024,0.226,0.064,0.242
+mbs4,512,10840.62,5423.75,47.73,10231.82,1316,9.85,512,2.075,2.073,507.5,0.616,0.169,0.208,0.420,0.146,0.061,0.245
+mbs8,1024,22962.50,11473.75,45.09,21609.09,1396,9.88,1024,3.640,2.191,980.6,0.622,0.182,0.208,1.118,0.920,0.062,0.323
+mbs16,2048,45737.50,22868.75,45.49,42254.50,1818,9.90,2048,3.770,3.542,2052.3,1.638,0.290,0.208,0.418,0.462,0.067,0.483

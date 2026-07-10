@@ -91,9 +91,47 @@ On 2026-07-10, EP2 was revalidated on a freshly rented 2 x RTX 3090 host with `N
 
 This validates EP correctness and exposes the next optimization boundary: remove or move the final replication all-reduce, then overlap token dispatch with local expert compute.
 
+## EP Token Scaling
+
+The EP2 path was then run without profiler overhead for 20 steps at three micro-batch sizes. This separates two questions: whether the dispatcher is correct, and whether the dispatch cost can be amortized as each expert receives more tokens.
+
+| Micro-batch | Tokens/step | Warm tokens/s | Tokens/s/GPU | Avg step ms | Step>=10 tokens/s | Peak reserved MiB |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| mbs2 | 256 | 5,658.8 | 2,828.8 | 45.9 | 5,325.5 | 1,302 |
+| mbs4 | 512 | 10,840.6 | 5,423.8 | 47.7 | 10,231.8 | 1,316 |
+| mbs8 | 1024 | 22,962.5 | 11,473.8 | 45.1 | 21,609.1 | 1,396 |
+| mbs16 | 2048 | 45,737.5 | 22,868.8 | 45.5 | 42,254.5 | 1,818 |
+
+The profiler run shows why larger token counts matter:
+
+| Micro-batch | Routed tokens/layer | Median dispatcher ms | Route + count ms | Dispatch A2A ms | Coalesce ms | GroupedGEMM ms | Return A2A ms | Final all-reduce ms |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| mbs2 | 256 | 2.144 | 0.667 | 0.186 | 0.225 | 1.024 | 0.226 | 0.242 |
+| mbs4 | 512 | 2.073 | 0.616 | 0.169 | 0.208 | 0.420 | 0.146 | 0.245 |
+| mbs8 | 1024 | 2.191 | 0.622 | 0.182 | 0.208 | 1.118 | 0.920 | 0.323 |
+| mbs16 | 2048 | 3.542 | 1.638 | 0.290 | 0.208 | 0.418 | 0.462 | 0.483 |
+
+The dispatcher has a visible fixed cost from route packing, metadata movement, sorting, and launch overhead. As tokens per step rise from 256 to 1024, throughput increases from 5.66K to 22.96K tokens/s while peak memory only increases from 1.30 GiB to 1.40 GiB. The follow-up mbs16 run reaches 45.7K tokens/s with 1.82 GiB peak memory, further showing that EP throughput is highly sensitive to routed-token granularity. At mbs16, dispatcher median latency rises to 3.54 ms and the largest visible segments are route/count, return all-to-all, and final all-reduce. This is the useful EP behavior for larger training: memory is reduced by sharding experts, while throughput depends on sending enough tokens to each local expert to amortize dispatch overhead.
+
+Full details: [`qwen3_moe_style_ep_token_scaling.md`](qwen3_moe_style_ep_token_scaling.md).
+
+## 4-GPU Mixed Parallel
+
+The final Project 1 profiling pass compares three 4-GPU strategies at the same 4096 tokens/step. Each run uses 100 training steps, and the table reports the stable average from steps >= 50.
+
+| Strategy | Tokens/step | Stable tokens/s | Tokens/s/GPU | Avg step ms | Peak reserved MiB/GPU | Final loss |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| DP4 | 4096 | 27.73K | 6.93K | 147.7 | 2642 | 9.79 |
+| TP2+DP2 | 4096 | 37.23K | 9.31K | 110.0 | 2572 | 9.81 |
+| EP2+DP2 | 4096 | 48.51K | 12.13K | 84.5 | 1944 | 9.80 |
+
+The result is the strongest systems evidence in this project. DP4 is simple but replicates all experts. TP2+DP2 improves throughput but pays tensor-parallel collectives. EP2+DP2 is fastest and lowest-memory in this model shape because expert sharding reduces per-rank expert state, while a 4096-token global step gives the dispatcher enough routed tokens to amortize fixed all-to-all and metadata overhead.
+
+Full details: [`qwen3_moe_style_4gpu_mixed_parallel.md`](qwen3_moe_style_4gpu_mixed_parallel.md).
+
 ## Resume Validation
 
-PP2 checkpoint/resume was validated by saving at step 20 and resuming to step 22. This confirms that pipeline-stage model shards, optimizer state, scheduler state, and random state can be restored well enough for continued training.
+PP2 checkpoint/resume was validated by saving at step 20 and resuming to step 22. EP2 checkpoint/resume was also validated after the All-to-All dispatcher change: the run loaded `last_train_step=20`, continued to step 22, and saved rank-local expert optimizer shards for both `exp-0-of-2` and `exp-1-of-2`. This confirms that pipeline-stage model shards, expert shards, optimizer state, scheduler state, and random state can be restored well enough for continued training.
 
 ## What This Project Claims
 

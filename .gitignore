@@ -23,6 +23,8 @@ project1_qwen3_moe_pretrain/data/project1/packed/
 
 # Curated Project 1 profiling result table kept for reproducibility.
 !project1_qwen3_moe_pretrain/results/project1_qwen3_moe_style_clean_summary.csv
+!project1_qwen3_moe_pretrain/results/qwen3_moe_style_ep_token_scaling.csv
+!project1_qwen3_moe_pretrain/results/qwen3_moe_style_4gpu_mixed_parallel.csv
 
 # Project 3 result tables are small enough and important for reproducibility.
 !project3_vla_inference/results/*.csv

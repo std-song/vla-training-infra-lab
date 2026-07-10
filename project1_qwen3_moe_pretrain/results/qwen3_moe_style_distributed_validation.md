@@ -93,6 +93,13 @@ TP2 does not improve throughput in this small setting because tensor parallelism
 
 ## EP2 Result And Blocker
 
+Update: this section records the first EP2 failure boundary from 2026-07-09. It has since been superseded by the All-to-All dispatcher implementation documented in:
+
+- [`qwen3_moe_style_ep_alltoall_dispatch.md`](qwen3_moe_style_ep_alltoall_dispatch.md)
+- [`qwen3_moe_style_ep_token_scaling.md`](qwen3_moe_style_ep_token_scaling.md)
+
+The original blocker was useful because it identified the exact missing piece: local expert token-count alignment and contiguous expert buffers before GroupedGEMM.
+
 Initial pure EP2 failed before model execution because Nanotron's `ParallelContext` had inconsistent expert-parallel world-size handling:
 
 - The initialization assertion checked only `TP*CP*DP*PP == WORLD_SIZE`.
