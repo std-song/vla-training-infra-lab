@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import os
 from pathlib import Path
+import sys
 import time
 from typing import Any
 
@@ -10,11 +11,15 @@ import torch
 import torch.distributed as dist
 from torch.nn.parallel import DistributedDataParallel
 from torch.utils.data import DataLoader
-from torch.utils.data.distributed import DistributedSampler
+
+# Permit direct ``torchrun scripts/train_smolvla_compatible_dp.py`` launches.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from smolvla_nanotron.data.collator import VLABatch, collate_lerobot_lowdim, describe_batch
 from smolvla_nanotron.data.lerobot_parquet_dataset import LeRobotParquetDataset
+from smolvla_nanotron.data.sampler import EpisodeAwareSampler, SampleIdentity
 from smolvla_nanotron.models.smolvla_compatible import SmolVLACompatiblePolicy
+from smolvla_nanotron.models.tiny_policy import masked_mse_loss
 
 
 def parse_args() -> argparse.Namespace:
@@ -31,9 +36,12 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--prefetch-factor", type=int, default=2)
     parser.add_argument("--pin-memory", action="store_true")
     parser.add_argument("--persistent-workers", action="store_true")
+    parser.add_argument("--sampling-policy", choices=["frame", "episode"], default="frame")
+    parser.add_argument("--sampler-seed", type=int, default=17)
     parser.add_argument("--lr", type=float, default=1e-3)
     parser.add_argument("--grad-clip", type=float, default=1.0)
     parser.add_argument("--save-every", type=int, default=0)
+    parser.add_argument("--log-every", type=int, default=10)
     parser.add_argument("--resume-from", type=Path, default=None)
     parser.add_argument("--backend", default=None, choices=["nccl", "gloo", None])
     return parser.parse_args()
@@ -91,7 +99,7 @@ def move_batch_to_device(batch: VLABatch, device: torch.device) -> VLABatch:
     )
 
 
-def make_loader(args: argparse.Namespace, rank: int, world_size: int) -> tuple[DataLoader, DistributedSampler]:
+def make_loader(args: argparse.Namespace, rank: int, world_size: int) -> tuple[DataLoader, Any]:
     dataset = LeRobotParquetDataset(
         args.cache_root,
         repo_id=args.repo_id,
@@ -100,7 +108,16 @@ def make_loader(args: argparse.Namespace, rank: int, world_size: int) -> tuple[D
         include_images=True,
         image_size=args.image_size,
     )
-    sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=True, drop_last=True)
+    if args.sampling_policy == "episode":
+        samples = [
+            SampleIdentity(index=position, episode_index=int(row["episode_index"]))
+            for position, (_, row) in enumerate(dataset.frame_df.iterrows())
+        ]
+        sampler: Any = EpisodeAwareSampler(samples, rank=rank, world_size=world_size, seed=args.sampler_seed)
+    else:
+        from torch.utils.data.distributed import DistributedSampler
+
+        sampler = DistributedSampler(dataset, num_replicas=world_size, rank=rank, shuffle=True, drop_last=True)
     kwargs: dict[str, Any] = {
         "batch_size": args.batch_size,
         "sampler": sampler,
@@ -192,7 +209,10 @@ def main() -> None:
         start_time = time.perf_counter()
         iterator = iter(loader)
         epoch = 0
+        data_wait_seconds = 0.0
+        update_seconds = 0.0
         while global_step < args.train_steps:
+            data_started = time.perf_counter()
             try:
                 batch = next(iterator)
             except StopIteration:
@@ -200,13 +220,18 @@ def main() -> None:
                 sampler.set_epoch(epoch)
                 iterator = iter(loader)
                 batch = next(iterator)
+            data_wait_seconds += time.perf_counter() - data_started
 
+            update_started = time.perf_counter()
             batch = move_batch_to_device(batch, device)
-            loss, prediction = model.loss(batch) if not isinstance(model, DistributedDataParallel) else model.module.loss(batch)
+            # Invoke DDP.forward so its reducer observes all model parameters.
+            prediction = model(batch)
+            loss = masked_mse_loss(prediction, batch.action.float(), batch.action_mask)
             optimizer.zero_grad(set_to_none=True)
             loss.backward()
             grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=args.grad_clip)
             optimizer.step()
+            update_seconds += time.perf_counter() - update_started
 
             global_step += 1
             metrics = torch.tensor(
@@ -215,7 +240,7 @@ def main() -> None:
                 device=device,
             )
             metrics = reduce_mean(metrics, world_size)
-            if rank == 0:
+            if rank == 0 and (global_step == 1 or global_step % args.log_every == 0 or global_step == args.train_steps):
                 print(
                     f"step={global_step} loss={metrics[0].item():.6f} grad_norm={metrics[1].item():.4f} "
                     f"pred_mean={metrics[2].item():.4f} target_mean={metrics[3].item():.4f}",
@@ -250,6 +275,8 @@ def main() -> None:
             print(f"elapsed_sec={max_elapsed:.3f}", flush=True)
             print(f"steps_per_sec={local_steps / max_elapsed:.3f}", flush=True)
             print(f"samples_per_sec={global_samples / max_elapsed:.3f}", flush=True)
+            print(f"avg_data_wait_ms_rank0={data_wait_seconds / local_steps * 1000:.3f}", flush=True)
+            print(f"avg_update_ms_rank0={update_seconds / local_steps * 1000:.3f}", flush=True)
             print(f"checkpoint={final_ckpt}", flush=True)
 
         if device.type == "cuda":

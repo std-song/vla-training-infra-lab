@@ -29,6 +29,8 @@ The useful engineering result is the bottleneck boundary: for this small two-GPU
 ## Reading Path
 
 - Final report: [`results/project2_final_report.md`](results/project2_final_report.md)
+- Dataset admission and distributed sampling: [`results/project2_dataset_admission.md`](results/project2_dataset_admission.md)
+- Episode-aware distributed sampler profile: [`results/project2_episode_sampler_profile.md`](results/project2_episode_sampler_profile.md)
 - Data schema: [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md)
 - Adapter design: [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md)
 - Nanotron-style DP wrapper: [`results/project2_nanotron_style_dp.md`](results/project2_nanotron_style_dp.md)

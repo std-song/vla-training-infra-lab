@@ -1,0 +1,3 @@
+sampling_policy,world_size,gpus,global_batch_size,train_steps,image_size,cameras,workers,samples_per_sec,avg_data_wait_ms_rank0,avg_update_ms_rank0,max_cuda_allocated_mib
+frame,2,2x RTX 4080 SUPER,4,200,224,3,2,147.826,2.494,22.603,64.7
+episode,2,2x RTX 4080 SUPER,4,200,224,3,2,156.768,0.742,22.217,64.7
