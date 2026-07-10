@@ -1,4 +1,4 @@
-﻿# Project 3 Stage 3: Qwen2 Attention Backend Comparison
+# Project 3 Stage 3: Qwen2 Attention Backend Comparison
 
 Date: 2026-07-07
 
@@ -20,7 +20,7 @@ The goal is to avoid a common oversimplification: installing FlashAttention does
 | Model | `Qwen/Qwen2-0.5B-Instruct` |
 | dtype | BF16 |
 | Cache | Hugging Face `past_key_values` |
-| Script | `project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py` |
+| Script | `project3_vla_inference/benchmarks/bench_qwen2_prefill_decode.py` |
 
 ## Sweep
 

@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="760" height="330" viewBox="0 0 760 330">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="32" y="34" font-family="Arial, sans-serif" font-size="20" font-weight="700" fill="#111827">Peak Reserved Memory by Strategy</text>
+<text x="32" y="56" font-family="Arial, sans-serif" font-size="13" fill="#4b5563">Qwen3-MoE-style Nanotron, warm-step average</text>
+<text x="34" y="95" font-family="Arial, sans-serif" font-size="13" fill="#111827">single</text>
+<rect x="150" y="78" width="421.3" height="24" rx="3" fill="#2563eb"/>
+<text x="581.3" y="95" font-family="Arial, sans-serif" font-size="13" fill="#111827">2242.0</text>
+<text x="34" y="137" font-family="Arial, sans-serif" font-size="13" fill="#111827">dp2</text>
+<rect x="150" y="120" width="460.0" height="24" rx="3" fill="#16a34a"/>
+<text x="620.0" y="137" font-family="Arial, sans-serif" font-size="13" fill="#111827">2448.0</text>
+<text x="34" y="179" font-family="Arial, sans-serif" font-size="13" fill="#111827">tp2</text>
+<rect x="150" y="162" width="378.8" height="24" rx="3" fill="#7c3aed"/>
+<text x="538.8" y="179" font-family="Arial, sans-serif" font-size="13" fill="#111827">2016.0</text>
+<text x="34" y="221" font-family="Arial, sans-serif" font-size="13" fill="#111827">pp2</text>
+<rect x="150" y="204" width="383.3" height="24" rx="3" fill="#ea580c"/>
+<text x="543.3" y="221" font-family="Arial, sans-serif" font-size="13" fill="#111827">2040.0</text>
+<text x="34" y="263" font-family="Arial, sans-serif" font-size="13" fill="#111827">ep2</text>
+<rect x="150" y="246" width="244.7" height="24" rx="3" fill="#0891b2"/>
+<text x="404.7" y="263" font-family="Arial, sans-serif" font-size="13" fill="#111827">1302.0</text>
+</svg>

@@ -1,60 +1,66 @@
 # Experiment Matrix
 
-This matrix defines the staged validation path from a single RTX 3090 smoke test to the intended 8x3090 distributed Qwen2-MoE project.
+This matrix summarizes the completed and planned validation points across the three independent projects.
 
-## Principle
-
-Do not jump directly to `DP/TP/PP/EP=8-way complexity`. Each axis should be validated independently first, then composed.
-
-## Completed Experiments
+## Project 1: Qwen3-MoE-style Pretraining
 
 | ID | GPUs | DP | TP | PP | EP | Goal | Status |
 | --- | ---: | ---: | ---: | ---: | ---: | --- | --- |
-| moe_unit | 1 | 1 | 1 | 1 | 1 | Nanotron MoE unit test | done |
-| smoke_5 | 1 | 1 | 1 | 1 | 1 | end-to-end train/checkpoint smoke | done |
-| resume_7 | 1 | 1 | 1 | 1 | 1 | checkpoint resume from step 5 | done |
-| baseline_20 | 1 | 1 | 1 | 1 | 1 | first profiling run | done |
-| baseline_100 | 1 | 1 | 1 | 1 | 1 | longer tiny baseline profile | done |
-| baseline_v2_500 | 1 | 1 | 1 | 1 | 1 | 75.5M-parameter 500-step profile | done |
-| baseline_v2_resume_520 | 1 | 1 | 1 | 1 | 1 | resume baseline v2 from step 500 to 520 | done |
-| recompute_ab | 1 | 1 | 1 | 1 | 1 | activation recomputation tradeoff | done |
-| dp2_200 | 2 | 2 | 1 | 1 | 1 | distributed DP training and checkpoint | done |
-| dp2_resume_220 | 2 | 2 | 1 | 1 | 1 | resume DP checkpoint from step 200 to 220 | done |
-| tp2_100 | 2 | 1 | 2 | 1 | 1 | tensor-parallel training and checkpoint | done |
-| tp2_resume_120 | 2 | 1 | 2 | 1 | 1 | resume TP checkpoint from step 100 to 120 | done |
-| pp2_100 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel training and checkpoint | done |
-| pp2_resume_120 | 2 | 1 | 1 | 2 | 1 | resume PP checkpoint from step 100 to 120 | done |
-| dp4_4gpu | 4 | 4 | 1 | 1 | 1 | 4-GPU DP composition | done |
-| tp2_dp2_4gpu | 4 | 2 | 2 | 1 | 1 | 4-GPU DP+TP composition | done |
-| pp2_dp2_4gpu | 4 | 2 | 1 | 2 | 1 | 4-GPU DP+PP composition | done |
-| ep2_dp2_4gpu | 4 | 2 | 1 | 1 | 2 | EP readiness attempt | blocked at local expert accounting |
+| qwen3_single | 1 | 1 | 1 | 1 | 1 | single-GPU smoke/profile | done |
+| qwen3_dp2 | 2 | 2 | 1 | 1 | 1 | data-parallel validation and resume | done |
+| qwen3_tp2 | 2 | 1 | 2 | 1 | 1 | tensor-parallel validation | done |
+| qwen3_pp2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel validation and resume | done |
+| qwen3_ep2 | 2 | 1 | 1 | 1 | 2 | local expert dispatch validation | done |
+| qwen2_dp4 | 4 | 4 | 1 | 1 | 1 | early 4-GPU DP scaling baseline | done |
+| qwen2_tp2_dp2 | 4 | 2 | 2 | 1 | 1 | early 4-GPU TP+DP composition | done |
+| qwen2_pp2_dp2 | 4 | 2 | 1 | 2 | 1 | early 4-GPU PP+DP composition | done |
 
-## Near-Term Experiments
+Metrics:
 
-The 2-GPU DP, TP, and PP axes plus 4-GPU DP/TP/PP compositions are complete. The near-term work is true EP implementation, not more config-only scaling.
+- loss, gradient norm, tokens/s, tokens/s/GPU
+- iteration time, peak allocated/reserved CUDA memory
+- checkpoint save/resume correctness
+- communication notes for DP all-reduce, TP collectives, PP bubbles, EP dispatch
 
-## 8-GPU Target Experiments
+Next EP work:
 
-| ID | GPUs | DP | TP | PP | EP | Goal |
-| --- | ---: | ---: | ---: | ---: | ---: | --- |
-| dp_8 | 8 | 8 | 1 | 1 | 1 | pure data-parallel scaling baseline |
-| tp2_dp4 | 8 | 4 | 2 | 1 | 1 | tensor parallel plus data parallel |
-| pp2_dp4 | 8 | 4 | 1 | 2 | 1 | pipeline parallel plus data parallel |
-| ep2_dp4 | 8 | 4 | 1 | 1 | 2 | first expert-parallel composition |
-| tp2_pp2_dp2 | 8 | 2 | 2 | 2 | 1 | combined dense-model parallelism |
-| tp2_pp2_ep2 | 8 | 1 | 2 | 2 | 2 | final MoE distributed stress case, if EP is implemented correctly |
+- cross-rank expert All-to-All dispatch
+- global-to-local expert id mapping
+- token buffer compaction before GroupedGEMM
+- communication/compute overlap
+- auxiliary-loss and checkpoint validation under `expert_parallel_size > 1`
 
-## Metrics To Record
+## Project 2: SmolVLA Training
 
-- final loss and finite-gradient check
-- tokens/s and tokens/s/GPU
-- time per iteration: average, p50, p95 if available
-- peak allocated and reserved CUDA memory
-- `nvidia-smi` sampled memory, utilization, power, and temperature
-- checkpoint save and resume time
-- model parameter count and per-rank parameter count
-- communication notes: all-reduce for DP/TP, pipeline bubbles for PP, all-to-all for EP
+| ID | GPUs | Goal | Status |
+| --- | ---: | --- | --- |
+| lerobot_schema | 0-1 | validate video/parquet/task schema | done |
+| smolvla_wrapper | 1 | validate compatible VLA batch and masked action loss | done |
+| nanotron_style_dp | 2 | validate DDP wrapper, sampler, metrics, checkpoint | done |
+| official_ddp | 2 | official SmolVLA Accelerate baseline | done |
+| worker_tuning | 2 | DataLoader worker throughput comparison | done |
+| bf16_tuning | 2 | mixed-precision throughput comparison | done |
 
-## Known EP Caveat
+Metrics:
 
-The current Nanotron Qwen2-MoE path validates expert routing and grouped expert compute within one rank. Before claiming true expert parallelism, the project must verify cross-rank expert token dispatch, process-group semantics, local/global expert id mapping, all-to-all correctness, and checkpoint layout under `expert_parallel_size > 1`.
+- samples/s, update time, dataloader time
+- GPU memory, rank metrics, checkpoint/resume correctness
+- video decode and CPU/GPU overlap notes
+
+## Project 3: VLM/VLA Inference
+
+| ID | GPU | Goal | Status |
+| --- | --- | --- | --- |
+| qwen3vl_vllm | 32GiB | vLLM concurrency baseline | done |
+| qwen25vl_visual | 32GiB | visual-token and prefill profiling | done |
+| paged_kv_sim | CPU/GPU optional | paged KV / batching simulator | done |
+| pi05_action | 32GiB | real VLA action chunk profiling | done |
+| async_queue | CPU | VLASH-inspired control-loop simulator | done |
+| triton_action | GPU | fused action post-processing benchmark | done |
+
+Metrics:
+
+- request latency, request throughput, output tokens/s
+- visual marker tokens, prefill time, KV footprint
+- action chunk latency, queue pop latency, state staleness
+- simulated control-loop reaction latency and action overhead

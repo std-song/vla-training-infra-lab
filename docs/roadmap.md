@@ -1,115 +1,50 @@
 # Roadmap
 
-This repository is organized as a staged VLA training-infrastructure portfolio.
+The repository is organized as three independent project folders. Each folder is designed to be readable and portable enough to become its own GitHub repository later.
 
-## Stage 1: Qwen2-MoE Single-GPU Correctness
-
-Status: completed.
-
-- Install Nanotron dependencies on RTX 3090.
-- Validate grouped_gemm and flash-attn imports.
-- Run `tests/test_moe.py`.
-- Run 5-step Qwen2-MoE dummy-data training.
-- Save checkpoint at step 5.
-
-## Stage 2: Checkpoint Resume
-
-Status: completed.
-
-Goal: prove training-state reliability.
-
-Completed evidence:
-
-- Resumed from `checkpoints/qwen2_moe_smoke/5`.
-- Extended training from step 5 to step 7.
-- Loaded optimizer and scheduler state.
-- Saved checkpoint at `checkpoints/qwen2_moe_smoke/7`.
-
-## Stage 3: Single-GPU Baseline Profiling
-
-Status: completed.
+## Project 1: Qwen3-MoE-style Pretraining Infra
 
 Completed:
 
-- 20-step tiny baseline profile.
-- 100-step tiny baseline profile.
-- 75.5M-parameter 500-step baseline profile.
-- Step-500 to step-520 checkpoint resume.
-- Activation recomputation A/B.
-- Memory, throughput, utilization, power, and checkpoint-size analysis.
+- Qwen3-MoE-style 100M-scale Nanotron configs and patches.
+- Single/DP2/TP2/PP2/EP2 smoke and profiling.
+- PP resume and pipeline-stage logging fixes.
+- Outer pretraining pipeline: corpus manifest, tokenizer fallback, sequence packing, launch matrix, log parser, figures.
+- Earlier 4-GPU Qwen2-MoE DP/TP/PP composition results retained as scaling evidence.
 
-Latest baseline v2 result:
+Next:
 
-| Metric | Value |
-| --- | ---: |
-| Parameters | 75.5M |
-| Avg throughput, logged steps >= 50 | 10,544 tokens/s |
-| Avg step time, logged steps >= 50 | 49.59 ms |
-| Max sampled GPU memory | 2,271 MiB |
-| Checkpoint size | 1009 MiB |
-| Recompute throughput change | -21.5% |
-| Recompute memory change | -0.8% sampled memory |
+- Implement true cross-rank EP All-to-All dispatch.
+- Add token buffer compaction and communication/compute overlap.
+- Validate EP checkpoint layout and auxiliary-loss aggregation.
 
-## Stage 4: Multi-GPU Data Parallel
+## Project 2: SmolVLA Training Infra
 
-Status: completed for `dp=2` and `dp=4`.
+Completed:
 
-Goal: validate distributed launcher and gradient synchronization.
+- LeRobot dataset schema parsing and VLA batch collation.
+- SmolVLA-compatible wrapper and Nanotron-style DDP wrapper.
+- Official SmolVLA Accelerate DDP baseline.
+- DataLoader worker, BF16, and DDP tuning reports.
 
-Suggested configs:
+Next:
 
-| Case | DP | TP | PP | EP | Purpose |
-| --- | ---: | ---: | ---: | ---: | --- |
-| dp_2 | 2 | 1 | 1 | 1 | distributed smoke, completed |
-| dp_4 | 4 | 1 | 1 | 1 | throughput scaling |
-| dp_8 | 8 | 1 | 1 | 1 | 8x3090 baseline |
+- Extend from wrapper validation toward deeper Nanotron Trainer integration.
+- Add more datasets and simulator/rollout-facing metrics.
 
-## Stage 5: Tensor and Pipeline Parallel
+## Project 3: VLM/VLA Inference Infra
 
-Status: completed for `tp=2`, `pp=2`, `tp2_dp2`, and `pp2_dp2` on 4 GPUs.
+Completed:
 
-Goal: validate dense-model distributed axes before introducing cross-rank experts.
+- Qwen3-VL vLLM serving baseline.
+- Qwen2.5-VL visual-token and prefill analysis.
+- Paged-KV, prefix-cache, and batching simulations.
+- Pi0.5 action chunk profiling.
+- VLASH-inspired asynchronous action queue simulator.
+- Triton fused action post-processing benchmark.
 
-| Case | GPUs | DP | TP | PP | EP | Purpose |
-| --- | ---: | ---: | ---: | ---: | ---: | --- |
-| tp_2 | 2 | 1 | 2 | 1 | 1 | tensor-parallel smoke, completed |
-| pp_2 | 2 | 1 | 1 | 2 | 1 | pipeline-parallel smoke, completed |
-| tp2_dp4 | 8 | 4 | 2 | 1 | 1 | TP+DP scaling |
-| pp2_dp4 | 8 | 4 | 1 | 2 | 1 | PP+DP scaling |
+Next:
 
-## Stage 6: Expert Parallel Experiments
-
-Goal: study MoE memory/communication tradeoffs on PCIe GPUs.
-
-| Case | DP | TP | PP | EP | Purpose |
-| --- | ---: | ---: | ---: | ---: | --- |
-| ep_2 | 4 | 1 | 1 | 2 | expert placement |
-| ep_4 | 2 | 1 | 1 | 4 | communication stress |
-| ep_8 | 1 | 1 | 1 | 8 | all-to-all limit |
-
-Caveat: EP2+DP2 was attempted on 4 GPUs. After a minimal process-group assert fix, the run reached MoE compute and failed at GroupedGEMM because local expert token counts did not match local expert placement. Do not claim true EP until cross-rank expert token dispatch and checkpoint layout are implemented and validated.
-
-## Stage 7: SmolVLA Finetuning
-
-Goal: connect the training-infra work to VLA/robotics data.
-
-Tasks:
-
-- Keep synthetic SmolVLA smoke test reproducible.
-- Add LeRobot-style collator.
-- Support image/language/state/action batch schema.
-- Validate action-head or expert-only finetuning.
-- Track dataloader throughput and GPU idle time.
-
-## Stage 8: Inference Latency Optimization
-
-Goal: profile VLA action generation latency.
-
-Candidate optimizations:
-
-- FlashAttention / SDPA comparison.
-- KV-cache reuse for language prefix.
-- image encoder feature caching.
-- CUDA Graph for fixed-shape inference.
-- `torch.compile` or Triton kernels for action modules.
-- DFlash-style acceleration where token decoding dominates.
+- Connect scheduler simulations to an actual serving engine.
+- Validate action queue behavior with dataset observations or simulator rollouts.
+- Explore quantization/CUDA Graph/TensorRT paths on compatible hardware.

@@ -1,0 +1,4 @@
+{"text":"A robot policy receives camera observations, proprioceptive state, and a natural language task before predicting the next action chunk."}
+{"text":"Vision language action models benefit from synchronized trajectories, stable action masks, and deterministic data sharding during distributed training."}
+{"text":"For manipulation tasks, the training record should preserve episode id, frame timestamp, joint state, gripper state, action target, and task instruction."}
+{"text":"A reliable VLA training system separates raw trajectory parsing, feature collation, model forward, loss computation, and checkpoint writing."}

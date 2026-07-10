@@ -1,4 +1,4 @@
-﻿# Project 3 Stage: Pi0.5 Real VLA Action Inference
+# Project 3 Stage: Pi0.5 Real VLA Action Inference
 
 Date: 2026-07-08
 
@@ -83,10 +83,10 @@ This stage makes the project more defensible as VLA infrastructure work. The Qwe
 
 The curated result files are:
 
-- `project3_vla_infer/results/pi05_policy_action_benchmark_tokenized.csv`
-- `project3_vla_infer/results/pi05_policy_queue_benchmark_tokenized.csv`
-- `project3_vla_infer/results/pi05_policy_queue_benchmark_tokenized_summary.csv`
-- `project3_vla_infer/results/pi05_first_smoke_result.txt`
+- `project3_vla_inference/results/pi05_policy_action_benchmark_tokenized.csv`
+- `project3_vla_inference/results/pi05_policy_queue_benchmark_tokenized.csv`
+- `project3_vla_inference/results/pi05_policy_queue_benchmark_tokenized_summary.csv`
+- `project3_vla_inference/results/pi05_first_smoke_result.txt`
 
 The model weights are intentionally not committed.
 

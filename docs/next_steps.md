@@ -1,28 +1,54 @@
 # Next Steps
 
-The first Qwen2-MoE training-infrastructure project is complete as a 4xRTX 3090 portfolio artifact.
+The repository is now split into three self-contained projects:
 
-Completed scope:
+1. `project1_qwen3_moe_pretrain`: Nanotron/Qwen3-MoE-style pretraining infra.
+2. `project2_smolvla_training`: LeRobot/SmolVLA training infra.
+3. `project3_vla_inferenceence`: VLM/VLA inference infra.
 
-- single-GPU baseline profiling and checkpoint/resume
-- activation recomputation A/B
-- 2-GPU DP, TP, and PP validation with checkpoint/resume
-- 4-GPU DP4, TP2+DP2, and PP2+DP2 composition runs
-- Qwen2-MoE pipeline compatibility patches
-- EP2+DP2 readiness attempt with the next blocker localized
-- GitHub reports, configs, patches, and SVG figures
+## Project 1
 
-## Remaining Engineering Work
+Completed:
 
-True expert parallelism is the main unfinished engineering item. The next implementation plan is:
+- Qwen3-MoE-style 100M-scale single/DP2/TP2/PP2/EP2 smoke and profiling runs.
+- PP resume and non-final pipeline-stage logging fixes.
+- EP2 local expert dispatch validation.
+- Outer pretraining pipeline: corpus manifest, packed shard generation, launch matrix, log parser, and SVG figures.
 
-1. Make `ParallelContext` consistently account for `expert_parallel_size` in world-size validation and rank reshaping.
-2. Define global-to-local expert id mapping for Qwen2-MoE.
-3. Dispatch routed tokens across `ep_pg` with all-to-all or a verified all-gather path.
-4. Convert global `num_tokens_per_expert` into local expert counts before GroupedGEMM.
-5. Restore token order after expert computation.
-6. Validate router auxiliary loss and checkpoint naming/loading under `expert_parallel_size > 1`.
+Remaining engineering direction:
 
-## Resume Bullet Draft
+- Implement cross-rank expert All-to-All dispatch.
+- Merge non-contiguous token buffers before expert compute.
+- Overlap EP communication with local expert computation.
+- Validate auxiliary-loss aggregation and checkpoint layout under `expert_parallel_size > 1`.
 
-Built a Nanotron-based Qwen2-MoE distributed training lab on RTX 3090 GPUs, validating BF16 training, FlashAttention, GroupedGEMM MoE expert MLP, router top-k dispatch, checkpoint save/resume, activation recomputation analysis, and throughput/memory profiling. Completed single-GPU, 2-GPU DP/TP/PP, and 4-GPU DP4 / TP2+DP2 / PP2+DP2 runs; debugged Qwen2-MoE pipeline `TensorPointer` handling and loss-stage logging; analyzed EP2+DP2 readiness and localized the next blocker to local expert token accounting before GroupedGEMM.
+## Project 2
+
+Completed:
+
+- LeRobot schema discovery and VLA batch collation.
+- Nanotron-style DDP wrapper for multimodal batch validation.
+- Official SmolVLA Accelerate DDP baseline.
+- DataLoader worker, BF16, DDP tuning, checkpoint/resume, and memory profiling.
+
+Remaining engineering direction:
+
+- Deeper Nanotron Trainer integration for multimodal loss surfaces.
+- Broader dataset coverage beyond `aloha_mobile_cabinet`.
+- More realistic action metrics or simulator rollouts.
+
+## Project 3
+
+Completed:
+
+- Qwen3-VL vLLM serving baseline.
+- Qwen2.5-VL visual-token and prefill analysis.
+- Paged-KV / continuous-batching / prefix-cache simulations.
+- Pi0.5 action chunk profiling.
+- VLASH-inspired async action queue simulator.
+
+Remaining engineering direction:
+
+- Replace simulator-only scheduler components with real serving integration.
+- Add real rollout or robot-simulator validation for action queue quality.
+- Explore quantization and CUDA Graph paths on supported hardware.

@@ -1,158 +1,43 @@
 # VLA Training Infrastructure Lab
 
-A practical training-infrastructure lab for Vision-Language-Action (VLA) model training experiments on resource-constrained RTX 3090 hardware.
+This repository collects three independent infrastructure projects for VLA training and inference roles. The focus is not model quality benchmarking, but system work: distributed training behavior, multimodal data pipelines, profiling, checkpointing, serving, and control-loop latency analysis under limited GPU resources.
 
-This repository is organized as a portfolio project for VLA training infrastructure roles. The emphasis is training-system correctness, distributed behavior, memory and throughput measurement, checkpoint reliability, and practical debugging under limited hardware rather than benchmark model quality.
+For resume and interview preparation, start with [`docs/xiaomi_vla_infra_application_pack.md`](docs/xiaomi_vla_infra_application_pack.md).
 
-For resume and interview use, start with [docs/xiaomi_vla_infra_application_pack.md](docs/xiaomi_vla_infra_application_pack.md). It condenses the three projects into resume bullets, a 3-5 minute project narrative, technical Q&A, and a GitHub reading path.
+## Projects
 
-## Target Role Alignment
+| Project | Focus | Start here |
+| --- | --- | --- |
+| Project 1 | Nanotron-based Qwen3-MoE-style pretraining infra, DP/TP/PP/EP validation, MoE dispatch, checkpoint/resume, profiling | [`project1_qwen3_moe_pretrain/README.md`](project1_qwen3_moe_pretrain/README.md) |
+| Project 2 | LeRobot/SmolVLA multimodal data pipeline, DDP fine-tuning baseline, Nanotron-style DP wrapper, dataloader and BF16 profiling | [`project2_smolvla_training/README.md`](project2_smolvla_training/README.md) |
+| Project 3 | VLM/VLA inference infra: Qwen-VL serving, KV/cache and batching analysis, Pi0.5 action inference, async action queue simulation | [`project3_vla_inferenceence/README.md`](project3_vla_inferenceence/README.md) |
 
-The project maps directly to common VLA training-infra requirements:
+## Role Alignment
 
-| Requirement | Project coverage |
+| VLA infra requirement | Repository coverage |
 | --- | --- |
-| PyTorch distributed training | Nanotron-based Qwen2-MoE training path, DP=2/4, TP=2, PP=2, 4-GPU DP/TP/PP composition, EP readiness analyzed |
-| MoE training | Router top-k, expert token permutation, GroupedGEMM expert MLP, shared expert |
-| Mixed precision | BF16 training on RTX 3090 |
-| Operator acceleration | FlashAttention and fused RMSNorm/rotary paths where available |
-| Checkpoint/resume | Step-5 to step-7, step-500 to step-520, DP step-200 to step-220, TP step-100 to step-120, PP step-100 to step-120 |
-| Performance analysis | tokens/s, step time, memory, GPU utilization, power, checkpoint size, scaling efficiency |
-| Data pipeline | planned VLA/LeRobot-style data schema and shard strategy |
-| Experiment management | structured configs, scripts, troubleshooting notes, result reports |
-
-## Current Status
-
-Completed:
-
-- AutoDL RTX 3090 environment validated with Python 3.10.8, PyTorch 2.1.2+cu118, CUDA toolkit 11.8.
-- Nanotron dependencies installed, including `flash-attn==2.5.8` and `grouped_gemm`.
-- Nanotron MoE test passed: `PYTHONPATH=src pytest -q tests/test_moe.py`.
-- Qwen2-MoE single-GPU smoke run completed for 5 steps.
-- Checkpoint resume validated from step 5 to step 7.
-- Tiny 20-step and 100-step baseline profiling completed.
-- Stronger 75.5M-parameter 500-step baseline profiling completed.
-- Step-500 checkpoint resumed to step 520.
-- Activation recomputation A/B completed on the 75.5M-parameter baseline v2.
-- First 2-GPU data-parallel distributed run completed with checkpoint/resume.
-- First 2-GPU tensor-parallel distributed run completed with checkpoint/resume.
-- First 2-GPU pipeline-parallel distributed run completed with checkpoint/resume after Qwen2-MoE PP compatibility fixes.
-- 4-GPU composition runs completed: DP4, TP2+DP2, and PP2+DP2.
-- EP2+DP2 readiness attempt completed; next blocker localized to MoE local expert accounting before GroupedGEMM.
-- Compatibility patches documented for PyTorch 2.1.2 collect-env behavior and dummy-data resume metadata.
-
-Latest baseline summary:
-
-| Metric | Value |
-| --- | ---: |
-| GPU | 1x RTX 3090 24 GiB |
-| Model size | 75.5M params |
-| MoE | 8 experts, top-k=1, shared expert |
-| Parallelism | DP=1, TP=1, PP=1, EP=1 |
-| 500-step avg throughput, logged steps >= 50 | 10,544 tokens/s |
-| 500-step avg step time, logged steps >= 50 | 49.59 ms |
-| Max sampled GPU memory | 2,271 MiB |
-| Checkpoint size | 1009 MiB |
-| Resume validation | step 500 -> step 520 |
-| Recompute A/B | -21.5% throughput, no useful memory win at this scale |
-| DP=2 throughput | 17,987 tokens/s total, 8,989 tokens/s/GPU |
-| DP=2 resume | step 200 -> step 220 |
-| TP=2 throughput | 10,311 tokens/s total, 5,154 tokens/s/GPU |
-| TP=2 resume | step 100 -> step 120 |
-| PP=2 throughput | 11,357 tokens/s total, 5,674 tokens/s/GPU |
-| PP=2 resume | step 100 -> step 120 |
-| 4-GPU DP4 throughput | 22,686 tokens/s total, 5,671 tokens/s/GPU |
-| 4-GPU TP2+DP2 throughput | 20,071 tokens/s total, 5,019 tokens/s/GPU |
-| 4-GPU PP2+DP2 throughput | 20,500 tokens/s total, 5,127 tokens/s/GPU |
-
-See the full reports: [`results/qwen2_moe_4gpu_composition.md`](results/qwen2_moe_4gpu_composition.md), [`docs/scaling_analysis.md`](docs/scaling_analysis.md), [`results/qwen2_moe_pp2_2x3090.md`](results/qwen2_moe_pp2_2x3090.md), [`results/qwen2_moe_tp2_2x3090.md`](results/qwen2_moe_tp2_2x3090.md), [`results/qwen2_moe_dp2_2x3090.md`](results/qwen2_moe_dp2_2x3090.md), [`results/qwen2_moe_baseline_v2_1x3090.md`](results/qwen2_moe_baseline_v2_1x3090.md), and [`results/qwen2_moe_baseline_1x3090.md`](results/qwen2_moe_baseline_1x3090.md).
+| PyTorch distributed training | Nanotron DP/TP/PP/EP experiments and SmolVLA DDP adapter |
+| MoE training | Router top-k, expert token dispatch, GroupedGEMM, load-balancing hooks |
+| Mixed precision and kernels | BF16, FlashAttention, Triton action post-processing, vLLM serving paths |
+| Data pipeline | LeRobot video shards, parquet state/action, task text, action mask collation |
+| Experiment tracking | Reproducible configs, launch scripts, parsed logs, CSV summaries, SVG figures |
+| Serving and control loop | VLM concurrency profiling, visual token cost, KV budget simulation, Pi0.5 action chunk latency |
 
 ## Repository Layout
 
 ```text
-configs/qwen2_moe/       Qwen2-MoE training configs
-scripts/                 setup, launch, and profiling scripts
-results/                 curated experiment reports
-docs/                    design notes, roadmap, experiment matrix, troubleshooting
-patches/                 compatibility patches for upstream Nanotron
+project1_qwen3_moe_pretrain/   Qwen3-MoE-style pretraining infra and Nanotron experiments
+project2_smolvla_training/     LeRobot/SmolVLA data and distributed fine-tuning work
+project3_vla_inferenceence/        VLM/VLA inference profiling and async action serving
+docs/                          Cross-project resume pack, roadmap, troubleshooting
 ```
 
-## Quick Start
+Large generated artifacts, model weights, checkpoints, and local AutoDL credentials are intentionally ignored.
 
-Clone Nanotron separately on the training machine:
+## Current Status
 
-```bash
-cd /root/autodl-tmp/vla-infra
-git clone https://github.com/huggingface/nanotron.git nanotron
-cd nanotron
-```
+- Project 1: Qwen3-MoE-style 100M-scale Nanotron smoke/distributed validation completed on 1-2x RTX 3090, including PP resume fix and EP2 dispatch validation.
+- Project 2: SmolVLA official DDP and custom Nanotron-style DP wrapper are documented, with dataloader worker and BF16 profiling results.
+- Project 3: Qwen3-VL vLLM baseline, Qwen2.5-VL visual-token profiling, Pi0.5 action chunk inference, and VLASH-inspired async queue simulation are documented with figures.
 
-Install the environment following [`scripts/setup_autodl_3090.sh`](scripts/setup_autodl_3090.sh). Then copy a config into the Nanotron checkout:
-
-```bash
-mkdir -p examples/smoke
-cp /root/autodl-tmp/vla-infra/vla-training-infra-lab/configs/qwen2_moe/config_qwen2_moe_baseline_v2_500step.yaml \
-  examples/smoke/config_qwen2_moe_baseline_v2_500step.yaml
-```
-
-Run the baseline v2 training:
-
-```bash
-CUDA_DEVICE_MAX_CONNECTIONS=1 PYTHONPATH=src torchrun --nproc_per_node=1 \
-  run_train.py --config-file examples/smoke/config_qwen2_moe_baseline_v2_500step.yaml
-```
-
-## What This Project Can Honestly Claim Today
-
-This project currently validates the single-GPU Qwen2-MoE path, three independent 2-GPU distributed axes, and 4-GPU DP/TP/PP compositions. The covered features include router top-k, expert dispatch inside one rank, GroupedGEMM, FlashAttention, BF16, checkpoint save/resume, 500-step stability, activation recomputation A/B, DP checkpoint/resume, TP checkpoint/resume, PP checkpoint/resume, and coarse profiling.
-
-It does not claim true expert-parallel training yet. EP2+DP2 was tested as a readiness experiment and the next blocker was localized to MoE local expert accounting / token dispatch before GroupedGEMM.
-
-## Figures
-
-![Throughput summary](assets/figures/throughput_summary.svg)
-
-![Distributed-axis coverage](assets/figures/coverage_matrix.svg)
-
-
-## Project 2: SmolVLA / LeRobot Adapter
-
-Project 2 has started with LeRobot batch dry-runs on `lerobot/aloha_mobile_cabinet`. The first milestones validate local schema discovery, parquet state/action loading, VLA batch collation, task-text mapping, sampled three-camera video decoding, shard-aware video resolution via `meta/episodes`, a SmolVLA-compatible multimodal policy wrapper, checkpoint/resume smoke training, 2-GPU Nanotron-style DP/DDP smoke training, official LeRobot/SmolVLA Accelerate DDP smoke training, matched 50-step DP profiling, official SmolVLA DataLoader worker profiling, BF16 mixed-precision profiling, and DDP `find_unused_parameters` tuning.
-
-Start with the integrated report: [`results/project2_final_report.md`](results/project2_final_report.md). Resume-ready bullets are in [`docs/project2_resume_bullets.md`](docs/project2_resume_bullets.md). Supporting reports include [`docs/project2_lerobot_schema.md`](docs/project2_lerobot_schema.md), [`docs/project2_adapter_design.md`](docs/project2_adapter_design.md), [`results/project2_nanotron_style_dp.md`](results/project2_nanotron_style_dp.md), [`results/project2_official_smolvla_ddp.md`](results/project2_official_smolvla_ddp.md), [`results/project2_50step_profile.md`](results/project2_50step_profile.md), [`results/project2_official_smolvla_worker_profile.md`](results/project2_official_smolvla_worker_profile.md), [`results/project2_official_smolvla_bf16_profile.md`](results/project2_official_smolvla_bf16_profile.md), and [`results/project2_official_smolvla_ddp_tuning.md`](results/project2_official_smolvla_ddp_tuning.md).
-
-![Official SmolVLA DDP tuning](assets/figures/project2_official_smolvla_ddp_tuning.svg)
-
-
-## Project 3: Multimodal VLM/VLA Inference Acceleration
-
-Project 3 is a three-layer multimodal inference-infra project. The VLM serving layer covers Qwen3-VL / Qwen2.5-VL with vLLM-style metrics, visual-token profiling, batching, KV-memory accounting, concurrency curves, and scheduler simulation. The real VLA policy layer adds Pi0.5 / LeRobot action inference, measuring 50-step action chunk latency, `select_action` queue amortization, cold-start behavior, and GPU memory. The control-loop layer adds a VLASH-inspired async action-queue simulator, connecting measured Pi0.5 latency to future-state refill, state staleness, blocking, and action quantization. Start with [`docs/project3_vlm_vla_upgrade_plan.md`](docs/project3_vlm_vla_upgrade_plan.md), [`results/project3_qwen3vl_vllm_serving.md`](results/project3_qwen3vl_vllm_serving.md), [`results/project3_pi05_vla_action_inference.md`](results/project3_pi05_vla_action_inference.md), [`results/project3_vlash_async_control_loop.md`](results/project3_vlash_async_control_loop.md), then [`results/project3_final_report.md`](results/project3_final_report.md). Resume-ready bullets are in [`docs/project3_resume_bullets.md`](docs/project3_resume_bullets.md), and reproduction commands are in [`docs/project3_quickstart.md`](docs/project3_quickstart.md).
-
-![Project 3 Qwen3-VL vLLM throughput](assets/figures/project3_qwen3vl_vllm_throughput.svg)
-
-![Project 3 Qwen3-VL vLLM eager vs default](assets/figures/project3_qwen3vl_vllm_eager_vs_default.svg)
-![Project 3 Qwen2.5-VL serving throughput](assets/figures/project3_qwen25vl_serving_throughput.svg)
-
-![Project 3 Qwen2.5-VL serving speedup](assets/figures/project3_qwen25vl_serving_speedup.svg)
-
-![Project 3 Qwen2.5-VL visual tokens](assets/figures/project3_qwen25vl_visual_tokens.svg)
-
-![Project 3 Qwen2.5-VL KV footprint](assets/figures/project3_qwen25vl_kv_footprint.svg)
-
-![Project 3 paged KV throughput](assets/figures/project3_paged_kv_throughput.svg)
-
-![Project 3 paged KV budget sweep](assets/figures/project3_paged_kv_budget_sweep_throughput.svg)
-
-![Project 3 bucketed scheduler throughput](assets/figures/project3_bucketed_scheduler_throughput.svg)
-
-![Project 3 bucketed scheduler padding waste](assets/figures/project3_bucketed_scheduler_padding_waste.svg)
-
-![Project 3 Pi0.5 async control-loop error](assets/figures/project3_vlash_async_error.svg)
-
-![Project 3 Pi0.5 async control-loop trace](assets/figures/project3_vlash_async_trace.svg)
-
-![Project 3 action Triton speedup](assets/figures/project3_qwen3_vla_action_triton.svg)
-
-## Next Step
-
-Projects 1-2 are complete as portfolio artifacts. Project 3 now includes Qwen3-VL vLLM serving, Qwen2.5-VL visual-token profiling, scheduler/KV simulations, Triton action post-processing, Pi0.5 LeRobot action-inference profiling, and a VLASH-inspired async control-loop simulator. The next useful improvement is connecting this control-loop layer to real dataset observations or a robot simulator rollout.
+The project folders are intentionally self-contained so each can be moved to its own GitHub repository later without dragging unrelated artifacts along.

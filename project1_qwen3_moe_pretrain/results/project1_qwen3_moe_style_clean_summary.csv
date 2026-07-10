@@ -1,0 +1,6 @@
+job,steps_seen,last_step,avg_tokens_s_warm,avg_tokens_s_per_gpu_warm,avg_time_ms_warm,last_loss,peak_reserved_mib,checkpoint_ok,log_failed
+single,20,20,4455.625,4455.625,57.73125,9.96,2242.0,True,False
+dp2,20,20,6948.75,3473.75,73.85625,9.96,2448.0,True,False
+tp2,20,20,4201.25,2100.625,61.31249999999999,9.94,2016.0,True,False
+pp2,20,20,4561.25,2280.0,56.725,9.86,2040.0,True,False
+ep2,20,20,3248.75,1624.375,79.7875,9.91,1302.0,True,False

@@ -1,0 +1,183 @@
+diff --git a/src/nanotron/config/models_config.py b/src/nanotron/config/models_config.py
+index a74630d9..2d79016b 100644
+--- a/src/nanotron/config/models_config.py
++++ b/src/nanotron/config/models_config.py
+@@ -45,6 +45,8 @@ class MoEConfig:
+         default_factory=lambda: [-1]
+     )  # Indices of layers that use MoE. -1 means all layers. Default is all layers
+     enable_shared_expert: bool = False  # Whether to use a shared expert alongside specialized experts
++    router_load_balancing_type: str = "local"  # "local" or "global_batch"; global_batch all-reduces stats over DP
++    add_router_aux_loss: bool = True  # Whether to add router load-balancing loss to the language-model loss
+     token_dispatcher_type: str = "alltoall"  # Communication pattern for MoE ("alltoall" or "allgather")
+ 
+     def __post_init__(self):
+@@ -57,6 +59,11 @@ class MoEConfig:
+                 f"token_dispatcher_type must be one of ['alltoall', 'allgather'], got {self.token_dispatcher_type}"
+             )
+ 
++        if self.router_load_balancing_type not in ["local", "global_batch"]:
++            raise ValueError(
++                f"router_load_balancing_type must be one of ['local', 'global_batch'], got {self.router_load_balancing_type}"
++            )
++
+ 
+ @dataclass
+ class LlamaConfig:
+@@ -145,6 +152,8 @@ class Qwen2Config:
+     flex_attention_mask: Optional[str] = None
+     attention_bias: bool = False
+     sliding_window_size: Optional[int] = None
++    qk_layernorm: bool = False  # Qwen3-style QK-Norm after q/k projection and before RoPE
++    qk_layernorm_eps: Optional[float] = None
+     z_loss_enabled: bool = False  # Z-loss regularization https://www.jmlr.org/papers/volume24/22-1144/22-1144.pdf
+     z_loss_coefficient: float = 0.0001  # Default from the paper (10^-4)
+     no_rope_layer: Optional[
+diff --git a/src/nanotron/models/qwen.py b/src/nanotron/models/qwen.py
+index a18ff704..3a9c454b 100644
+--- a/src/nanotron/models/qwen.py
++++ b/src/nanotron/models/qwen.py
+@@ -212,6 +212,12 @@ class Qwen2Attention(LogMixin, nn.Module):
+             )
+         self.attention = CoreAttention(config, tp_pg, cp_pg, layer_idx)
+         self.simple_causal_mask = True
++        self.qk_layernorm = getattr(config, "qk_layernorm", False)
++        if self.qk_layernorm:
++            qk_eps = config.qk_layernorm_eps if config.qk_layernorm_eps is not None else config.rms_norm_eps
++            norm_class = TritonRMSNorm if config._fused_rms_norm else RMSNorm
++            self.q_norm = norm_class(self.head_dim, eps=qk_eps)
++            self.k_norm = norm_class(self.head_dim, eps=qk_eps)
+         self._use_qkv_packed = config._use_qkv_packed
+         self.sliding_window_size = config.sliding_window_size
+         self.log_attn_probs = config.log_attn_probs
+@@ -269,6 +275,11 @@ class Qwen2Attention(LogMixin, nn.Module):
+         kv = qkv[..., self.local_num_heads * self.head_dim :]  # Not contiguous, similar to flash_attn
+         q = q.view(-1, seq_length, self.local_num_heads, self.head_dim)
+         kv = kv.view(-1, seq_length, 2, self.local_num_kv_heads, self.head_dim)
++        if self.qk_layernorm:
++            q = self.q_norm(q)
++            k = self.k_norm(kv[:, :, 0])
++            v = kv[:, :, 1]
++            kv = torch.stack((k, v), dim=2)
+         if self.config.no_rope_layer is None or (self.layer_idx + 1) % self.config.no_rope_layer != 0:
+             seqlen_offset = dist.get_rank(self.cp_pg) * seq_length
+             q, kv = self.rotary_emb(
+@@ -573,6 +584,7 @@ class Qwen2DecoderLayer(nn.Module):
+         parallel_config: Optional[ParallelismArgs],
+         tp_pg: dist.ProcessGroup,
+         cp_pg: dist.ProcessGroup,
++        dp_pg: Optional[dist.ProcessGroup],
+         layer_idx: int,
+     ) -> None:
+         super().__init__()
+@@ -599,6 +611,7 @@ class Qwen2DecoderLayer(nn.Module):
+                 config=config,
+                 parallel_config=parallel_config,
+                 tp_pg=tp_pg,
++                dp_pg=dp_pg,
+                 layer_idx=layer_idx,
+             )
+         else:
+@@ -721,6 +734,7 @@ class Qwen2Model(nn.Module):
+                         "parallel_config": parallel_config,
+                         "tp_pg": parallel_context.tp_pg,
+                         "cp_pg": parallel_context.cp_pg,
++                        "dp_pg": parallel_context.dp_pg,
+                         "layer_idx": layer_idx,
+                     },
+                     module_input_keys={"hidden_states", "position_ids", "cu_seqlens"},
+@@ -942,11 +956,27 @@ class Qwen2ForTraining(NanotronModel, LoggingCollectorMixin):
+             label_ids=label_ids,
+             label_mask=label_mask,
+         )
++        router_aux_loss = self._get_router_aux_loss()
++        if router_aux_loss is not None:
++            loss["loss"] = loss["loss"] + router_aux_loss
+         if self.config.z_loss_enabled:
+             return {"loss": loss["loss"], "z_loss": loss["z_loss"]}
+         else:
+             return {"loss": loss["loss"]}
+ 
++    def _get_router_aux_loss(self) -> Optional[torch.Tensor]:
++        if self.config.moe_config is None or not self.config.moe_config.add_router_aux_loss:
++            return None
++
++        aux_losses = []
++        for module in self.modules():
++            aux_loss = getattr(module, "router_aux_loss", None)
++            if isinstance(aux_loss, torch.Tensor):
++                aux_losses.append(aux_loss)
++        if not aux_losses:
++            return None
++        return torch.stack(aux_losses).sum()
++
+     @torch.no_grad()
+     def init_model_randomly(self, config: Config):
+         """Initialize model parameters randomly."""
+diff --git a/src/nanotron/nn/moe.py b/src/nanotron/nn/moe.py
+index 40a296d0..781ef9ba 100644
+--- a/src/nanotron/nn/moe.py
++++ b/src/nanotron/nn/moe.py
+@@ -60,7 +60,8 @@ class Router(nn.Module):
+ 
+     def forward(self, x: torch.Tensor):
+         logits = self.gating(x)
+-        return self.routing(logits)
++        routing_weights, routing_indices = self.routing(logits)
++        return routing_weights, routing_indices, F.softmax(logits, dim=-1, dtype=torch.float32)
+ 
+ 
+ class GroupedMLP(nn.Module):
+@@ -107,6 +108,7 @@ class Qwen2MoELayer(nn.Module):
+         config: Qwen2Config,
+         parallel_config: Optional[ParallelismArgs],
+         tp_pg: dist.ProcessGroup,
++        dp_pg: Optional[dist.ProcessGroup] = None,
+         layer_idx: int = 0,
+     ) -> None:
+         super().__init__()
+@@ -122,6 +124,11 @@ class Qwen2MoELayer(nn.Module):
+         self.expert_parallel_size = parallel_config.expert_parallel_size
+         self.num_local_experts = self.num_experts // self.expert_parallel_size  # Experts per device
+ 
++        self.dp_pg = dp_pg
++        self.router_aux_loss_coef = config.moe_config.router_aux_loss_coef
++        self.router_load_balancing_type = getattr(config.moe_config, "router_load_balancing_type", "local")
++        self.router_aux_loss: Optional[torch.Tensor] = None
++
+         # Get TP mode configuration
+ 
+         # Router for selecting experts
+@@ -174,10 +181,32 @@ class Qwen2MoELayer(nn.Module):
+         hidden_states = ops.unpermute(expert_outputs, inverse_mapping, routing_weights)
+         return hidden_states
+ 
++    def _compute_router_aux_loss(self, router_probs: torch.Tensor, routing_indices: torch.Tensor) -> torch.Tensor:
++        """Qwen3-style load-balance loss over the current batch, optionally all-reduced over DP."""
++        with torch.no_grad():
++            expert_mask = F.one_hot(routing_indices.long(), num_classes=self.num_experts).to(torch.float32)
++            tokens_per_expert = expert_mask.sum(dim=(0, 1))
++            denominator = torch.tensor(routing_indices.numel(), device=router_probs.device, dtype=torch.float32)
++
++        prob_sum_per_expert = router_probs.sum(dim=0)
++        prob_denominator = torch.tensor(router_probs.shape[0], device=router_probs.device, dtype=torch.float32)
++
++        if self.router_load_balancing_type == "global_batch" and self.dp_pg is not None and self.dp_pg.size() > 1:
++            dist.all_reduce(tokens_per_expert, group=self.dp_pg, op=dist.ReduceOp.SUM)
++            dist.all_reduce(denominator, group=self.dp_pg, op=dist.ReduceOp.SUM)
++            dist.all_reduce(prob_sum_per_expert, group=self.dp_pg, op=dist.ReduceOp.SUM)
++            dist.all_reduce(prob_denominator, group=self.dp_pg, op=dist.ReduceOp.SUM)
++
++        tokens_fraction = tokens_per_expert / denominator.clamp_min(1.0)
++        prob_mean = prob_sum_per_expert / prob_denominator.clamp_min(1.0)
++        load_balance_loss = self.num_experts * torch.sum(tokens_fraction * prob_mean)
++        return load_balance_loss.to(router_probs.dtype) * self.router_aux_loss_coef
++
+     def _core_forward(self, hidden_states):
+         """Core forward logic for MoE layer."""
+         # Get top-k routing weights and indices
+-        routing_weights, routing_indices = self.router(hidden_states)  # [num_tokens, num_experts_per_token]
++        routing_weights, routing_indices, router_probs = self.router(hidden_states)  # [num_tokens, num_experts_per_token]
++        self.router_aux_loss = self._compute_router_aux_loss(router_probs, routing_indices)
+ 
+         # Dispatch tokens to experts
+         dispatched_inputs, inverse_permute_mapping, num_tokens_per_expert = self._dispatch_tokens(

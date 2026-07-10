@@ -1,4 +1,4 @@
-﻿# Project 3 Stage 4: VLA Action Head and Triton Fused Post-Processing
+# Project 3 Stage 4: VLA Action Head and Triton Fused Post-Processing
 
 Date: 2026-07-08
 
@@ -26,8 +26,8 @@ In PyTorch, this becomes several elementwise ops and intermediate tensors. The T
 | action head | `Linear -> SiLU -> Linear` |
 | post-process baseline | PyTorch elementwise ops |
 | fused kernel | custom Triton JIT kernel |
-| script | `project3_vla_infer/benchmarks/bench_vla_action_head_triton.py` |
-| result CSV | `project3_vla_infer/results/vla_action_head_triton_bf16.csv` |
+| script | `project3_vla_inference/benchmarks/bench_vla_action_head_triton.py` |
+| result CSV | `project3_vla_inference/results/vla_action_head_triton_bf16.csv` |
 
 ## Sweep
 

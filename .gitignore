@@ -16,7 +16,13 @@ outputs/
 profiling_logs/
 results/raw/
 .autodl/
-# Curated Project 3 result tables kept for reproducibility.
-!project3_vla_infer/results/qwen3vl_vllm_*.csv
-!project3_vla_infer/results/pi05_*.csv
-!project3_vla_infer/results/vlash_async_control_loop_*.csv
+
+# Project 1 generated mini pretraining artifacts are reproducible from scripts.
+project1_qwen3_moe_pretrain/data/project1/processed/
+project1_qwen3_moe_pretrain/data/project1/packed/
+
+# Curated Project 1 profiling result table kept for reproducibility.
+!project1_qwen3_moe_pretrain/results/project1_qwen3_moe_style_clean_summary.csv
+
+# Project 3 result tables are small enough and important for reproducibility.
+!project3_vla_inference/results/*.csv

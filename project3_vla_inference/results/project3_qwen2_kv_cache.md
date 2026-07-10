@@ -1,4 +1,4 @@
-﻿# Project 3 Stage 2: Qwen2 KV Cache vs No-Cache Decode
+# Project 3 Stage 2: Qwen2 KV Cache vs No-Cache Decode
 
 Date: 2026-07-07
 
@@ -15,8 +15,8 @@ This report compares cached autoregressive decode against a no-cache baseline fo
 | attention | PyTorch SDPA |
 | cached path | prefill once, then decode one token at a time with `past_key_values` |
 | no-cache path | decode one token at a time by recomputing the full prompt plus generated prefix |
-| benchmark script | `project3_vla_infer/benchmarks/bench_qwen2_kv_cache.py` |
-| result CSV | `project3_vla_infer/results/qwen2_kv_cache_compare_sdpa_bf16.csv` |
+| benchmark script | `project3_vla_inference/benchmarks/bench_qwen2_kv_cache.py` |
+| result CSV | `project3_vla_inference/results/qwen2_kv_cache_compare_sdpa_bf16.csv` |
 
 ## Sweep
 

@@ -1,4 +1,4 @@
-﻿# Project 3 Stage 1: Qwen2 Prefill / Decode Baseline
+# Project 3 Stage 1: Qwen2 Prefill / Decode Baseline
 
 Date: 2026-07-07
 
@@ -26,8 +26,8 @@ The benchmark follows a vLLM-inspired measurement split:
 | dtype | BF16 |
 | attention | PyTorch SDPA |
 | cache | Hugging Face `past_key_values` |
-| benchmark script | `project3_vla_infer/benchmarks/bench_qwen2_prefill_decode.py` |
-| result CSV | `project3_vla_infer/results/qwen2_prefill_decode_sdpa_bf16.csv` |
+| benchmark script | `project3_vla_inference/benchmarks/bench_qwen2_prefill_decode.py` |
+| result CSV | `project3_vla_inference/results/qwen2_prefill_decode_sdpa_bf16.csv` |
 
 ## Sweep
 

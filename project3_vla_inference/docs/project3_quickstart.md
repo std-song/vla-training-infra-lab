@@ -17,16 +17,16 @@ export MODEL_DIR=/root/autodl-tmp/vla-infra-project3/modelscope/models/Qwen--Qwe
 export VLLM_USE_FLASHINFER_SAMPLER=0
 export VLLM_WORKER_MULTIPROC_METHOD=spawn
 
-python project3_vla_infer/benchmarks/bench_qwen3vl_vllm.py \
+python project3_vla_inference/benchmarks/bench_qwen3vl_vllm.py \
   --model-dir "$MODEL_DIR" \
   --image-sizes 224,448 \
   --concurrency 1,2,4,8 \
   --max-new-tokens 64 \
   --warmup 3 \
   --repeat 5 \
-  --out project3_vla_infer/results/qwen3vl_vllm_default_concurrency.csv
+  --out project3_vla_inference/results/qwen3vl_vllm_default_concurrency.csv
 
-python project3_vla_infer/benchmarks/bench_qwen3vl_vllm.py \
+python project3_vla_inference/benchmarks/bench_qwen3vl_vllm.py \
   --model-dir "$MODEL_DIR" \
   --image-sizes 224,448 \
   --concurrency 1,2,4,8 \
@@ -34,7 +34,7 @@ python project3_vla_infer/benchmarks/bench_qwen3vl_vllm.py \
   --warmup 3 \
   --repeat 5 \
   --enforce-eager \
-  --out project3_vla_infer/results/qwen3vl_vllm_eager_concurrency.csv
+  --out project3_vla_inference/results/qwen3vl_vllm_eager_concurrency.csv
 ```
 
 Memory sampling example:
@@ -69,19 +69,19 @@ Important setup notes:
 ```bash
 export MODEL_DIR=/root/autodl-tmp/vla-infra-project3-pi05/models/pi05_libero_finetuned_v044
 
-python project3_vla_infer/benchmarks/bench_pi05_action_chunk.py \
+python project3_vla_inference/benchmarks/bench_pi05_action_chunk.py \
   --model-dir "$MODEL_DIR" \
   --batch-sizes 1 \
   --warmup 3 \
   --repeat 10 \
-  --out project3_vla_infer/results/pi05_action_benchmark_strict_false.csv
+  --out project3_vla_inference/results/pi05_action_benchmark_strict_false.csv
 
-python project3_vla_infer/benchmarks/bench_pi05_queue.py \
+python project3_vla_inference/benchmarks/bench_pi05_queue.py \
   --model-dir "$MODEL_DIR" \
   --steps 60 \
   --warmup-chunks 4 \
-  --out project3_vla_infer/results/pi05_queue_benchmark_warm_strict_false.csv \
-  --summary-out project3_vla_infer/results/pi05_queue_benchmark_warm_strict_false_summary.csv
+  --out project3_vla_inference/results/pi05_queue_benchmark_warm_strict_false.csv \
+  --summary-out project3_vla_inference/results/pi05_queue_benchmark_warm_strict_false_summary.csv
 ```
 
 The first benchmark measures full `predict_action_chunk` latency for `(1, 50, 7)` action chunks. The second benchmark measures `select_action` queue amortization: full model calls happen when the action queue is empty, while intermediate control steps pop from the queue.
@@ -106,11 +106,11 @@ PY
 Then rerun the benchmark with real PI05 prompt construction:
 
 ```bash
-python project3_vla_infer/benchmarks/bench_pi05_action_chunk.py \
+python project3_vla_inference/benchmarks/bench_pi05_action_chunk.py \
   --model-dir "$MODEL_DIR" \
   --tokenizer-name-or-path "$TOKENIZER_DIR" \
   --task "open the cabinet" \
-  --out project3_vla_infer/results/pi05_policy_action_benchmark_tokenized.csv
+  --out project3_vla_inference/results/pi05_policy_action_benchmark_tokenized.csv
 ```
 
 ## Track C: VLASH-inspired async control-loop simulator
@@ -118,13 +118,13 @@ python project3_vla_infer/benchmarks/bench_pi05_action_chunk.py \
 This layer does not require a GPU. It uses the measured Pi0.5 warm action-chunk latency and queue-pop latency to compare synchronous chunk execution, naive async queue refill, future-state-aware async refill, and future-state async with action quantization.
 
 ```bash
-python project3_vla_infer/simulators/vlash_async_control_loop.py \
+python project3_vla_inference/simulators/vlash_async_control_loop.py \
   --policy-latency-ms 87.65 \
   --queue-pop-ms 3.467 \
   --chunk-size 50 \
   --control-hz 30 \
-  --out-summary project3_vla_infer/results/vlash_async_control_loop_summary.csv \
-  --out-trace project3_vla_infer/results/vlash_async_control_loop_trace.csv
+  --out-summary project3_vla_inference/results/vlash_async_control_loop_summary.csv \
+  --out-trace project3_vla_inference/results/vlash_async_control_loop_trace.csv
 
 python scripts/make_project3_vlash_figures.py
 ```
@@ -149,7 +149,7 @@ export MODEL_DIR=/root/autodl-tmp/vla-infra-project3/modelscope/models/Qwen--Qwe
 ## Visual-token profiling
 
 ```bash
-python project3_vla_infer/benchmarks/bench_qwen25vl_visual_tokens.py \
+python project3_vla_inference/benchmarks/bench_qwen25vl_visual_tokens.py \
   --model-dir "$MODEL_DIR" \
   --image-sizes 224,448 \
   --image-counts 1,3 \
@@ -160,7 +160,7 @@ python project3_vla_infer/benchmarks/bench_qwen25vl_visual_tokens.py \
   --max-pixels 802816 \
   --dtype bf16 \
   --attn-implementation sdpa \
-  --out project3_vla_infer/results/qwen25vl_visual_tokens_dynamic_pixels_sdpa_bf16.csv
+  --out project3_vla_inference/results/qwen25vl_visual_tokens_dynamic_pixels_sdpa_bf16.csv
 ```
 
 ## Serving prototype
@@ -168,7 +168,7 @@ python project3_vla_infer/benchmarks/bench_qwen25vl_visual_tokens.py \
 Smoke:
 
 ```bash
-python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
+python project3_vla_inference/benchmarks/bench_qwen25vl_serving_prototype.py \
   --model-dir "$MODEL_DIR" \
   --request-count 2 \
   --image-count 1 \
@@ -179,13 +179,13 @@ python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
   --max-pixels 802816 \
   --dtype bf16 \
   --attn-implementation sdpa \
-  --out project3_vla_infer/results/qwen25vl_serving_prototype_smoke.csv
+  --out project3_vla_inference/results/qwen25vl_serving_prototype_smoke.csv
 ```
 
 8-request three-camera benchmark:
 
 ```bash
-python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
+python project3_vla_inference/benchmarks/bench_qwen25vl_serving_prototype.py \
   --model-dir "$MODEL_DIR" \
   --request-count 8 \
   --image-count 3 \
@@ -196,9 +196,9 @@ python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
   --max-pixels 802816 \
   --dtype bf16 \
   --attn-implementation sdpa \
-  --out project3_vla_infer/results/qwen25vl_serving_prototype_8req_3x224_d32.csv
+  --out project3_vla_inference/results/qwen25vl_serving_prototype_8req_3x224_d32.csv
 
-python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
+python project3_vla_inference/benchmarks/bench_qwen25vl_serving_prototype.py \
   --model-dir "$MODEL_DIR" \
   --request-count 8 \
   --image-count 3 \
@@ -209,7 +209,7 @@ python project3_vla_infer/benchmarks/bench_qwen25vl_serving_prototype.py \
   --max-pixels 802816 \
   --dtype bf16 \
   --attn-implementation sdpa \
-  --out project3_vla_infer/results/qwen25vl_serving_prototype_8req_3x448_d32.csv
+  --out project3_vla_inference/results/qwen25vl_serving_prototype_8req_3x448_d32.csv
 ```
 
 The serving prototype compares:
@@ -224,21 +224,21 @@ It reports requests/s, per-request latency, speedup, peak memory, and estimated 
 ## Paged KV and continuous batching simulator
 
 ```bash
-python project3_vla_infer/simulators/paged_kv_continuous_batching.py \
+python project3_vla_inference/simulators/paged_kv_continuous_batching.py \
   --request-count 128 \
   --mean-arrival-ms 90 \
   --kv-budget-mib 512 \
   --max-active 16 \
   --block-size 16 \
-  --out project3_vla_infer/results/qwen25vl_paged_kv_continuous_batching.csv
+  --out project3_vla_inference/results/qwen25vl_paged_kv_continuous_batching.csv
 
-python project3_vla_infer/simulators/paged_kv_continuous_batching.py \
+python project3_vla_inference/simulators/paged_kv_continuous_batching.py \
   --request-count 128 \
   --mean-arrival-ms 90 \
   --kv-budget-mib 256 \
   --max-active 16 \
   --block-size 16 \
-  --out project3_vla_infer/results/qwen25vl_paged_kv_budget256.csv
+  --out project3_vla_inference/results/qwen25vl_paged_kv_budget256.csv
 ```
 
 The simulator compares serial execution, continuous batching with static KV reservation, naive paged KV, and guarded paged KV admission.
@@ -247,13 +247,13 @@ The simulator compares serial execution, continuous batching with static KV rese
 ## Bucketed scheduler and prefix-cache simulator
 
 ```bash
-python project3_vla_infer/simulators/bucketed_prefix_cache.py \
+python project3_vla_inference/simulators/bucketed_prefix_cache.py \
   --request-count 256 \
   --mean-arrival-ms 70 \
   --max-batch-tokens 4096 \
   --max-batch-requests 16 \
   --prefix-pool 32 \
-  --out project3_vla_infer/results/qwen25vl_bucketed_prefix_cache_sim.csv
+  --out project3_vla_inference/results/qwen25vl_bucketed_prefix_cache_sim.csv
 ```
 
 The simulator compares FCFS, shape-aware buckets, token-budget buckets, and prefix-cache hits for repeated VLA visual/task prefixes.
@@ -263,7 +263,7 @@ The simulator compares FCFS, shape-aware buckets, token-budget buckets, and pref
 ```bash
 export QWEN3_DIR=/root/autodl-tmp/vla-infra-project3/modelscope/models/Qwen--Qwen3-0.6B/snapshots/master
 
-python project3_vla_infer/benchmarks/bench_causallm_prefill_decode.py \
+python project3_vla_inference/benchmarks/bench_causallm_prefill_decode.py \
   --model-dir "$QWEN3_DIR" \
   --batch-sizes 1,2,4 \
   --prompt-lengths 128,512,1024 \
@@ -271,15 +271,15 @@ python project3_vla_infer/benchmarks/bench_causallm_prefill_decode.py \
   --repeat 3 \
   --dtype bf16 \
   --attn-implementation sdpa \
-  --out project3_vla_infer/results/qwen3_prefill_decode_sdpa_bf16.csv
+  --out project3_vla_inference/results/qwen3_prefill_decode_sdpa_bf16.csv
 ```
 
 ## Triton action post-processing
 
 ```bash
-python project3_vla_infer/benchmarks/bench_vla_action_head_triton.py \
+python project3_vla_inference/benchmarks/bench_vla_action_head_triton.py \
   --hidden-dim 1024 \
-  --out project3_vla_infer/results/qwen3_vla_action_triton_hidden1024.csv
+  --out project3_vla_inference/results/qwen3_vla_action_triton_hidden1024.csv
 ```
 
 ## Figures

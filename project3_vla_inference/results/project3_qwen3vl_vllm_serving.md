@@ -97,16 +97,16 @@ export MODEL_DIR=/root/autodl-tmp/vla-infra-project3/modelscope/models/Qwen--Qwe
 export VLLM_USE_FLASHINFER_SAMPLER=0
 export VLLM_WORKER_MULTIPROC_METHOD=spawn
 
-python project3_vla_infer/benchmarks/bench_qwen3vl_vllm.py \
+python project3_vla_inference/benchmarks/bench_qwen3vl_vllm.py \
   --model-dir "$MODEL_DIR" \
   --image-sizes 224,448 \
   --concurrency 1,2,4,8 \
   --max-new-tokens 64 \
   --warmup 3 \
   --repeat 5 \
-  --out project3_vla_infer/results/qwen3vl_vllm_default_concurrency.csv
+  --out project3_vla_inference/results/qwen3vl_vllm_default_concurrency.csv
 
-python project3_vla_infer/benchmarks/bench_qwen3vl_vllm.py \
+python project3_vla_inference/benchmarks/bench_qwen3vl_vllm.py \
   --model-dir "$MODEL_DIR" \
   --image-sizes 224,448 \
   --concurrency 1,2,4,8 \
@@ -114,5 +114,5 @@ python project3_vla_infer/benchmarks/bench_qwen3vl_vllm.py \
   --warmup 3 \
   --repeat 5 \
   --enforce-eager \
-  --out project3_vla_infer/results/qwen3vl_vllm_eager_concurrency.csv
+  --out project3_vla_inference/results/qwen3vl_vllm_eager_concurrency.csv
 ```

@@ -1,0 +1,4 @@
+{"text":"Tensor parallelism shards attention and MLP weights across devices, reducing memory pressure but adding collective communication to every layer."}
+{"text":"Pipeline parallelism assigns consecutive transformer blocks to different ranks. Micro-batch scheduling is required to reduce pipeline bubbles."}
+{"text":"Expert parallelism routes tokens to expert owners, performs grouped expert computation, and sends token outputs back to their original ranks."}
+{"text":"Profiling a training run should report tokens per second, step latency, peak reserved memory, checkpoint status, and failure signatures."}

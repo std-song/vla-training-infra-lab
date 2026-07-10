@@ -1,0 +1,34 @@
+# Mini corpus mix for Project 1.
+#
+# This mirrors the outer data-engineering shape used by public Qwen3
+# pretraining repos: raw corpora -> token budget -> packed fixed-length
+# shards -> training/profiling.
+#
+# It is intentionally tiny so the whole pipeline can be validated on a laptop
+# or a rented AutoDL instance before switching to real corpora.
+
+seed: 42
+tokenizer:
+  # Prefer a real Qwen tokenizer when available. The scripts fall back to a
+  # byte-level tokenizer so CI/local dry runs do not need network access.
+  name_or_path: Qwen/Qwen3-0.6B
+  fallback: byte
+
+packing:
+  seq_len: 128
+  shard_tokens: 4096
+  dtype: uint16
+
+corpora:
+  - name: robotics_en
+    weight: 0.40
+    path: data/project1/raw/robotics_en.jsonl
+    text_key: text
+  - name: systems_en
+    weight: 0.35
+    path: data/project1/raw/systems_en.jsonl
+    text_key: text
+  - name: mixed_zh
+    weight: 0.25
+    path: data/project1/raw/mixed_zh.jsonl
+    text_key: text
