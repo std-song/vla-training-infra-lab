@@ -23,6 +23,8 @@
 
 **必须先读：** [最终报告](../results/vlash_final/final_vlash_report.md) 和
 [实验条件](../results/vlash_final/experiment_protocol.md)。
+Future-state 与真实控制延迟的对齐边界见
+[未来状态对齐说明](../results/vlash_final/future_state_alignment.md)。
 
 ### 为什么会同时看到 87.7 ms 和几十秒
 

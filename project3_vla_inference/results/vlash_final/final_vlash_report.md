@@ -2,6 +2,8 @@
 
 实验环境、计时范围与每张图的阅读方式见
 [`experiment_protocol.md`](experiment_protocol.md)。
+关于 future-state、`max_delay_steps=8`、`overlap=4` 与真实控制 tick 的对应关系，见
+[`future_state_alignment.md`](future_state_alignment.md)。
 
 ## 一句话结论
 
