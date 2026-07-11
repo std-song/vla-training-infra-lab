@@ -4,11 +4,12 @@
 
 ## 先用一句话讲清楚
 
-这是一个以 **Pi0.5 + VLASH 真实 VLA 策略复现** 为主线的推理基础设施项目。
+这是一个以 **Pi0.5 + VLASH 时延鲁棒性训练与异步动作块调度** 为主线的 VLA 训推协同项目。
 
 最终交付不是“把几个 Qwen 模型都跑了一遍”，而是：在 ALOHA 三相机机器人数据上，
-完成上游 VLASH 的 Pi0.5 LoRA 微调、共享观测训练、动作块队列和未来状态调度的策略级
-离线回放；再用两个 Qwen-VL 实验补充说明多模态输入和通用 VLM 服务在系统层面的成本。
+完成上游 VLASH 的 Pi0.5 LoRA 微调、共享观测延迟增强、episode 留出集动作对齐验证、
+动作块队列和未来状态调度的策略级离线回放；再用两个 Qwen-VL 实验补充说明多模态输入和
+通用 VLM 服务在系统层面的成本。
 
 ## 建议阅读顺序
 
@@ -21,14 +22,13 @@ flowchart LR
     H[4. 历史探索] --> I[Qwen2 KV cache、调度器模拟、Triton 微基准]
 ```
 
-1. **先读最终 VLA 结果**：
-   [VLASH Pi0.5 复现结果与推理分析](results/vlash_final/final_vlash_report.md)。
-2. **再看数字到底如何测得**：
-   [实验条件与结果阅读说明](results/vlash_final/experiment_protocol.md)。
-   关于 future-state 的训练范围、`d=4` 的时间含义和本次闭环验证边界，另见
+1. **先读核心留出集结果**：
+   [延迟鲁棒性实验](results/vlash_delay_ablation/README.md)。它给出相同预算 Normal Pi0.5
+   LoRA 与 VLASH 的 `d=0/4/8` 对照，是本项目的主要性能证据。
+2. **再看训练和调度机制**：
+   [VLASH Pi0.5 复现结果与推理分析](results/vlash_final/final_vlash_report.md)、
+   [实验条件与结果阅读说明](results/vlash_final/experiment_protocol.md) 和
    [未来状态对齐说明](results/vlash_final/future_state_alignment.md)。
-   Future-state 微调的 held-out `d=0/4/8` 动作对齐对照见
-   [延迟鲁棒性实验](results/vlash_delay_ablation/README.md)。
 3. **理解 Pi0.5 本身的动作推理路径**：
    [Pi0.5 动作块推理基准](results/project3_pi05_vla_action_inference.md)。
 4. **最后再读两个辅助实验**：
@@ -55,8 +55,8 @@ flowchart LR
 flowchart LR
     A[ALOHA 三相机视频 + state/action + task] --> B[上游 VLASH 数据集]
     B --> C[共享观测: delay offset 0..8]
-    C --> D[Pi0.5 LoRA 微调]
-    D --> E[step 1000 checkpoint]
+    C --> D[Pi0.5 LoRA 微调: 5000 step]
+    D --> E[68/17 episode 留出集对照]
     E --> F[上游 VLASHAsyncManager]
     F --> G[50 步 x 7 维动作块]
     G --> H[同步/异步/量化离线回放]
@@ -66,12 +66,13 @@ flowchart LR
 | --- | --- |
 | 数据 | `lerobot/aloha_mobile_cabinet`，85 个 episode、127,500 帧、三路相机 |
 | 策略 | Pi0.5，3.77B 总参数、154M 可训练 LoRA 参数 |
-| 训练 | 单张 32 GiB vGPU，1,000 step，shared observation，delay offset 0..8 |
-| 训练状态 | loss 从 step 20 的 0.413 降至 step 1,000 的 0.059 |
-| 回放 | 同一 checkpoint 连续回放 96 个 control tick，分别执行同步、VLASH 异步、异步 + 量化比 2 |
-| 核心发现 | 完整模型生成动作块很重；已有动作块时，普通控制 tick 主要是约 0.05 ms 的队列取动作 |
+| 对照训练 | 同一 Pi0.5 基座、LoRA 配置和 5,000 step：Normal 为 `d=0`，VLASH 为 shared observation、`d=0..8` |
+| 留出集 | 固定 seed 1000 按 episode 划分 68 训练 / 17 验证；在 34 个验证样本上评测 `d=0/4/8` |
+| 核心结果 | `d=4/d=8` 首动作 MSE 分别降低 66.3% / 67.7%；`d=8` 完整 50 步动作块 MSE 降低 49.0% |
+| 推理调度 | 50 步动作块剩余 `overlap=4` 步时预取下一块；量化比 2 时有效窗口为 8 步，未超出训练延迟范围 |
+| 性能边界 | Pi0.5 动作块 warm 前向约 87.7 ms；真实 I/O、模型预测代理和闭环成功率未在本实验中测量 |
 
-![Pi0.5 VLASH 训练曲线](assets/figures/vlash_pi05_training.svg)
+![延迟动作首动作 MSE 对照](assets/figures/vlash_delay_ablation_first_action_mse.svg)
 
 ## 两个辅助实验为什么仍然保留
 

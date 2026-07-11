@@ -4,9 +4,10 @@
 
 ## One Project, One Main Line
 
-The main deliverable is an **upstream VLASH reproduction on a real Pi0.5 VLA
-policy**: LoRA fine-tuning on ALOHA multi-camera data, followed by replay through
-the upstream action-chunk and future-state scheduling manager.
+The main deliverable is a **Pi0.5 + upstream VLASH delay-robustness study**:
+matched-budget LoRA fine-tuning on ALOHA multi-camera data, held-out delayed-action
+alignment evaluation, and replay through the upstream action-chunk/future-state
+scheduling manager.
 
 The Qwen-VL experiments are supporting system studies. They answer two questions
 that arise before a VLA policy enters a robot control loop: how visual inputs
@@ -26,11 +27,11 @@ flowchart TB
 
 ## Read in This Order
 
-1. **Start here - actual VLA result:**
-   [final VLASH report](results/vlash_final/final_vlash_report.md) and its
+1. **Start here - main held-out VLA result:**
+   [the delay-robustness result](results/vlash_delay_ablation/README.md), which
+   compares matched-budget Normal Pi0.5 LoRA and VLASH at `d=0/4/8`. Then read
+   the [final VLASH report](results/vlash_final/final_vlash_report.md) and its
    [experiment protocol](results/vlash_final/experiment_protocol.md).
-   The held-out `d=0/4/8` action-alignment ablation is documented in
-   [the delay-robustness result](results/vlash_delay_ablation/README.md).
 2. **Understand the Pi0.5 policy path:**
    [Pi0.5 action inference](results/project3_pi05_vla_action_inference.md).
 3. **Understand the VLM serving support studies:**
@@ -55,13 +56,14 @@ flowchart TB
 
 | Item | Result |
 | --- | --- |
-| Data and training | Upstream VLASH Pi0.5 LoRA on 85 ALOHA episodes / 127,500 frames |
+| Data and split | 85 ALOHA episodes / 127,500 frames; fixed 68-episode train / 17-episode held-out split |
 | Policy | 3.77B total parameters / 154M trainable LoRA parameters |
-| Training | 1,000 steps, shared observation with delay offsets 0..8 |
-| Policy replay | Final checkpoint replayed with the upstream `VLASHAsyncManager` in sync, async, and quantization-ratio-2 modes |
-| Key runtime distinction | Action-chunk refill is expensive; an existing chunk is served by about 0.05 ms queue pops |
+| Matched training | 5,000 steps: Normal uses `d=0`; VLASH uses shared observation and delay offsets `0..8` |
+| Held-out action alignment | First-action MSE improves by 66.3% at `d=4` and 67.7% at `d=8`; full 50-action chunk MSE improves by 49.0% at `d=8` |
+| Scheduling scope | Upstream `VLASHAsyncManager` prefetches at `overlap=4`; quantization ratio 2 makes the effective window 8 steps, inside the trained range |
+| Important boundary | This is offline alignment with recorded future-state proxies, not robot rollout or measured hardware-side end-to-end speedup |
 
-![VLASH Pi0.5 training](assets/figures/vlash_pi05_training.svg)
+![Held-out delayed action alignment](assets/figures/vlash_delay_ablation_first_action_mse.svg)
 
 ## Evidence and Source Layout
 

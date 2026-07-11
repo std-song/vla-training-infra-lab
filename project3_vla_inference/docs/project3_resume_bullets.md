@@ -1,36 +1,48 @@
-# Project 3 Resume Bullets: Multimodal VLM/VLA Inference Acceleration
+# 项目三简历表述：Pi0.5 VLA 时延鲁棒性训练与异步动作块推理
 
-## Resume Title
+## 推荐标题
 
-**Multimodal VLM/VLA Inference Acceleration and Edge-Deployment Analysis**
+**基于 Pi0.5 的 VLA 训推协同时延鲁棒性优化**
 
-## Current Completed Scope
+## 推荐表述（完整版）
 
-- Built a multimodal serving baseline covering Qwen3-VL-4B through vLLM and Qwen2.5-VL-3B through Hugging Face. The benchmarks separate image preprocessing, multimodal prefill, estimated TTFT, decode TPOT, visual-token count, request throughput, GPU memory, and KV-cache footprint.
-- Profiled single-camera and three-camera inputs on an RTX 4080 SUPER. From `1x224` to `3x448`, visual marker tokens increased from 66 to 774, multimodal prefill increased from 40.3 ms to 166.4 ms, and GPU memory increased from about 7.2 GiB to 7.6 GiB.
-- Implemented visual input cache, same-shape microbatching, and KV footprint accounting. For 8 three-camera requests, `3x224, decode=32` improved from 1.58 req/s to 8.82 req/s, reaching 5.62x throughput; `3x448` improved from 1.29 req/s to 4.13 req/s, reaching 3.21x.
-- Implemented a PagedAttention-style KV block manager and continuous-batching simulator. On a 128-request workload, throughput improved from 1.40 req/s to 10.44 req/s, reaching 7.45x. Guarded paged admission was used to analyze decode-block starvation under tight KV budgets.
-- Implemented a shape-aware scheduler and prefix-cache simulator. Shape-aware batching reduced padding waste from 33.3% to 5.7% and improved throughput from 4.56 req/s to 6.01 req/s; adding modeled prefix cache reached 6.45 req/s.
-- Implemented a Triton fused action post-processing kernel that combines action denormalization, clamp, and mask select into one kernel. The benchmark reached 1.43x median speedup and up to 14.24x on larger action tensor shapes.
+**时延鲁棒性训练链路搭建：** 基于 Pi0.5 和上游 VLASH 搭建 VLA 训推协同链路；在
+ALOHA 三相机数据上按 episode 划分 68 个训练集和 17 个留出验证集，完成 3.77B 参数
+策略的 LoRA 微调（154M 可训练参数、5,000 step）。训练端引入 `d=0..8` 的时序延迟
+增强与共享观测编码：以延迟状态代理为条件，监督对应时刻的 50 步、7 维动作块，使模型
+在推理时能够对齐有观测滞后的控制目标。
 
-## Upgraded Target Scope
+**延迟鲁棒性效果验证：** 自主实现 episode-held-out 的延迟动作对齐评测器，在 34 个未见
+样本上与相同训练预算的 Normal Pi0.5 LoRA 对照。VLASH 在 `d=4` / `d=8` 时将首动作
+MSE 从 `0.01943 / 0.02576` 降至 `0.00654 / 0.00831`，分别降低 **66.3% / 67.7%**；
+在 `d=8` 时，前 4 步和完整 50 步动作块 MSE 分别降低 **65.3%** 和 **49.0%**。三组
+首动作指标的配对 bootstrap 95% 区间均为正，验证了延迟条件下的稳定收益。
 
-- Added a Qwen3-VL-4B vLLM serving track on a 32 GiB GPU. The default vLLM path reached 10.08 req/s for 224px images and 8.73 req/s for 448px images at concurrency 8, with about 21.3 GiB peak memory. Compared with eager mode, default vLLM improved concurrent throughput by 18-41% across most tested shapes.
-- Added a Pi0.5 / LeRobot real VLA action-inference track. On a 32 GiB vGPU, `predict_action_chunk` produced `(1, 50, 7)` actions with 87.7 ms warm latency and 7.3 GiB peak memory; `select_action` showed chunk-queue behavior with full model calls around 92.8 ms and queue pops around 3.47 ms.
-- Reproduced upstream VLASH Pi0.5 LoRA fine-tuning with shared-observation delay offsets 0..8 on real ALOHA multi-camera data. Replayed the step-1,000 checkpoint through `VLASHAsyncManager` to separate costly action-chunk refills from sub-millisecond action-queue pops; clearly scoped the remaining hardware-I/O validation gap.
-- Keep the existing Qwen2.5-VL serving prototype, scheduler simulator, KV-memory analysis, Pi0.5 action queue benchmark, and Triton action kernel as supporting systems experiments, while explicitly avoiding claims about robot task success or policy quality.
+**异步动作块调度与部署边界：** 复现并接入上游 `VLASHAsyncManager`：Pi0.5 每次生成
+`(50, 7)` 动作块，在当前块剩余 `overlap=4` 步时预取下一块，并以当前块末动作作为
+future-state proxy；量化比为 2 时有效预取窗口扩展至 8 步，严格落在训练覆盖的
+`d=0..8` 范围。构建同步、异步和量化离线回放链路，明确区分约 `87.7 ms` 的策略动作块
+前向与已有动作块的轻量队列消费；同时界定真实机器人 I/O 与闭环成功率仍需后续验证。
 
-## Target Short Version
+## 推荐表述（简历空间紧张时）
 
-Built a multimodal VLM/VLA inference-acceleration lab covering three layers: Qwen3-VL/Qwen2.5-VL VLM serving, Pi0.5 real VLA action inference, and VLASH-inspired async control-loop serving. The project profiles visual tokens, multimodal prefill/decode, KV-cache memory, batching, concurrency, Pi0.5 action chunk latency, action queue amortization, state staleness, future-state queue refill, action quantization, and action post-processing. It also implements shape-aware batching, KV-memory accounting, continuous-batching simulation, and a Triton fused action post-processing kernel to compare VLM serving bottlenecks with VLA control-loop bottlenecks.
+**基于 Pi0.5 的 VLA 训推协同时延鲁棒性优化：** 基于 VLASH 搭建 Pi0.5 LoRA 时延增强
+训练与异步动作块调度链路，在 ALOHA 三相机数据上完成 68/17 episode 留出集、5,000 step
+对照实验。自研延迟动作对齐评测器显示：相对同预算 Normal LoRA，VLASH 在 `d=4/d=8`
+延迟下首动作 MSE 分别降低 **66.3%/67.7%**，`d=8` 完整 50 步动作块 MSE 降低 **49.0%**；
+复现 50 步动作块的 future-state 预取与异步队列调度，并明确闭环机器人验证边界。
 
-## Interview Talking Points
+## 不应写入核心成果的表述
 
-- Why VLM serving and VLA action inference have different bottlenecks.
-- How visual-token count affects prefill, TTFT, KV footprint, memory, and batch capacity.
-- Why Qwen3-VL is a better path for vLLM serving analysis, while Pi0.5 is a better path for real VLA policy inference.
-- Why Pi0.5 action chunk inference changes the serving problem from per-token decode to queue refill, state staleness, and control-loop scheduling.
-- Why visual input cache alone helps less than microbatching in the measured Qwen2.5-VL path.
-- Why shape-aware batching can beat naive token-budget batching for multimodal VLA-like workloads.
-- How VLASH-style async inference, future-state awareness, and action quantization fit into a VLA serving stack.
-- Which parts are real model experiments, which parts are simulators, and which claims should not be overstated.
+- 不写“端到端控制时延从 266.7 ms 降到 166.7 ms”：这是早期模拟器结果，不是 Pi0.5
+  实机闭环测量。
+- 不写“动作量化在无精度损失下节省 50%”：本次没有做轨迹精度或任务成功率验证。
+- 不写“视觉 token 稀疏采样、KV cache 复用优化了 Pi0.5”：Qwen-VL 的视觉输入实验是
+  辅助分析，不能归因到 Pi0.5/VLASH 主线。
+- 不写“提升实体机器人成功率”：当前结果是真实数据上的留出集离线动作对齐，不是机器人
+  rollout。
+
+## 面试时的一句话边界
+
+“本项目证明的是 future-state-aware 训练能减少真实留出轨迹上的延迟动作失配；异步
+队列的控制收益需要在实体 I/O 或闭环仿真中，用模型预测的 future-state proxy 继续验证。”
