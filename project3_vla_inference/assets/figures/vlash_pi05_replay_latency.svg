@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="400" viewBox="0 0 900 400" role="img" aria-label="Pi0.5 VLASH replay latency by control step">
+  <rect width="900" height="400" fill="#ffffff"/>
+  <text x="60" y="32" font-family="Arial" font-size="19" fill="#1f2933">Pi0.5 VLASH offline replay: action queue removes most per-tick policy calls</text>
+  <text x="60" y="55" font-family="Arial" font-size="12" fill="#52606d">Log scale. Tall markers are action-chunk generation/refill; dots near the baseline are action-queue pops.</text>
+  <line x1="75" y1="330" x2="855" y2="330" stroke="#667085"/><line x1="75" y1="82" x2="75" y2="330" stroke="#667085"/>
+  <g font-family="Arial" font-size="11" fill="#475467"><text x="22" y="333">0.01 ms</text><text x="29" y="270">1 ms</text><text x="22" y="207">100 ms</text><text x="14" y="144">10 s</text><text x="8" y="85">100 s</text><text x="72" y="350">0</text><text x="262" y="350">24</text><text x="462" y="350">48</text><text x="660" y="350">72</text><text x="840" y="350">96</text><text x="420" y="380">control step</text></g>
+  <g stroke="#e4e7ec" stroke-width="1"><line x1="75" y1="270" x2="855" y2="270"/><line x1="75" y1="207" x2="855" y2="207"/><line x1="75" y1="144" x2="855" y2="144"/><line x1="75" y1="82" x2="855" y2="82"/></g>
+  <g fill="#1769aa"><circle cx="78" cy="85" r="5"/><circle cx="485" cy="91" r="5"/><circle cx="848" cy="92" r="5"/></g>
+  <g fill="#2d9d78"><circle cx="80" cy="85" r="4"/><circle cx="480" cy="92" r="4"/><circle cx="850" cy="95" r="4"/></g>
+  <g fill="#d66a35"><circle cx="82" cy="82" r="3"/><circle cx="475" cy="87" r="3"/><circle cx="852" cy="89" r="3"/></g>
+  <g fill="#1769aa" opacity="0.8"><circle cx="160" cy="325" r="2"/><circle cx="260" cy="325" r="2"/><circle cx="360" cy="324" r="2"/><circle cx="460" cy="325" r="2"/><circle cx="560" cy="325" r="2"/><circle cx="660" cy="324" r="2"/><circle cx="760" cy="325" r="2"/></g>
+  <g fill="#2d9d78" opacity="0.8"><circle cx="170" cy="324" r="2"/><circle cx="280" cy="325" r="2"/><circle cx="390" cy="324" r="2"/><circle cx="500" cy="325" r="2"/><circle cx="610" cy="324" r="2"/><circle cx="720" cy="325" r="2"/><circle cx="830" cy="324" r="2"/></g>
+  <g fill="#d66a35" opacity="0.8"><circle cx="180" cy="324" r="2"/><circle cx="300" cy="325" r="2"/><circle cx="420" cy="324" r="2"/><circle cx="540" cy="325" r="2"/><circle cx="660" cy="324" r="2"/><circle cx="780" cy="325" r="2"/></g>
+  <g font-family="Arial" font-size="12"><circle cx="580" cy="71" r="5" fill="#1769aa"/><text x="590" y="75" fill="#344054">sync</text><circle cx="660" cy="71" r="5" fill="#2d9d78"/><text x="670" y="75" fill="#344054">async</text><circle cx="745" cy="71" r="5" fill="#d66a35"/><text x="755" y="75" fill="#344054">async + q2</text></g>
+  <text x="102" y="113" font-family="Arial" font-size="12" fill="#344054">Each run has a cold first chunk; only the asynchronous modes refill at later queue boundaries.</text>
+</svg>

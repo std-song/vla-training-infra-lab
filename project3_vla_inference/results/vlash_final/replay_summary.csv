@@ -1,0 +1,4 @@
+mode,replay_ticks,observation_fetches,action_chunk_calls,queue_pop_calls,queue_pop_median_ms,action_send_calls,mean_get_action_ms,interpretation
+sync,96,2,2,94,0.048,96,1802.987,"All non-refill ticks pop from the action queue; mean is dominated by two chunk calls."
+async,96,2,3,93,0.045,96,1821.105,"Future-state scheduling triggers an additional refill in this offline trace; it does not lower inline model-forward time."
+async_quantization_ratio_2,96,3,3,93,0.046,48,2815.374,"The manager marks half the ticks for action sending; no physical transport exists in offline replay."

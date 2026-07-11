@@ -17,7 +17,7 @@
 
 - Added a Qwen3-VL-4B vLLM serving track on a 32 GiB GPU. The default vLLM path reached 10.08 req/s for 224px images and 8.73 req/s for 448px images at concurrency 8, with about 21.3 GiB peak memory. Compared with eager mode, default vLLM improved concurrent throughput by 18-41% across most tested shapes.
 - Added a Pi0.5 / LeRobot real VLA action-inference track. On a 32 GiB vGPU, `predict_action_chunk` produced `(1, 50, 7)` actions with 87.7 ms warm latency and 7.3 GiB peak memory; `select_action` showed chunk-queue behavior with full model calls around 92.8 ms and queue pops around 3.47 ms.
-- Added a VLASH-inspired async control-loop simulator grounded in the measured Pi0.5 latency. Under a 30 Hz loop, future-state async refill reduced reaction latency from 266.7 ms to 166.7 ms versus naive async refill, while action quantization ratio 2 halved modeled control-side action overhead from 1237.7 ms to 618.9 ms.
+- Reproduced upstream VLASH Pi0.5 LoRA fine-tuning with shared-observation delay offsets 0..8 on real ALOHA multi-camera data. Replayed the step-1,000 checkpoint through `VLASHAsyncManager` to separate costly action-chunk refills from sub-millisecond action-queue pops; clearly scoped the remaining hardware-I/O validation gap.
 - Keep the existing Qwen2.5-VL serving prototype, scheduler simulator, KV-memory analysis, Pi0.5 action queue benchmark, and Triton action kernel as supporting systems experiments, while explicitly avoiding claims about robot task success or policy quality.
 
 ## Target Short Version

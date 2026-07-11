@@ -2,6 +2,12 @@
 
 Date: 2026-07-08
 
+> Historical note: this document records the earlier Qwen/VLM and control-loop
+> simulator exploration. The 30 Hz future-state and action-quantization numbers
+> below are simulated, not final Pi0.5/VLASH measurements. The final upstream
+> VLASH reproduction, replay traces, experimental protocol, and limits are in
+> [`vlash_final/final_vlash_report.md`](vlash_final/final_vlash_report.md).
+
 Project 3 now uses `Qwen/Qwen2.5-VL-3B-Instruct` to add real image input, visual tokens, and a lightweight serving prototype to the inference path. The earlier `Qwen/Qwen3-0.6B` benchmark is retained as a language-backbone decode sub-experiment, but the main VLA-style claim is now grounded in a VLM path:
 
 ```text

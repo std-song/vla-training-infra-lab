@@ -9,8 +9,11 @@ This project turns the original inference benchmark into a three-layer VLM/VLA i
 The final VLA path reproduces upstream VLASH Pi0.5 LoRA training on all 85
 ALOHA episodes for 1,000 steps with future-state delay offsets 0..8 and shared
 observation encoding. Final replay traces use the step-1,000 checkpoint through
-the upstream `VLASHAsyncManager`; see
+the upstream `VLASHAsyncManager`. The report separates verified queue behavior
+from claims that require a physical robot I/O loop; see
 [`results/vlash_final/final_vlash_report.md`](results/vlash_final/final_vlash_report.md).
+For the exact GPU, software, data, timing scope, and how to interpret each
+plot, see [`results/vlash_final/experiment_protocol.md`](results/vlash_final/experiment_protocol.md).
 
 ![VLASH Pi0.5 training](assets/figures/vlash_pi05_training.svg)
 
@@ -18,7 +21,7 @@ the upstream `VLASHAsyncManager`; see
 - Qwen2.5-VL visual-token profiling for single-camera and multi-camera inputs.
 - KV-cache, paged-cache, prefix/cache reuse, and bucketed continuous-batching simulations.
 - Pi0.5/LeRobot real VLA action inference with action chunk latency and `select_action` queue amortization.
-- VLASH-inspired asynchronous action queue simulator for 30Hz control-loop reaction latency and state staleness.
+- Historical control-loop simulator used during early exploration. It is kept as a simulator rather than presented as the final VLASH result.
 - Triton fused action post-processing benchmark.
 
 ## Key Results
@@ -46,12 +49,10 @@ Pi0.5 action inference:
 | Queue pop latency | 3.47 ms |
 | Peak memory | about 7.3 GiB |
 
-Async control-loop simulation:
-
-| Setting | Effect |
-| --- | --- |
-| Future-state refill at 30Hz | Reaction latency reduced from 266.7 ms to 166.7 ms |
-| Action quantization ratio = 2 | Simulated control-side action overhead reduced by about 50% |
+The earlier 30 Hz control-loop numbers are simulation-only results. They are not
+used as claims about the final Pi0.5/VLASH reproduction. For measured training,
+offline action-queue traces, exact experimental conditions, and limits of the
+offline setup, read the [final VLASH report](results/vlash_final/final_vlash_report.md).
 
 ![Qwen3-VL vLLM throughput](assets/figures/project3_qwen3vl_vllm_throughput.svg)
 

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="330" viewBox="0 0 900 330" role="img" aria-label="VLASH action send cadence in offline replay">
+  <rect width="900" height="330" fill="#ffffff"/>
+  <text x="60" y="34" font-family="Arial" font-size="19" fill="#1f2933">Command-send cadence over 96 replay control ticks</text>
+  <text x="60" y="57" font-family="Arial" font-size="12" fill="#52606d">This is an upstream manager configuration trace, not a robot-side transmission-speed measurement.</text>
+  <line x1="185" y1="260" x2="830" y2="260" stroke="#667085"/><line x1="185" y1="80" x2="185" y2="260" stroke="#667085"/>
+  <g font-family="Arial" font-size="12" fill="#475467"><text x="93" y="120">sync</text><text x="83" y="173">async</text><text x="47" y="226">async + q2</text><text x="175" y="280">0</text><text x="480" y="280">48</text><text x="805" y="280">96 sent actions</text></g>
+  <rect x="185" y="98" width="635" height="30" fill="#1769aa"/><rect x="185" y="151" width="635" height="30" fill="#2d9d78"/><rect x="185" y="204" width="318" height="30" fill="#d66a35"/>
+  <g font-family="Arial" font-size="12" fill="#ffffff"><text x="785" y="118">96 / 96</text><text x="785" y="171">96 / 96</text><text x="468" y="224">48 / 96</text></g>
+  <text x="185" y="310" font-family="Arial" font-size="12" fill="#344054">q2 marks every second control tick for action transmission. The offline adapter has no physical robot transport, so it verifies cadence only.</text>
+</svg>
