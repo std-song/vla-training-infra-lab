@@ -29,3 +29,4 @@ project1_qwen3_moe_pretrain/data/project1/packed/
 # Project 3 result tables are small enough and important for reproducibility.
 !project3_vla_inference/results/*.csv
 !project3_vla_inference/results/vlash_final/*.csv
+!project3_vla_inference/results/vlash_delay_ablation/*.csv

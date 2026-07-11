@@ -27,6 +27,8 @@ flowchart LR
    [实验条件与结果阅读说明](results/vlash_final/experiment_protocol.md)。
    关于 future-state 的训练范围、`d=4` 的时间含义和本次闭环验证边界，另见
    [未来状态对齐说明](results/vlash_final/future_state_alignment.md)。
+   Future-state 微调的 held-out `d=0/4/8` 动作对齐对照见
+   [延迟鲁棒性实验](results/vlash_delay_ablation/README.md)。
 3. **理解 Pi0.5 本身的动作推理路径**：
    [Pi0.5 动作块推理基准](results/project3_pi05_vla_action_inference.md)。
 4. **最后再读两个辅助实验**：

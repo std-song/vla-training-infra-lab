@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="420" viewBox="0 0 900 420" role="img" aria-label="Held-out delayed action first-action MSE: sync Pi0.5 LoRA versus VLASH">
+  <rect width="900" height="420" fill="#ffffff"/>
+  <text x="65" y="34" font-family="Arial" font-size="19" fill="#1f2933">Held-out delayed-action alignment: first-action MSE</text>
+  <text x="65" y="56" font-family="Arial" font-size="12" fill="#52606d">34 ALOHA validation samples; lower is better. d is the execution delay in control ticks.</text>
+  <line x1="80" y1="345" x2="845" y2="345" stroke="#667085"/><line x1="80" y1="75" x2="80" y2="345" stroke="#667085"/>
+  <g stroke="#e4e7ec" stroke-width="1"><line x1="80" y1="255" x2="845" y2="255"/><line x1="80" y1="165" x2="845" y2="165"/><line x1="80" y1="75" x2="845" y2="75"/></g>
+  <g font-family="Arial" font-size="12" fill="#475467"><text x="39" y="348">0.00</text><text x="39" y="258">0.01</text><text x="39" y="168">0.02</text><text x="39" y="78">0.03</text><text x="213" y="374">d=0</text><text x="458" y="374">d=4</text><text x="703" y="374">d=8</text><text x="24" y="104" transform="rotate(-90 24,104)">MSE</text></g>
+  <rect x="168" y="163" width="55" height="182" fill="#1769aa"/><rect x="229" y="260" width="55" height="85" fill="#2d9d78"/>
+  <rect x="413" y="170" width="55" height="175" fill="#1769aa"/><rect x="474" y="286" width="55" height="59" fill="#2d9d78"/>
+  <rect x="658" y="113" width="55" height="232" fill="#1769aa"/><rect x="719" y="270" width="55" height="75" fill="#2d9d78"/>
+  <g font-family="Arial" font-size="12" fill="#344054"><text x="165" y="155">0.0202</text><text x="226" y="252">0.0095</text><text x="410" y="162">0.0194</text><text x="471" y="278">0.0065</text><text x="655" y="105">0.0258</text><text x="716" y="262">0.0083</text></g>
+  <g font-family="Arial" font-size="12"><rect x="616" y="27" width="14" height="14" fill="#1769aa"/><text x="637" y="39" fill="#344054">normal Pi0.5 LoRA</text><rect x="760" y="27" width="14" height="14" fill="#2d9d78"/><text x="781" y="39" fill="#344054">VLASH LoRA</text></g>
+  <g font-family="Arial" font-size="12" fill="#1769aa"><text x="185" y="400">-53.0%</text><text x="430" y="400">-66.3%</text><text x="675" y="400">-67.7%</text></g>
+</svg>

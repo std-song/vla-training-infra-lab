@@ -29,6 +29,8 @@ flowchart TB
 1. **Start here - actual VLA result:**
    [final VLASH report](results/vlash_final/final_vlash_report.md) and its
    [experiment protocol](results/vlash_final/experiment_protocol.md).
+   The held-out `d=0/4/8` action-alignment ablation is documented in
+   [the delay-robustness result](results/vlash_delay_ablation/README.md).
 2. **Understand the Pi0.5 policy path:**
    [Pi0.5 action inference](results/project3_pi05_vla_action_inference.md).
 3. **Understand the VLM serving support studies:**

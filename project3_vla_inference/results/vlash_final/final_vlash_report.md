@@ -4,6 +4,8 @@
 [`experiment_protocol.md`](experiment_protocol.md)。
 关于 future-state、`max_delay_steps=8`、`overlap=4` 与真实控制 tick 的对应关系，见
 [`future_state_alignment.md`](future_state_alignment.md)。
+普通 Pi0.5 与 VLASH Pi0.5 在 held-out ALOHA episode 上的 `d=0/4/8` 动作对齐对照见
+[`../vlash_delay_ablation/README.md`](../vlash_delay_ablation/README.md)。
 
 ## 一句话结论
 
