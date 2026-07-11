@@ -4,6 +4,16 @@ This project turns the original inference benchmark into a three-layer VLM/VLA i
 
 ## What It Covers
 
+## VLASH Reproduction Addendum
+
+The final VLA path reproduces upstream VLASH Pi0.5 LoRA training on all 85
+ALOHA episodes for 1,000 steps with future-state delay offsets 0..8 and shared
+observation encoding. Final replay traces use the step-1,000 checkpoint through
+the upstream `VLASHAsyncManager`; see
+[`results/vlash_final/final_vlash_report.md`](results/vlash_final/final_vlash_report.md).
+
+![VLASH Pi0.5 training](assets/figures/vlash_pi05_training.svg)
+
 - Qwen3-VL vLLM serving baseline with concurrency, latency, throughput, and memory measurements.
 - Qwen2.5-VL visual-token profiling for single-camera and multi-camera inputs.
 - KV-cache, paged-cache, prefix/cache reuse, and bucketed continuous-batching simulations.

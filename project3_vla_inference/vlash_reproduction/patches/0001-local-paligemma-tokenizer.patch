@@ -1,0 +1,12 @@
+diff --git a/vlash/policies/pi05/modeling_pi05.py b/vlash/policies/pi05/modeling_pi05.py
+--- a/vlash/policies/pi05/modeling_pi05.py
++++ b/vlash/policies/pi05/modeling_pi05.py
+@@ -1156,7 +1156,10 @@ class PI05Policy(PreTrainedPolicy):
+ 
+         # Initialize tokenizer and model
+-        self.language_tokenizer = AutoTokenizer.from_pretrained("google/paligemma-3b-pt-224")
++        tokenizer_path = os.environ.get(
++            "VLASH_PALIGEMMA_TOKENIZER_PATH", "google/paligemma-3b-pt-224"
++        )
++        self.language_tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+         self.model = PI05Model(config)
