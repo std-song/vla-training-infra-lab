@@ -1,0 +1,207 @@
+{
+  "experiment": {
+    "suite": "libero_spatial",
+    "task_id": 3,
+    "delay_ticks": 2,
+    "delay_ms": 200,
+    "episodes_per_condition": 10,
+    "paired_episode_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "bootstrap_samples": 20000
+  },
+  "aggregate": {
+    "standard_sync": {
+      "episodes": 10,
+      "success_rate": 0.3,
+      "mean_steps": 239.8,
+      "mean_inference_ms": 347.87795509921295,
+      "mean_handoff_action_l2": 0.9402485009401615,
+      "queue_underflows": 0
+    },
+    "standard_naive_d2": {
+      "episodes": 10,
+      "success_rate": 0.1,
+      "mean_steps": 263.1,
+      "mean_inference_ms": 346.86572810280177,
+      "mean_handoff_action_l2": 0.9228916864317875,
+      "queue_underflows": 0
+    },
+    "standard_skip_d2": {
+      "episodes": 10,
+      "success_rate": 0.4,
+      "mean_steps": 222.3,
+      "mean_inference_ms": 349.58703600845877,
+      "mean_handoff_action_l2": 1.048940087279618,
+      "queue_underflows": 0
+    },
+    "stale_augmented_d2": {
+      "episodes": 10,
+      "success_rate": 0.3,
+      "mean_steps": 231.3,
+      "mean_inference_ms": 353.57883034052236,
+      "mean_handoff_action_l2": 0.8451406859372128,
+      "queue_underflows": 0
+    },
+    "learned_future_d2": {
+      "episodes": 10,
+      "success_rate": 0.3,
+      "mean_steps": 230.9,
+      "mean_inference_ms": 365.7622225876913,
+      "mean_handoff_action_l2": 0.8565622796313932,
+      "queue_underflows": 0
+    },
+    "learned_stale_input_d2": {
+      "episodes": 10,
+      "success_rate": 0.4,
+      "mean_steps": 235.8,
+      "mean_inference_ms": 358.51353844644734,
+      "mean_handoff_action_l2": 0.8954046707365799,
+      "queue_underflows": 0
+    }
+  },
+  "same_weight_comparisons": {
+    "standard_naive_vs_standard_sync": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.2,
+        "ci95": [
+          -0.6,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 23.3,
+        "ci95": [
+          -33.8,
+          77.10499999999955
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.01735681450837413,
+        "ci95": [
+          -0.19107703001535123,
+          0.14024721721824346
+        ]
+      }
+    },
+    "standard_skip_vs_standard_naive": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.3,
+        "ci95": [
+          -0.1,
+          0.7
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -40.8,
+        "ci95": [
+          -100.1,
+          20.01499999999869
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.12604840084783028,
+        "ci95": [
+          -0.03927206111216443,
+          0.301557502430622
+        ]
+      }
+    },
+    "learned_future_vs_learned_stale_input": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.1,
+        "ci95": [
+          -0.4,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -4.9,
+        "ci95": [
+          -58.7,
+          46.5
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.03884239110518687,
+        "ci95": [
+          -0.10297892230227342,
+          0.029821741340967153
+        ]
+      }
+    }
+  },
+  "cross_weight_comparisons": {
+    "stale_augmented_vs_standard_naive": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.2,
+        "ci95": [
+          -0.2,
+          0.6
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -31.8,
+        "ci95": [
+          -93.5,
+          33.8
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.07775100049457481,
+        "ci95": [
+          -0.25548730346275206,
+          0.12207610786419677
+        ]
+      }
+    },
+    "learned_future_vs_stale_augmented": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.0,
+        "ci95": [
+          -0.3,
+          0.3
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -0.4,
+        "ci95": [
+          -43.7,
+          40.7
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.011421593694180287,
+        "ci95": [
+          -0.1063329617996459,
+          0.15205612146645917
+        ]
+      }
+    }
+  },
+  "interpretation_guardrail": "Same-weight comparisons isolate deployment/input handling. Cross-weight comparisons also include independent LoRA optimization and different offset supervision counts."
+}

@@ -4,10 +4,10 @@
 
 ## One Project, One Main Line
 
-The main deliverable is a **Pi0.5 + upstream VLASH delay-robustness study**:
-matched-budget LoRA fine-tuning on ALOHA multi-camera data, held-out delayed-action
-alignment evaluation, and replay through the upstream action-chunk/future-state
-scheduling manager.
+The main deliverable is a **Pi0.5 + upstream VLASH delay-robustness study** with
+two evidence layers: matched-budget LoRA and held-out action alignment on ALOHA,
+followed by paired closed-loop LIBERO ablations of synchronous execution, naive
+delay, stale-prefix skipping, delay-augmented training, and learned future state.
 
 The Qwen-VL experiments are supporting system studies. They answer two questions
 that arise before a VLA policy enters a robot control loop: how visual inputs
@@ -27,17 +27,20 @@ flowchart TB
 
 ## Read in This Order
 
-1. **Start here - main held-out VLA result:**
-   [the delay-robustness result](results/vlash_delay_ablation/README.md), which
+1. **Start here - closed-loop result:**
+   [the LIBERO delay report](results/libero_standard_delay_ablation/README_CN.md),
+   which reports paired robot-simulation rollouts and bootstrap intervals.
+2. **Then read the held-out VLA result:**
+   [the ALOHA delay-robustness result](results/vlash_delay_ablation/README.md), which
    compares matched-budget Normal Pi0.5 LoRA and VLASH at `d=0/4/8`. Then read
    the [final VLASH report](results/vlash_final/final_vlash_report.md) and its
    [experiment protocol](results/vlash_final/experiment_protocol.md).
-2. **Understand the Pi0.5 policy path:**
+3. **Understand the Pi0.5 policy path:**
    [Pi0.5 action inference](results/project3_pi05_vla_action_inference.md).
-3. **Understand the VLM serving support studies:**
+4. **Understand the VLM serving support studies:**
    [Qwen2.5-VL visual-token study](results/project3_qwen25vl_visual_tokens.md)
    and [Qwen3-VL vLLM serving](results/project3_qwen3vl_vllm_serving.md).
-4. **Read only when discussing design alternatives:**
+5. **Read only when discussing design alternatives:**
    historical simulations, Qwen2 cache experiments, and Triton microbenchmarks
    listed in [the experiment map](docs/experiment_map_cn.md).
 
@@ -61,7 +64,9 @@ flowchart TB
 | Matched training | 5,000 steps: Normal uses `d=0`; VLASH uses shared observation and delay offsets `0..8` |
 | Held-out action alignment | First-action MSE improves by 66.3% at `d=4` and 67.7% at `d=8`; full 50-action chunk MSE improves by 49.0% at `d=8` |
 | Scheduling scope | Upstream `VLASHAsyncManager` prefetches at `overlap=4`; quantization ratio 2 makes the effective window 8 steps, inside the trained range |
-| Important boundary | This is offline alignment with recorded future-state proxies, not robot rollout or measured hardware-side end-to-end speedup |
+| LIBERO closed loop | Full policy calls average about 350 ms; at `d=4`, skipping the stale action prefix improves task-3 success from 10% to 50% versus naive delayed execution, paired bootstrap 95% CI `[+10,+70]` percentage points |
+| Learned-state boundary | On the same learned-policy weights at `d=2`, predicted future state reduces handoff L2 by about 4.3%, but success is 30% versus 40% with stale state |
+| Important boundary | LIBERO is simulation, not a physical robot; 87.7 ms synthetic warmed inference and about 350 ms full LIBERO policy calls are different measurement conditions |
 
 ![Held-out delayed action alignment](assets/figures/vlash_delay_ablation_first_action_mse.svg)
 
@@ -71,6 +76,8 @@ flowchart TB
   and replay adapter.
 - `results/vlash_final/`: final checkpoint logs, replay CSVs, figures, experimental
   conditions, and conclusions. This is the source of final VLA claims.
+- `results/libero_standard_delay_ablation/`: closed-loop episode records, paired
+  bootstrap analyses, and the detailed Chinese report.
 - `results/project3_qwen25vl_*.md`: supporting visual-token and prefill studies.
 - `results/project3_qwen3vl_vllm_serving.md`: supporting vLLM serving study.
 - `results/project3_final_report.md`: dated historical umbrella report. Its simulator

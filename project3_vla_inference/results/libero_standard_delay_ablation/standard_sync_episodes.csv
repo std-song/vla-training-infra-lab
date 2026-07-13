@@ -1,0 +1,21 @@
+condition,suite,task_id,task,episode_index,seed,delay_ticks,delay_ms,success,reward,steps,policy_calls,mean_inference_ms,p95_inference_ms,mean_state_prediction_mse,mean_handoff_action_l2,queue_underflows
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,0,1000,0,0,False,0.0,280,28,357.35794143485174,399.92486564442515,nan,1.0470046213379613,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,1,1001,0,0,True,1.0,147,15,348.83827194571495,421.6214505955577,nan,1.206898495554924,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,2,1002,0,0,False,0.0,280,28,347.26342944694414,432.22239976748824,nan,0.9520068182437508,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,3,1003,0,0,True,1.0,116,12,361.50056946401793,453.63674676045775,nan,0.5832355076616461,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,4,1004,0,0,True,1.0,175,18,351.42799839377403,424.58820370957255,nan,0.7066488454447073,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,5,1005,0,0,False,0.0,280,28,342.2360229305923,412.29625856503844,nan,1.1790039958777252,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,6,1006,0,0,False,0.0,280,28,340.29374198455895,415.9593764692545,nan,0.9784470664130317,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,7,1007,0,0,False,0.0,280,28,329.34295033503855,405.06593724712724,nan,1.032959450174261,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,8,1008,0,0,False,0.0,280,28,352.15469343321666,421.2656458839774,nan,0.8829121203334244,0
+standard_sync,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,9,1009,0,0,False,0.0,280,28,348.36393162342057,416.1024115048349,nan,0.8333680883601859,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,0,1000,0,0,False,0.0,280,28,343.00639713183045,418.2356273755431,nan,0.9426571644014783,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,1,1001,0,0,False,0.0,280,28,341.087831184268,399.11512071266765,nan,1.1491502512384344,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,2,1002,0,0,False,0.0,280,28,361.49997763069615,453.57241779565805,nan,1.019561610839985,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,3,1003,0,0,False,0.0,280,28,335.083737104599,413.97026544436807,nan,0.9660180045498742,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,4,1004,0,0,False,0.0,280,28,341.48425981402397,395.1391688548028,nan,1.0482193882818576,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,5,1005,0,0,False,0.0,280,28,340.0474760814437,411.8024729192257,nan,1.0089142156971826,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,6,1006,0,0,False,0.0,280,28,345.0715181949948,415.7085460610688,nan,0.9323397179444631,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,7,1007,0,0,False,0.0,280,28,344.1551126140569,366.537616122514,nan,1.2657988601260715,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,8,1008,0,0,False,0.0,280,28,343.8865068767752,426.9118281081319,nan,1.0451770259274378,0
+standard_sync,libero_spatial,9,pick up the black bowl on the wooden cabinet and place it on the plate,9,1009,0,0,False,0.0,280,28,352.1925143099257,427.51191118732095,nan,1.0076981214461502,0

@@ -1,0 +1,100 @@
+{
+  "sync|libero_spatial|task3|delay0": {
+    "episodes": 3,
+    "success_rate": 0.6666666666666666,
+    "mean_reward": 0.6666666666666666,
+    "mean_steps": 162.33333333333334,
+    "mean_inference_ms": 349.1789936580788
+  },
+  "sync|libero_spatial|task9|delay0": {
+    "episodes": 3,
+    "success_rate": 0.3333333333333333,
+    "mean_reward": 0.3333333333333333,
+    "mean_steps": 248.33333333333334,
+    "mean_inference_ms": 347.8899827836207
+  },
+  "stale|libero_spatial|task3|delay1": {
+    "episodes": 3,
+    "success_rate": 0.6666666666666666,
+    "mean_reward": 0.6666666666666666,
+    "mean_steps": 157.0,
+    "mean_inference_ms": 357.2076177978445
+  },
+  "stale|libero_spatial|task3|delay2": {
+    "episodes": 3,
+    "success_rate": 0.3333333333333333,
+    "mean_reward": 0.3333333333333333,
+    "mean_steps": 217.66666666666666,
+    "mean_inference_ms": 348.01234979005085
+  },
+  "stale|libero_spatial|task9|delay1": {
+    "episodes": 3,
+    "success_rate": 0.3333333333333333,
+    "mean_reward": 0.3333333333333333,
+    "mean_steps": 241.66666666666666,
+    "mean_inference_ms": 355.7730088941753
+  },
+  "stale|libero_spatial|task9|delay2": {
+    "episodes": 3,
+    "success_rate": 0.0,
+    "mean_reward": 0.0,
+    "mean_steps": 280.0,
+    "mean_inference_ms": 353.10823119999395
+  },
+  "learned|libero_spatial|task3|delay1": {
+    "episodes": 3,
+    "success_rate": 0.0,
+    "mean_reward": 0.0,
+    "mean_steps": 280.0,
+    "mean_inference_ms": 370.70684678231675
+  },
+  "learned|libero_spatial|task3|delay2": {
+    "episodes": 3,
+    "success_rate": 0.3333333333333333,
+    "mean_reward": 0.3333333333333333,
+    "mean_steps": 220.66666666666666,
+    "mean_inference_ms": 360.4111465347278
+  },
+  "learned|libero_spatial|task9|delay1": {
+    "episodes": 3,
+    "success_rate": 0.0,
+    "mean_reward": 0.0,
+    "mean_steps": 280.0,
+    "mean_inference_ms": 348.52361769991967
+  },
+  "learned|libero_spatial|task9|delay2": {
+    "episodes": 3,
+    "success_rate": 0.0,
+    "mean_reward": 0.0,
+    "mean_steps": 280.0,
+    "mean_inference_ms": 332.71751084941485
+  },
+  "learned_stale|libero_spatial|task3|delay1": {
+    "episodes": 3,
+    "success_rate": 0.0,
+    "mean_reward": 0.0,
+    "mean_steps": 280.0,
+    "mean_inference_ms": 354.7307458218365
+  },
+  "learned_stale|libero_spatial|task3|delay2": {
+    "episodes": 3,
+    "success_rate": 0.3333333333333333,
+    "mean_reward": 0.3333333333333333,
+    "mean_steps": 269.3333333333333,
+    "mean_inference_ms": 348.7453009507486
+  },
+  "learned_stale|libero_spatial|task9|delay1": {
+    "episodes": 3,
+    "success_rate": 0.0,
+    "mean_reward": 0.0,
+    "mean_steps": 280.0,
+    "mean_inference_ms": 349.2805447118978
+  },
+  "learned_stale|libero_spatial|task9|delay2": {
+    "episodes": 3,
+    "success_rate": 0.0,
+    "mean_reward": 0.0,
+    "mean_steps": 280.0,
+    "mean_inference_ms": 352.7906426184234
+  }
+}

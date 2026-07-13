@@ -1,0 +1,128 @@
+diff --git a/vlash/configs/train_config.py b/vlash/configs/train_config.py
+index 4621f30..4ff04d3 100644
+--- a/vlash/configs/train_config.py
++++ b/vlash/configs/train_config.py
+@@ -102,5 +102,9 @@ class VLASHTrainConfig(TrainPipelineConfig):
+     # masks to prevent cross-offset attention.
+     shared_observation: bool = False
+
++    # Optional frozen residual state predictor. When set, shared-observation
++    # branches d>0 use predicted s(t+d) instead of endpoint action a(t+d-1).
++    future_state_predictor_path: str | None = None
++
+     # LoRA configuration
+     lora: LoRAConfig = field(default_factory=LoRAConfig)
+diff --git a/vlash/datasets/vlash_dataset.py b/vlash/datasets/vlash_dataset.py
+index 22f2b6d..5fff9af 100644
+--- a/vlash/datasets/vlash_dataset.py
++++ b/vlash/datasets/vlash_dataset.py
+@@ -55,6 +55,8 @@ from torch.utils.data._utils.collate import default_collate
+
+ from lerobot.datasets.lerobot_dataset import LeRobotDataset
+
++from .future_state_predictor import ResidualStatePredictor, predict_future_state
++
+
+ class VLASHDataset(LeRobotDataset):
+     """Dataset with temporal delay augmentation for VLASH training.
+@@ -84,6 +86,7 @@ class VLASHDataset(LeRobotDataset):
+         max_delay_steps: int = 0,
+         *,
+         use_state_ground_truth: bool = False,
++        future_state_predictor_path: str | Path | None = None,
+     ):
+         """Initialize VLASH dataset.
+
+@@ -106,6 +109,8 @@ class VLASHDataset(LeRobotDataset):
+         # Required when state_dim != action_dim, since the action-proxy path
+         # assumes they match.
+         self.use_state_ground_truth = use_state_ground_truth
++        self.future_state_predictor = None
++        self.future_state_predictor_stats = None
+
+         super().__init__(
+             repo_id=repo_id,
+@@ -124,6 +129,18 @@ class VLASHDataset(LeRobotDataset):
+         # Track last offset for state construction in __getitem__
+         self._last_offset: int = 0
+
++        if future_state_predictor_path is not None:
++            checkpoint = torch.load(future_state_predictor_path, map_location="cpu", weights_only=False)
++            self.future_state_predictor = ResidualStatePredictor(**checkpoint["config"])
++            self.future_state_predictor.load_state_dict(checkpoint["model"])
++            self.future_state_predictor.eval()
++            self.future_state_predictor_stats = checkpoint["stats"]
++            if self.future_state_predictor.max_horizon < self.max_delay_steps:
++                raise ValueError(
++                    "future-state predictor max_horizon is smaller than max_delay_steps: "
++                    f"{self.future_state_predictor.max_horizon} < {self.max_delay_steps}"
++                )
++
+     def _get_query_indices(self, idx: int, ep_idx: int) -> tuple[dict[str, list[int | bool]]]:
+         """Get query indices with random temporal offset.
+
+@@ -261,6 +278,7 @@ class SharedObservationVLASHDataset(VLASHDataset):
+         max_delay_steps: int = 0,
+         *,
+         use_state_ground_truth: bool = False,
++        future_state_predictor_path: str | Path | None = None,
+     ):
+         """Initialize SharedObservationVLASHDataset.
+
+@@ -280,6 +298,7 @@ class SharedObservationVLASHDataset(VLASHDataset):
+             batch_encoding_size=batch_encoding_size,
+             max_delay_steps=max_delay_steps,
+             use_state_ground_truth=use_state_ground_truth,
++            future_state_predictor_path=future_state_predictor_path,
+         )
+
+     def _get_query_indices_for_offset(
+@@ -400,9 +419,25 @@ class SharedObservationVLASHDataset(VLASHDataset):
+             action_tensor = torch.stack(action_list, dim=0)  # [chunk_size, action_dim]
+             actions.append(action_tensor)
+             action_is_pads.append(padding["action_is_pad"])
+-
++
++        stacked_states = torch.stack(states, dim=0)
++        if self.future_state_predictor is not None and num_offsets > 1:
++            horizons = torch.arange(1, num_offsets, dtype=torch.long)
++            current_state = base_item["observation.state"].unsqueeze(0).expand(num_offsets - 1, -1)
++            current_actions = actions[0][: self.future_state_predictor.max_horizon]
++            action_prefix = current_actions.unsqueeze(0).expand(num_offsets - 1, -1, -1)
++            with torch.inference_mode():
++                learned_states = predict_future_state(
++                    self.future_state_predictor,
++                    current_state,
++                    action_prefix,
++                    horizons,
++                    self.future_state_predictor_stats,
++                )
++            stacked_states[1:num_offsets] = learned_states
++
+         # Stack all offsets
+-        result["observation.state"] = torch.stack(states, dim=0)  # [num_offsets, state_dim]
++        result["observation.state"] = stacked_states  # [num_offsets, state_dim]
+         result["action"] = torch.stack(actions, dim=0)  # [num_offsets, chunk_size, action_dim]
+         result["action_is_pad"] = torch.stack(action_is_pads, dim=0)  # [num_offsets, chunk_size]
+         result["num_offsets"] = num_offsets
+diff --git a/vlash/train.py b/vlash/train.py
+index 509eb30..98041ea 100644
+--- a/vlash/train.py
++++ b/vlash/train.py
+@@ -126,6 +126,7 @@ def make_vlash_dataset(cfg: VLASHTrainConfig):
+             revision=cfg.dataset.revision,
+             video_backend=cfg.dataset.video_backend,
+             max_delay_steps=cfg.max_delay_steps,
++            future_state_predictor_path=cfg.future_state_predictor_path,
+         )
+     else:
+         # Log the temporal delay configuration
+@@ -136,6 +137,8 @@ def make_vlash_dataset(cfg: VLASHTrainConfig):
+             )
+         else:
+             logging.info("Creating VLASHDataset with max_delay_steps=0 (no temporal delay)")
++        if cfg.future_state_predictor_path is not None:
++            raise ValueError("future_state_predictor_path requires shared_observation=true")
+
+         # Create dataset with temporal offset augmentation
+         dataset = VLASHDataset(

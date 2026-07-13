@@ -1,0 +1,11 @@
+condition,suite,task_id,task,episode_index,seed,delay_ticks,delay_ms,success,reward,steps,policy_calls,mean_inference_ms,p95_inference_ms,mean_state_prediction_mse,mean_handoff_action_l2,queue_underflows
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,0,1000,2,200,False,0.0,280,28,336.5888290905527,421.50311032310117,nan,0.6681219466306545,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,1,1001,2,200,False,0.0,280,28,342.4976743491633,431.7536768503487,nan,0.9438009426273681,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,2,1002,2,200,True,1.0,93,10,361.0468989238143,450.81962747499347,nan,0.6744615005122291,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,3,1003,2,200,True,1.0,145,15,358.05579746762913,417.4184639006853,nan,0.7269848010369709,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,4,1004,2,200,False,0.0,280,28,341.338607283043,384.7574196755886,nan,0.9813767638471391,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,5,1005,2,200,False,0.0,280,28,351.51587227093324,444.1361558623612,nan,0.9206584559546577,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,6,1006,2,200,False,0.0,280,28,344.6383520827762,424.22268772497773,nan,1.1184893349806468,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,7,1007,2,200,False,0.0,280,28,378.19399797756756,444.575004465878,nan,0.9395627197292116,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,8,1008,2,200,False,0.0,280,28,349.7641884189631,416.6791453026235,nan,0.883606920087779,0
+stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,9,1009,2,200,True,1.0,115,12,372.14808554078144,468.73931828886265,nan,0.5943434739654715,0

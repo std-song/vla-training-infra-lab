@@ -1,0 +1,21 @@
+condition,suite,task_id,task,episode_index,seed,delay_ticks,delay_ms,success,reward,steps,policy_calls,mean_inference_ms,p95_inference_ms,mean_state_prediction_mse,mean_handoff_action_l2,queue_underflows
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,0,1000,2,200,False,0.0,280,28,386.2073593772948,467.7747858688235,2.3728166524961125e-05,0.8380959006371321,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,1,1001,2,200,False,0.0,280,28,373.69667552411556,431.6531276330352,3.2778571768108964e-05,0.9419632049070464,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,2,1002,2,200,True,1.0,102,11,363.8569026846777,434.44945849478245,1.5618266338100915e-05,0.6438446905877855,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,3,1003,2,200,False,0.0,280,28,354.9375890621117,455.7327667251228,2.7145674098223766e-05,0.9026979632951595,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,4,1004,2,200,False,0.0,280,28,365.13206575598036,415.0402311235666,2.7249264736315968e-05,0.8641698001711456,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,5,1005,2,200,True,1.0,131,14,389.9809048910226,452.2514037787914,1.900961710058861e-05,0.7056757013003031,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,6,1006,2,200,False,0.0,280,28,347.4607027934066,443.9688517712056,2.3210236951887998e-05,0.9063521518751427,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,7,1007,2,200,False,0.0,280,28,359.15943567774127,418.2298569008708,1.949230007388299e-05,0.8049014122397812,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,8,1008,2,200,False,0.0,280,28,352.0535665697285,423.47640013322234,2.3266574474847504e-05,0.8499294996813491,0
+learned,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,9,1009,2,200,True,1.0,116,12,365.1370235408346,425.70821084082127,6.997129277537665e-05,1.1079924716190859,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,0,1000,2,200,False,0.0,280,28,348.7936262972653,422.94987468048924,nan,0.9338695009549459,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,1,1001,2,200,False,0.0,280,28,352.5676656115268,406.6525223664939,nan,0.7986065695683161,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,2,1002,2,200,True,1.0,248,25,376.2075239419937,423.8504536449909,nan,0.8060278402020534,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,3,1003,2,200,False,0.0,280,28,354.6518166549504,431.32723812013865,nan,0.9643921562367015,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,4,1004,2,200,True,1.0,153,16,347.3347567487508,433.3321060985327,nan,0.9277261227369309,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,5,1005,2,200,False,0.0,280,28,378.44506092369556,481.1008162796497,nan,0.8881036418455618,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,6,1006,2,200,True,1.0,169,17,354.1625802788664,435.72903983294964,nan,0.7702308520674706,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,7,1007,2,200,False,0.0,280,28,357.9085946216115,415.65936570987105,nan,0.8295103118375495,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,8,1008,2,200,False,0.0,280,28,350.28872046885743,440.7093498855829,nan,0.8138613722942494,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,9,1009,2,200,True,1.0,108,11,364.7750389169563,423.36841486394405,nan,1.2217183396220208,0

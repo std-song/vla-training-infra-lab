@@ -1,0 +1,44 @@
+{
+  "groups": {
+    "learned|libero_spatial|task3|delay2": {
+      "episodes": 10,
+      "successes": 3,
+      "success_rate": 0.3,
+      "mean_steps": 230.9,
+      "mean_inference_ms": 365.7622225876914,
+      "mean_handoff_action_l2": 0.8565622796313932,
+      "mean_state_prediction_mse": 2.814699648422945e-05,
+      "queue_underflows": 0
+    },
+    "learned_stale|libero_spatial|task3|delay2": {
+      "episodes": 10,
+      "successes": 4,
+      "success_rate": 0.4,
+      "mean_steps": 235.8,
+      "mean_inference_ms": 358.5135384464474,
+      "mean_handoff_action_l2": 0.8954046707365799,
+      "mean_state_prediction_mse": NaN,
+      "queue_underflows": 0
+    }
+  },
+  "paired_comparison": {
+    "pair_a": "learned",
+    "pair_b": "learned_stale",
+    "episodes": 10,
+    "success": {
+      "mean_difference": -0.1,
+      "bootstrap_ci95_low": -0.4,
+      "bootstrap_ci95_high": 0.2
+    },
+    "steps": {
+      "mean_difference": -4.9,
+      "bootstrap_ci95_low": -59.3,
+      "bootstrap_ci95_high": 47.3
+    },
+    "mean_handoff_action_l2": {
+      "mean_difference": -0.03884239110518687,
+      "bootstrap_ci95_low": -0.10270294576004987,
+      "bootstrap_ci95_high": 0.03181388826185342
+    }
+  }
+}

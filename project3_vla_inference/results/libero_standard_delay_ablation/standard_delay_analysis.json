@@ -1,0 +1,359 @@
+{
+  "experiment": {
+    "suite": "libero_spatial",
+    "task_id": 3,
+    "episodes_per_condition": 10,
+    "paired_episode_indices": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "control_frequency_hz": 10,
+    "replan_interval_ticks": 10,
+    "delays_ticks": [
+      1,
+      2,
+      4
+    ],
+    "delays_ms": [
+      100,
+      200,
+      400
+    ],
+    "bootstrap_samples": 20000
+  },
+  "aggregate": {
+    "standard_naive|d1": {
+      "episodes": 10,
+      "success_rate": 0.2,
+      "mean_steps": 247.6,
+      "mean_inference_ms": 348.88575937472723,
+      "mean_handoff_action_l2": 0.9284139745840522,
+      "queue_underflows": 0
+    },
+    "standard_naive|d2": {
+      "episodes": 10,
+      "success_rate": 0.1,
+      "mean_steps": 263.1,
+      "mean_inference_ms": 346.86572810280177,
+      "mean_handoff_action_l2": 0.9228916864317875,
+      "queue_underflows": 0
+    },
+    "standard_naive|d4": {
+      "episodes": 10,
+      "success_rate": 0.1,
+      "mean_steps": 276.3,
+      "mean_inference_ms": 339.3899590266602,
+      "mean_handoff_action_l2": 1.0032489871009345,
+      "queue_underflows": 0
+    },
+    "standard_skip|d1": {
+      "episodes": 10,
+      "success_rate": 0.1,
+      "mean_steps": 262.5,
+      "mean_inference_ms": 351.3171678275935,
+      "mean_handoff_action_l2": 0.9115625536110669,
+      "queue_underflows": 0
+    },
+    "standard_skip|d2": {
+      "episodes": 10,
+      "success_rate": 0.4,
+      "mean_steps": 222.3,
+      "mean_inference_ms": 349.58703600845877,
+      "mean_handoff_action_l2": 1.048940087279618,
+      "queue_underflows": 0
+    },
+    "standard_skip|d4": {
+      "episodes": 10,
+      "success_rate": 0.5,
+      "mean_steps": 204.8,
+      "mean_inference_ms": 347.0049140495779,
+      "mean_handoff_action_l2": 1.0021511655813793,
+      "queue_underflows": 0
+    },
+    "standard_sync|d0": {
+      "episodes": 10,
+      "success_rate": 0.3,
+      "mean_steps": 239.8,
+      "mean_inference_ms": 347.87795509921295,
+      "mean_handoff_action_l2": 0.9402485009401615,
+      "queue_underflows": 0
+    }
+  },
+  "paired": {
+    "standard_naive|d1_vs_sync": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.1,
+        "ci95": [
+          -0.4,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 7.8,
+        "ci95": [
+          -43.8,
+          62.4
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.01183452635610972,
+        "ci95": [
+          -0.1616276883359266,
+          0.11804127504853212
+        ]
+      },
+      "success_transitions": {
+        "sync_0_candidate_0": 6,
+        "sync_0_candidate_1": 1,
+        "sync_1_candidate_0": 2,
+        "sync_1_candidate_1": 1
+      }
+    },
+    "standard_naive|d2_vs_sync": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.2,
+        "ci95": [
+          -0.6,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 23.3,
+        "ci95": [
+          -33.8,
+          77.10499999999955
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.01735681450837413,
+        "ci95": [
+          -0.19107703001535123,
+          0.14024721721824346
+        ]
+      },
+      "success_transitions": {
+        "sync_0_candidate_0": 6,
+        "sync_0_candidate_1": 1,
+        "sync_1_candidate_0": 3
+      }
+    },
+    "standard_naive|d4_vs_sync": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.2,
+        "ci95": [
+          -0.6,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 36.5,
+        "ci95": [
+          -1.5,
+          79.8
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.06300048616077265,
+        "ci95": [
+          -0.047557875411053024,
+          0.1581048691900953
+        ]
+      },
+      "success_transitions": {
+        "sync_0_candidate_0": 6,
+        "sync_0_candidate_1": 1,
+        "sync_1_candidate_0": 3
+      }
+    },
+    "standard_skip|d1_vs_sync": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.2,
+        "ci95": [
+          -0.5,
+          0.0
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 22.7,
+        "ci95": [
+          -14.0,
+          68.8
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.02868594732909514,
+        "ci95": [
+          -0.11130024652205775,
+          0.05426984921847163
+        ]
+      },
+      "success_transitions": {
+        "sync_0_candidate_0": 7,
+        "sync_1_candidate_0": 2,
+        "sync_1_candidate_1": 1
+      }
+    },
+    "standard_skip|d2_vs_sync": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.1,
+        "ci95": [
+          -0.2,
+          0.4
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -17.5,
+        "ci95": [
+          -66.4,
+          34.3
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.10869158633945615,
+        "ci95": [
+          -0.023613881408592042,
+          0.24318547246315111
+        ]
+      },
+      "success_transitions": {
+        "sync_0_candidate_0": 5,
+        "sync_0_candidate_1": 2,
+        "sync_1_candidate_0": 1,
+        "sync_1_candidate_1": 2
+      }
+    },
+    "standard_skip|d4_vs_sync": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.2,
+        "ci95": [
+          -0.2,
+          0.6
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -35.0,
+        "ci95": [
+          -84.8,
+          13.1
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.06190266464121754,
+        "ci95": [
+          -0.06516915370442104,
+          0.18850082697104426
+        ]
+      },
+      "success_transitions": {
+        "sync_0_candidate_0": 4,
+        "sync_0_candidate_1": 3,
+        "sync_1_candidate_0": 1,
+        "sync_1_candidate_1": 2
+      }
+    },
+    "standard_skip|d1_vs_standard_naive|d1": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.1,
+        "ci95": [
+          -0.3,
+          0.0
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 14.9,
+        "ci95": [
+          -4.8,
+          49.5
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.01685142097298542,
+        "ci95": [
+          -0.11376844628453751,
+          0.08451489389958698
+        ]
+      }
+    },
+    "standard_skip|d2_vs_standard_naive|d2": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.3,
+        "ci95": [
+          -0.1,
+          0.7
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -40.8,
+        "ci95": [
+          -100.4,
+          22.8
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.12604840084783028,
+        "ci95": [
+          -0.03882455107010374,
+          0.30414614603102724
+        ]
+      }
+    },
+    "standard_skip|d4_vs_standard_naive|d4": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.4,
+        "ci95": [
+          0.1,
+          0.7
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -71.5,
+        "ci95": [
+          -119.205,
+          -24.3
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.001097821519555109,
+        "ci95": [
+          -0.1201067405091428,
+          0.12585729182447727
+        ]
+      }
+    }
+  }
+}

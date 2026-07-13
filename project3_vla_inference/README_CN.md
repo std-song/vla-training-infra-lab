@@ -6,10 +6,10 @@
 
 这是一个以 **Pi0.5 + VLASH 时延鲁棒性训练与异步动作块调度** 为主线的 VLA 训推协同项目。
 
-最终交付不是“把几个 Qwen 模型都跑了一遍”，而是：在 ALOHA 三相机机器人数据上，
-完成上游 VLASH 的 Pi0.5 LoRA 微调、共享观测延迟增强、episode 留出集动作对齐验证、
-动作块队列和未来状态调度的策略级离线回放；再用两个 Qwen-VL 实验补充说明多模态输入和
-通用 VLM 服务在系统层面的成本。
+最终交付不是“把几个 Qwen 模型都跑了一遍”，而是两层互补证据：先在 ALOHA 三相机
+机器人数据上完成上游 VLASH 的 Pi0.5 LoRA 微调、共享观测延迟增强和 episode 留出集
+动作对齐验证；再在 LIBERO 中完成标准、延迟增强和未来状态策略的仿真闭环消融，验证
+动作块晚到后的时序对齐问题。两个 Qwen-VL 实验只补充多模态输入和通用 VLM 服务成本。
 
 ## 建议阅读顺序
 
@@ -22,16 +22,19 @@ flowchart LR
     H[4. 历史探索] --> I[Qwen2 KV cache、调度器模拟、Triton 微基准]
 ```
 
-1. **先读核心留出集结果**：
+1. **先读 LIBERO 闭环结果**：
+   [Pi0.5 / VLASH 闭环时延实验](results/libero_standard_delay_ablation/README_CN.md)。它给出
+   标准 LoRA、朴素异步、动作跳步、延迟增强和未来状态输入的配对对照。
+2. **再读 ALOHA 核心留出集结果**：
    [延迟鲁棒性实验](results/vlash_delay_ablation/README.md)。它给出相同预算 Normal Pi0.5
-   LoRA 与 VLASH 的 `d=0/4/8` 对照，是本项目的主要性能证据。
-2. **再看训练和调度机制**：
+   LoRA 与 VLASH 的 `d=0/4/8` 离线动作对齐对照。
+3. **再看训练和调度机制**：
    [VLASH Pi0.5 复现结果与推理分析](results/vlash_final/final_vlash_report.md)、
    [实验条件与结果阅读说明](results/vlash_final/experiment_protocol.md) 和
    [未来状态对齐说明](results/vlash_final/future_state_alignment.md)。
-3. **理解 Pi0.5 本身的动作推理路径**：
+4. **理解 Pi0.5 本身的动作推理路径**：
    [Pi0.5 动作块推理基准](results/project3_pi05_vla_action_inference.md)。
-4. **最后再读两个辅助实验**：
+5. **最后再读两个辅助实验**：
    [Qwen2.5-VL 多相机视觉 token 与 prefill](results/project3_qwen25vl_visual_tokens.md)、
    [Qwen3-VL vLLM 并发服务](results/project3_qwen3vl_vllm_serving.md)。
 
@@ -70,7 +73,9 @@ flowchart LR
 | 留出集 | 固定 seed 1000 按 episode 划分 68 训练 / 17 验证；在 34 个验证样本上评测 `d=0/4/8` |
 | 核心结果 | `d=4/d=8` 首动作 MSE 分别降低 66.3% / 67.7%；`d=8` 完整 50 步动作块 MSE 降低 49.0% |
 | 推理调度 | 50 步动作块剩余 `overlap=4` 步时预取下一块；量化比 2 时有效窗口为 8 步，未超出训练延迟范围 |
-| 性能边界 | Pi0.5 动作块 warm 前向约 87.7 ms；真实 I/O、模型预测代理和闭环成功率未在本实验中测量 |
+| LIBERO 闭环 | 完整策略调用约 350 ms；`d=4` 时动作跳步相对朴素延迟将 task 3 成功率从 10% 提升到 50%，配对 bootstrap 95% 区间 `[+10,+70]` 个百分点 |
+| 未来状态边界 | 同一 learned policy 下，预测状态使动作交接 L2 改善约 4.3%，但成功率为 30% vs 滞后状态 40%，未证明闭环收益 |
+| 性能边界 | 87.7 ms 来自固定合成输入的 warmed 微基准；约 350 ms 来自 LIBERO 完整策略调用，二者不能直接比较 |
 
 ![延迟动作首动作 MSE 对照](assets/figures/vlash_delay_ablation_first_action_mse.svg)
 
@@ -106,6 +111,7 @@ flowchart LR
 ```text
 vlash_reproduction/        主线配置、上游兼容补丁、回放 adapter
 results/vlash_final/       最终训练日志、回放 CSV、图、实验条件、结论
+results/libero_standard_delay_ablation/  LIBERO 闭环原始 episode、配对统计和中文报告
 results/project3_qwen25*   Qwen2.5-VL 多模态输入成本辅助实验
 results/project3_qwen3vl*  Qwen3-VL vLLM 并发服务辅助实验
 benchmarks/                基准脚本
