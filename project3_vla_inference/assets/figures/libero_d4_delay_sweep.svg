@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560">
+<rect width="100%" height="100%" fill="white"/>
+<text x="600.0" y="30" text-anchor="middle" font-family="Arial, sans-serif" font-size="21" fill="#202124">Pi0.5 LIBERO task 3: d&lt;=4 delay sweep</text>
+<text x="305.0" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#202124">Closed-loop success</text>
+<line x1="80" y1="420.0" x2="530" y2="420.0" stroke="#e5e7eb"/>
+<text x="68" y="424.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">0%</text>
+<line x1="80" y1="356.0" x2="530" y2="356.0" stroke="#e5e7eb"/>
+<text x="68" y="360.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">12%</text>
+<line x1="80" y1="292.0" x2="530" y2="292.0" stroke="#e5e7eb"/>
+<text x="68" y="296.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">24%</text>
+<line x1="80" y1="228.0" x2="530" y2="228.0" stroke="#e5e7eb"/>
+<text x="68" y="232.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">36%</text>
+<line x1="80" y1="164.0" x2="530" y2="164.0" stroke="#e5e7eb"/>
+<text x="68" y="168.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">48%</text>
+<line x1="80" y1="100.0" x2="530" y2="100.0" stroke="#e5e7eb"/>
+<text x="68" y="104.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">60%</text>
+<text x="80.0" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=0</text>
+<text x="192.5" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=1</text>
+<text x="305.0" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=2</text>
+<text x="417.5" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=3</text>
+<text x="530.0" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=4</text>
+<circle cx="80.0" cy="153.33333333333331" r="5" fill="#e45756"/>
+<circle cx="192.5" cy="260.0" r="5" fill="#e45756"/>
+<circle cx="305.0" cy="313.33333333333337" r="5" fill="#e45756"/>
+<circle cx="417.5" cy="366.6666666666667" r="5" fill="#e45756"/>
+<circle cx="530.0" cy="313.33333333333337" r="5" fill="#e45756"/>
+<polyline points="80.0,153.33333333333331 192.5,260.0 305.0,313.33333333333337 417.5,366.6666666666667 530.0,313.33333333333337" fill="none" stroke="#e45756" stroke-width="3"/>
+<circle cx="80.0" cy="153.33333333333331" r="5" fill="#4c78a8"/>
+<circle cx="192.5" cy="153.33333333333331" r="5" fill="#4c78a8"/>
+<circle cx="305.0" cy="206.66666666666669" r="5" fill="#4c78a8"/>
+<circle cx="417.5" cy="260.0" r="5" fill="#4c78a8"/>
+<circle cx="530.0" cy="260.0" r="5" fill="#4c78a8"/>
+<polyline points="80.0,153.33333333333331 192.5,153.33333333333331 305.0,206.66666666666669 417.5,260.0 530.0,260.0" fill="none" stroke="#4c78a8" stroke-width="3"/>
+<circle cx="80.0" cy="153.33333333333331" r="5" fill="#54a24b"/>
+<circle cx="192.5" cy="153.33333333333331" r="5" fill="#54a24b"/>
+<circle cx="305.0" cy="153.33333333333331" r="5" fill="#54a24b"/>
+<circle cx="417.5" cy="206.66666666666669" r="5" fill="#54a24b"/>
+<circle cx="530.0" cy="260.0" r="5" fill="#54a24b"/>
+<polyline points="80.0,153.33333333333331 192.5,153.33333333333331 305.0,153.33333333333331 417.5,206.66666666666669 530.0,260.0" fill="none" stroke="#54a24b" stroke-width="3"/>
+<text x="905.0" y="75" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" fill="#202124">Action handoff L2</text>
+<line x1="680" y1="420.0" x2="1130" y2="420.0" stroke="#e5e7eb"/>
+<text x="668" y="424.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">0</text>
+<line x1="680" y1="356.0" x2="1130" y2="356.0" stroke="#e5e7eb"/>
+<text x="668" y="360.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">0</text>
+<line x1="680" y1="292.0" x2="1130" y2="292.0" stroke="#e5e7eb"/>
+<text x="668" y="296.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">0</text>
+<line x1="680" y1="228.0" x2="1130" y2="228.0" stroke="#e5e7eb"/>
+<text x="668" y="232.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">1</text>
+<line x1="680" y1="164.0" x2="1130" y2="164.0" stroke="#e5e7eb"/>
+<text x="668" y="168.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">1</text>
+<line x1="680" y1="100.0" x2="1130" y2="100.0" stroke="#e5e7eb"/>
+<text x="668" y="104.0" text-anchor="end" font-family="Arial, sans-serif" font-size="11" fill="#202124">1</text>
+<text x="680.0" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=0</text>
+<text x="792.5" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=1</text>
+<text x="905.0" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=2</text>
+<text x="1017.5" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=3</text>
+<text x="1130.0" y="444" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">d=4</text>
+<circle cx="680.0" cy="175.5000856923468" r="5" fill="#e45756"/>
+<circle cx="792.5" cy="174.73583432038623" r="5" fill="#e45756"/>
+<circle cx="905.0" cy="150.84400308787758" r="5" fill="#e45756"/>
+<circle cx="1017.5" cy="156.16009907590018" r="5" fill="#e45756"/>
+<circle cx="1130.0" cy="183.9113762349258" r="5" fill="#e45756"/>
+<polyline points="680.0,175.5000856923468 792.5,174.73583432038623 905.0,150.84400308787758 1017.5,156.16009907590018 1130.0,183.9113762349258" fill="none" stroke="#e45756" stroke-width="3"/>
+<circle cx="680.0" cy="178.91417112459348" r="5" fill="#4c78a8"/>
+<circle cx="792.5" cy="183.53045786307294" r="5" fill="#4c78a8"/>
+<circle cx="905.0" cy="189.76119251539507" r="5" fill="#4c78a8"/>
+<circle cx="1017.5" cy="181.64815737656602" r="5" fill="#4c78a8"/>
+<circle cx="1130.0" cy="174.4511591689086" r="5" fill="#4c78a8"/>
+<polyline points="680.0,178.91417112459348 792.5,183.53045786307294 905.0,189.76119251539507 1017.5,181.64815737656602 1130.0,174.4511591689086" fill="none" stroke="#4c78a8" stroke-width="3"/>
+<circle cx="680.0" cy="178.91417112459348" r="5" fill="#54a24b"/>
+<circle cx="792.5" cy="174.00855536152477" r="5" fill="#54a24b"/>
+<circle cx="905.0" cy="176.06788512238214" r="5" fill="#54a24b"/>
+<circle cx="1017.5" cy="177.9784888647221" r="5" fill="#54a24b"/>
+<circle cx="1130.0" cy="169.86791250474778" r="5" fill="#54a24b"/>
+<polyline points="680.0,178.91417112459348 792.5,174.00855536152477 905.0,176.06788512238214 1017.5,177.9784888647221 1130.0,169.86791250474778" fill="none" stroke="#54a24b" stroke-width="3"/>
+<line x1="110" y1="492" x2="144" y2="492" stroke="#e45756" stroke-width="4"/>
+<text x="153" y="496" text-anchor="start" font-family="Arial, sans-serif" font-size="12" fill="#202124">Stale-D4 policy</text>
+<line x1="465" y1="492" x2="499" y2="492" stroke="#4c78a8" stroke-width="4"/>
+<text x="508" y="496" text-anchor="start" font-family="Arial, sans-serif" font-size="12" fill="#202124">Learned-D4 + predicted state</text>
+<line x1="820" y1="492" x2="854" y2="492" stroke="#54a24b" stroke-width="4"/>
+<text x="863" y="496" text-anchor="start" font-family="Arial, sans-serif" font-size="12" fill="#202124">Same Learned-D4 + stale state</text>
+<text x="600.0" y="535" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#202124">10 paired initial states; 10 Hz control; d=0..4 means 0..400 ms logical delay</text>
+</svg>

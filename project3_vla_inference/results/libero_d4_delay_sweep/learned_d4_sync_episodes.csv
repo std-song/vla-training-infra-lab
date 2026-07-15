@@ -1,0 +1,11 @@
+condition,suite,task_id,task,episode_index,seed,delay_ticks,delay_ms,success,reward,steps,policy_calls,mean_inference_ms,p95_inference_ms,mean_state_prediction_mse,mean_handoff_action_l2,queue_underflows
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,0,1000,0,0,True,1.0,193,20,391.6783516295254,468.1398897431794,nan,0.7189622395916989,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,1,1001,0,0,False,0.0,280,28,359.313143151147,438.0540631711483,nan,0.9164936465245707,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,2,1002,0,0,False,0.0,280,28,350.4078898445836,436.61033958196634,nan,1.1045007043414645,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,3,1003,0,0,True,1.0,216,22,372.9092836887999,448.6721584573388,nan,0.9592635212909608,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,4,1004,0,0,True,1.0,99,10,370.073620043695,458.6124453693628,nan,0.784979846742418,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,5,1005,0,0,True,1.0,102,11,376.28799812360245,418.29870268702507,nan,0.9752323865890503,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,6,1006,0,0,True,1.0,97,10,373.37504997849464,445.7005059346556,nan,0.5593580719497468,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,7,1007,0,0,False,0.0,280,28,352.56245439606056,423.36548203602433,nan,1.052042829769629,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,8,1008,0,0,False,0.0,280,28,376.4507751246648,415.199485514313,nan,0.8902110485015092,0
+learned_stale,libero_spatial,3,pick up the black bowl on the cookie box and place it on the plate,9,1009,0,0,False,0.0,280,28,360.5604797069515,429.9652887508273,nan,1.0796742875266958,0

@@ -1,0 +1,743 @@
+{
+  "experiment": {
+    "suite": "libero_spatial",
+    "task_id": 3,
+    "task": "pick up the black bowl on the cookie box and place it on the plate",
+    "episodes_per_condition": 10,
+    "paired_seeds": [
+      1000,
+      1001,
+      1002,
+      1003,
+      1004,
+      1005,
+      1006,
+      1007,
+      1008,
+      1009
+    ],
+    "control_frequency_hz": 10,
+    "replan_interval_ticks": 10,
+    "delay_ticks": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "delay_ms": [
+      0,
+      100,
+      200,
+      300,
+      400
+    ],
+    "bootstrap_samples": 20000,
+    "training_delay_range": "d=0..4"
+  },
+  "aggregate": {
+    "learned_future|d0": {
+      "episodes": 10,
+      "success_rate": 0.5,
+      "mean_steps": 210.7,
+      "mean_inference_ms": 368.3619045687525,
+      "p95_inference_ms": 438.2618361245841,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.9040718582827745,
+      "queue_underflows": 0
+    },
+    "learned_future|d1": {
+      "episodes": 10,
+      "success_rate": 0.5,
+      "mean_steps": 237.2,
+      "mean_inference_ms": 389.2474342871398,
+      "p95_inference_ms": 447.5034751929343,
+      "mean_state_prediction_mse": 9.470138200629725e-06,
+      "mean_handoff_action_l2": 0.8867607830134764,
+      "queue_underflows": 0
+    },
+    "learned_future|d2": {
+      "episodes": 10,
+      "success_rate": 0.4,
+      "mean_steps": 215.4,
+      "mean_inference_ms": 382.84170359992635,
+      "p95_inference_ms": 431.61926813423634,
+      "mean_state_prediction_mse": 2.4018043059614803e-05,
+      "mean_handoff_action_l2": 0.8633955280672684,
+      "queue_underflows": 0
+    },
+    "learned_future|d3": {
+      "episodes": 10,
+      "success_rate": 0.3,
+      "mean_steps": 233.2,
+      "mean_inference_ms": 387.364952042457,
+      "p95_inference_ms": 440.42106725275517,
+      "mean_state_prediction_mse": 4.0777533718196706e-05,
+      "mean_handoff_action_l2": 0.8938194098378773,
+      "queue_underflows": 0
+    },
+    "learned_future|d4": {
+      "episodes": 10,
+      "success_rate": 0.3,
+      "mean_steps": 235.2,
+      "mean_inference_ms": 392.40690706005614,
+      "p95_inference_ms": 445.82985285669565,
+      "mean_state_prediction_mse": 8.240574357134593e-05,
+      "mean_handoff_action_l2": 0.9208081531165927,
+      "queue_underflows": 0
+    },
+    "learned_stale|d0": {
+      "episodes": 10,
+      "success_rate": 0.5,
+      "mean_steps": 210.7,
+      "mean_inference_ms": 368.3619045687525,
+      "p95_inference_ms": 438.2618361245841,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.9040718582827745,
+      "queue_underflows": 0
+    },
+    "learned_stale|d1": {
+      "episodes": 10,
+      "success_rate": 0.5,
+      "mean_steps": 236.6,
+      "mean_inference_ms": 386.00280357342,
+      "p95_inference_ms": 432.9443343821913,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.9224679173942821,
+      "queue_underflows": 0
+    },
+    "learned_stale|d2": {
+      "episodes": 10,
+      "success_rate": 0.5,
+      "mean_steps": 215.7,
+      "mean_inference_ms": 389.13934277335477,
+      "p95_inference_ms": 439.42825687117875,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.914745430791067,
+      "queue_underflows": 0
+    },
+    "learned_stale|d3": {
+      "episodes": 10,
+      "success_rate": 0.4,
+      "mean_steps": 230.8,
+      "mean_inference_ms": 387.4560215902782,
+      "p95_inference_ms": 445.897829066962,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.9075806667572921,
+      "queue_underflows": 0
+    },
+    "learned_stale|d4": {
+      "episodes": 10,
+      "success_rate": 0.3,
+      "mean_steps": 244.9,
+      "mean_inference_ms": 390.8685286998608,
+      "p95_inference_ms": 441.78961156867445,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.9379953281071959,
+      "queue_underflows": 0
+    },
+    "stale_policy|d0": {
+      "episodes": 10,
+      "success_rate": 0.5,
+      "mean_steps": 189.2,
+      "mean_inference_ms": 369.9806927342277,
+      "p95_inference_ms": 451.1897356528789,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.9168746786536994,
+      "queue_underflows": 0
+    },
+    "stale_policy|d1": {
+      "episodes": 10,
+      "success_rate": 0.3,
+      "mean_steps": 226.0,
+      "mean_inference_ms": 362.54032471386546,
+      "p95_inference_ms": 435.3755357582122,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.9197406212985516,
+      "queue_underflows": 0
+    },
+    "stale_policy|d2": {
+      "episodes": 10,
+      "success_rate": 0.2,
+      "mean_steps": 245.0,
+      "mean_inference_ms": 360.90825077451046,
+      "p95_inference_ms": 437.20459919422865,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 1.009334988420459,
+      "queue_underflows": 0
+    },
+    "stale_policy|d3": {
+      "episodes": 10,
+      "success_rate": 0.1,
+      "mean_steps": 264.8,
+      "mean_inference_ms": 349.30790250783195,
+      "p95_inference_ms": 428.6267000157386,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.9893996284653743,
+      "queue_underflows": 0
+    },
+    "stale_policy|d4": {
+      "episodes": 10,
+      "success_rate": 0.2,
+      "mean_steps": 244.2,
+      "mean_inference_ms": 385.60958208080814,
+      "p95_inference_ms": 433.8400478847325,
+      "mean_state_prediction_mse": null,
+      "mean_handoff_action_l2": 0.8853323391190282,
+      "queue_underflows": 0
+    }
+  },
+  "paired": {
+    "learned_future_vs_same_weight_stale|d1": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.0,
+        "ci95": [
+          -0.4,
+          0.4
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 0.6,
+        "ci95": [
+          -49.5,
+          45.3
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.03570713438080565,
+        "ci95": [
+          -0.13435667346380464,
+          0.05663854855592538
+        ]
+      }
+    },
+    "learned_future_vs_same_weight_stale|d2": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.1,
+        "ci95": [
+          -0.4,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -0.3,
+        "ci95": [
+          -54.6,
+          50.4
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.05134990272379838,
+        "ci95": [
+          -0.13903202053668756,
+          0.052698852781093326
+        ]
+      }
+    },
+    "learned_future_vs_same_weight_stale|d3": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.1,
+        "ci95": [
+          -0.4,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 2.4,
+        "ci95": [
+          -47.5,
+          46.0
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.01376125691941491,
+        "ci95": [
+          -0.13884883359757558,
+          0.10505746841499639
+        ]
+      }
+    },
+    "learned_future_vs_same_weight_stale|d4": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.0,
+        "ci95": [
+          -0.4,
+          0.4
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -9.7,
+        "ci95": [
+          -76.4,
+          57.6
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.017187174990603415,
+        "ci95": [
+          -0.17366637738905,
+          0.1605484611080198
+        ]
+      }
+    },
+    "learned_future_vs_stale_policy|d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.0,
+        "ci95": [
+          -0.4,
+          0.4
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 21.5,
+        "ci95": [
+          -43.4,
+          86.5
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.012802820370924983,
+        "ci95": [
+          -0.11606506308423373,
+          0.08871306975304957
+        ]
+      }
+    },
+    "learned_future_vs_stale_policy|d1": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.2,
+        "ci95": [
+          -0.2,
+          0.6
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 11.2,
+        "ci95": [
+          -43.0,
+          67.4
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.03297983828507513,
+        "ci95": [
+          -0.1924102986071025,
+          0.11690138613246374
+        ]
+      }
+    },
+    "learned_future_vs_stale_policy|d2": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.2,
+        "ci95": [
+          -0.2,
+          0.6
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -29.6,
+        "ci95": [
+          -87.5025,
+          30.3
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.14593946035319058,
+        "ci95": [
+          -0.3227283042168777,
+          0.004819660429099604
+        ]
+      }
+    },
+    "learned_future_vs_stale_policy|d3": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.2,
+        "ci95": [
+          -0.2,
+          0.6
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -31.6,
+        "ci95": [
+          -90.2,
+          28.0
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.09558021862749701,
+        "ci95": [
+          -0.26059541437305783,
+          0.047251017156712385
+        ]
+      }
+    },
+    "learned_future_vs_stale_policy|d4": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.1,
+        "ci95": [
+          -0.2,
+          0.4
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": -9.0,
+        "ci95": [
+          -57.5,
+          41.1
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.03547581399756448,
+        "ci95": [
+          -0.1580491409123082,
+          0.22245174302409057
+        ]
+      }
+    },
+    "stale_policy|d1_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.2,
+        "ci95": [
+          -0.5,
+          0.0
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 36.8,
+        "ci95": [
+          1.6,
+          85.30249999999978
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.0028659426448521706,
+        "ci95": [
+          -0.07259844648341339,
+          0.10165392341864875
+        ]
+      }
+    },
+    "stale_policy|d2_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.3,
+        "ci95": [
+          -0.6,
+          0.0
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 55.8,
+        "ci95": [
+          9.6,
+          107.9
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.09246030976675974,
+        "ci95": [
+          -0.005951400059792777,
+          0.2182586050915344
+        ]
+      }
+    },
+    "stale_policy|d3_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.4,
+        "ci95": [
+          -0.8,
+          0.0
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 75.6,
+        "ci95": [
+          3.8,
+          145.70249999999976
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.07252494981167493,
+        "ci95": [
+          -0.09395838220638253,
+          0.2408778329117706
+        ]
+      }
+    },
+    "stale_policy|d4_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.3,
+        "ci95": [
+          -0.6,
+          0.0
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 55.0,
+        "ci95": [
+          5.4,
+          107.9
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.03154233953467124,
+        "ci95": [
+          -0.18400966944310954,
+          0.12318949505341795
+        ]
+      }
+    },
+    "learned_future|d1_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.0,
+        "ci95": [
+          -0.4,
+          0.4
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 26.5,
+        "ci95": [
+          -2.8,
+          67.00249999999978
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.01731107526929797,
+        "ci95": [
+          -0.0987780299927886,
+          0.06441641528549549
+        ]
+      }
+    },
+    "learned_future|d2_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.1,
+        "ci95": [
+          -0.4,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 4.7,
+        "ci95": [
+          -46.4,
+          43.2
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.04067633021550586,
+        "ci95": [
+          -0.1639272481823679,
+          0.08121406062439247
+        ]
+      }
+    },
+    "learned_future|d3_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.2,
+        "ci95": [
+          -0.6,
+          0.3
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 22.5,
+        "ci95": [
+          -44.9,
+          87.7
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": -0.0102524484448971,
+        "ci95": [
+          -0.17744558267035176,
+          0.15085623753943486
+        ]
+      }
+    },
+    "learned_future|d4_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.2,
+        "ci95": [
+          -0.6,
+          0.3
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 24.5,
+        "ci95": [
+          -44.3,
+          90.60249999999978
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.01673629483381822,
+        "ci95": [
+          -0.17332326880063723,
+          0.21340339117037074
+        ]
+      }
+    },
+    "learned_stale|d1_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.0,
+        "ci95": [
+          -0.4,
+          0.4
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 25.9,
+        "ci95": [
+          -20.5,
+          80.1
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.018396059111507677,
+        "ci95": [
+          -0.06288293004147823,
+          0.11183877712432778
+        ]
+      }
+    },
+    "learned_stale|d2_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": 0.0,
+        "ci95": [
+          -0.4,
+          0.4
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 5.0,
+        "ci95": [
+          -41.6025,
+          44.20249999999979
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.010673572508292517,
+        "ci95": [
+          -0.11283917548980059,
+          0.13109442630436488
+        ]
+      }
+    },
+    "learned_stale|d3_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.1,
+        "ci95": [
+          -0.5,
+          0.3
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 20.1,
+        "ci95": [
+          -25.5,
+          68.6
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.0035088084745178104,
+        "ci95": [
+          -0.09208899274882343,
+          0.0970734635772678
+        ]
+      }
+    },
+    "learned_stale|d4_vs_d0": {
+      "success_rate": {
+        "pairs": 10,
+        "mean_difference": -0.2,
+        "ci95": [
+          -0.6,
+          0.2
+        ]
+      },
+      "steps": {
+        "pairs": 10,
+        "mean_difference": 34.2,
+        "ci95": [
+          -26.4,
+          91.4
+        ]
+      },
+      "handoff_action_l2": {
+        "pairs": 10,
+        "mean_difference": 0.03392346982442165,
+        "ci95": [
+          -0.10975776956397253,
+          0.16077388874913595
+        ]
+      }
+    }
+  },
+  "interpretation_guardrails": {
+    "same_weight_causal_comparison": "learned_future vs learned_stale",
+    "cross_weight_reference_only": "learned_future vs stale_policy",
+    "d0_alias": "learned_future and learned_stale share the same synchronous learned-policy rows"
+  }
+}

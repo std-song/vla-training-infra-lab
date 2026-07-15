@@ -24,7 +24,9 @@ flowchart LR
 
 1. **先读 LIBERO 闭环结果**：
    [Pi0.5 / VLASH 闭环时延实验](results/libero_standard_delay_ablation/README_CN.md)。它给出
-   标准 LoRA、朴素异步、动作跳步、延迟增强和未来状态输入的配对对照。
+   标准 LoRA、朴素异步、动作跳步、延迟增强和未来状态输入的配对对照；随后阅读
+   [D4 延迟闭环扫描](results/libero_d4_delay_sweep/README_CN.md)，查看延迟训练扩展至
+   `d=0..4` 后的三条配对曲线和同权重未来状态消融。
 2. **再读 ALOHA 核心留出集结果**：
    [延迟鲁棒性实验](results/vlash_delay_ablation/README.md)。它给出相同预算 Normal Pi0.5
    LoRA 与 VLASH 的 `d=0/4/8` 离线动作对齐对照。
@@ -74,7 +76,8 @@ flowchart LR
 | 核心结果 | `d=4/d=8` 首动作 MSE 分别降低 66.3% / 67.7%；`d=8` 完整 50 步动作块 MSE 降低 49.0% |
 | 推理调度 | 50 步动作块剩余 `overlap=4` 步时预取下一块；量化比 2 时有效窗口为 8 步，未超出训练延迟范围 |
 | LIBERO 闭环 | 完整策略调用约 350 ms；`d=4` 时动作跳步相对朴素延迟将 task 3 成功率从 10% 提升到 50%，配对 bootstrap 95% 区间 `[+10,+70]` 个百分点 |
-| 未来状态边界 | 同一 learned policy 下，预测状态使动作交接 L2 改善约 4.3%，但成功率为 30% vs 滞后状态 40%，未证明闭环收益 |
+| D4 延迟训练 | Stale-D4 与 Learned-D4 均完成 5,000-step LoRA 和 `d=0..4` 闭环扫描；Learned-D4 成功率由同步 50% 降至 `d=4` 的 30% |
+| 未来状态边界 | 同一 Learned-D4 权重下，预测状态在 `d=1..4` 使动作交接 L2 改善约 1.5%--5.6%，但成功率与滞后状态相同或更低，未证明闭环收益 |
 | 性能边界 | 87.7 ms 来自固定合成输入的 warmed 微基准；约 350 ms 来自 LIBERO 完整策略调用，二者不能直接比较 |
 
 ![延迟动作首动作 MSE 对照](assets/figures/vlash_delay_ablation_first_action_mse.svg)
@@ -112,6 +115,7 @@ flowchart LR
 vlash_reproduction/        主线配置、上游兼容补丁、回放 adapter
 results/vlash_final/       最终训练日志、回放 CSV、图、实验条件、结论
 results/libero_standard_delay_ablation/  LIBERO 闭环原始 episode、配对统计和中文报告
+results/libero_d4_delay_sweep/  D4 微调配置、d=0..4 配对扫描、bootstrap 与结论
 results/project3_qwen25*   Qwen2.5-VL 多模态输入成本辅助实验
 results/project3_qwen3vl*  Qwen3-VL vLLM 并发服务辅助实验
 benchmarks/                基准脚本

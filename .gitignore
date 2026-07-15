@@ -32,3 +32,5 @@ project1_qwen3_moe_pretrain/data/project1/packed/
 !project3_vla_inference/results/vlash_delay_ablation/*.csv
 !project3_vla_inference/results/libero_closed_loop_pilot/*.csv
 !project3_vla_inference/results/libero_standard_delay_ablation/*.csv
+!project3_vla_inference/results/libero_d4_policy_pair/*.csv
+!project3_vla_inference/results/libero_d4_delay_sweep/*.csv

@@ -1,0 +1,20 @@
+experiment:
+  description: Pi0.5 LIBERO delay augmentation extended from d=0..2 to d=0..4
+  steps: 5000
+  paired_evaluation_seeds: [1000, 1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009]
+
+shared_overrides:
+  max_delay_steps: 4
+  shared_observation: true
+  save_freq: 5000
+
+variants:
+  stale_d4:
+    base_config: ../../vlash_reproduction/configs/pi05_libero_stale_5000.yaml
+    future_state_mode: stale
+    output_dir: __PROJECT_ROOT__/outputs/pi05_libero_stale_d4_5000
+  learned_d4:
+    base_config: ../../vlash_reproduction/configs/pi05_libero_learned_5000.yaml
+    future_state_mode: learned
+    future_state_predictor_path: __PROJECT_ROOT__/vlash_reproduction/ablation/libero_state_predictor/best.pt
+    output_dir: __PROJECT_ROOT__/outputs/pi05_libero_learned_d4_5000

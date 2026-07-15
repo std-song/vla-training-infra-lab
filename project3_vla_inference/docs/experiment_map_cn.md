@@ -20,14 +20,16 @@
 | A1 | Pi0.5 动作推理基准 | Pi0.5 checkpoint、图像/state/task；产生 `(1,50,7)` 动作块 | warm action chunk 约 87.7 ms、显存约 7.3 GiB | VLA 推理不是文本逐 token decode，而是动作块生成与消费 | 真实任务成功率 |
 | A2 | VLASH LoRA 微调 | ALOHA 85 episode、三相机、offset 0..8、shared observation、1,000 step | loss 0.413 到 0.059；可加载 checkpoint | 上游训练、数据、LoRA 与 checkpoint 链路跑通且稳定 | 已充分收敛或泛化能力 |
 | A3 | 上游 manager 离线回放 | A2 checkpoint、96 个记录轨迹 tick；sync/async/q2 | 动作块重填次数、队列取动作、发送节奏 | 动作队列、future-state 路径、量化发送分支真正执行 | 实体机器人端时延或加速比例 |
-| A4 | LIBERO 仿真闭环 | Standard/Stale/Learned 三组 5,000-step LoRA；task 3、10 个配对初态；`d=0/1/2/4` | 成功率、完成步数、完整策略时延、动作交接 L2、队列欠载、bootstrap 区间 | 完整策略调用约 350 ms；`d=4` 动作跳步相对朴素延迟成功率 10% 到 50%，区间 `[+10,+70]` 个百分点 | 实体机器人成功率；未来状态必然提升闭环性能 |
+| A4 | LIBERO 仿真闭环 | Standard/Stale/Learned 三组 5,000-step LoRA；task 3、10 个配对初态；固定延迟消融 | 成功率、完成步数、完整策略时延、动作交接 L2、队列欠载、bootstrap 区间 | 完整策略调用约 350 ms；`d=4` 动作跳步相对朴素延迟成功率 10% 到 50%，区间 `[+10,+70]` 个百分点 | 实体机器人成功率；未来状态必然提升闭环性能 |
+| A5 | D4 延迟训练与扫描 | Stale-D4/Learned-D4，5,000-step LoRA，训练和评测覆盖 `d=0..4`；10 个配对初态 | 三条延迟曲线、同权重 future/stale state 消融、20,000 次 bootstrap | Learned-D4 从同步 50% 降至 `d=4` 的 30%；预测状态使交接 L2 改善 1.5%--5.6%，但没有成功率收益 | Learned-D4 相对 Stale-D4 的差异全部来自状态预测器；小样本趋势具备统计显著性 |
 
 **必须先读：** [最终报告](../results/vlash_final/final_vlash_report.md) 和
 [实验条件](../results/vlash_final/experiment_protocol.md)。
 Future-state 与真实控制延迟的对齐边界见
 [未来状态对齐说明](../results/vlash_final/future_state_alignment.md)。
 LIBERO 闭环条件、配对结果与统计边界见
-[闭环时延实验](../results/libero_standard_delay_ablation/README_CN.md)。
+[闭环时延实验](../results/libero_standard_delay_ablation/README_CN.md) 和
+[D4 延迟闭环扫描](../results/libero_d4_delay_sweep/README_CN.md)。
 
 ### 为什么会同时看到 87.7 ms 和几十秒
 

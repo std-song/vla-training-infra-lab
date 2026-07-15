@@ -29,7 +29,9 @@ flowchart TB
 
 1. **Start here - closed-loop result:**
    [the LIBERO delay report](results/libero_standard_delay_ablation/README_CN.md),
-   which reports paired robot-simulation rollouts and bootstrap intervals.
+   which reports paired robot-simulation rollouts and bootstrap intervals. Then
+   read the [`d=0..4` D4 sweep](results/libero_d4_delay_sweep/README_CN.md) for
+   the expanded delay training and same-weight future-state ablation.
 2. **Then read the held-out VLA result:**
    [the ALOHA delay-robustness result](results/vlash_delay_ablation/README.md), which
    compares matched-budget Normal Pi0.5 LoRA and VLASH at `d=0/4/8`. Then read
@@ -65,7 +67,8 @@ flowchart TB
 | Held-out action alignment | First-action MSE improves by 66.3% at `d=4` and 67.7% at `d=8`; full 50-action chunk MSE improves by 49.0% at `d=8` |
 | Scheduling scope | Upstream `VLASHAsyncManager` prefetches at `overlap=4`; quantization ratio 2 makes the effective window 8 steps, inside the trained range |
 | LIBERO closed loop | Full policy calls average about 350 ms; at `d=4`, skipping the stale action prefix improves task-3 success from 10% to 50% versus naive delayed execution, paired bootstrap 95% CI `[+10,+70]` percentage points |
-| Learned-state boundary | On the same learned-policy weights at `d=2`, predicted future state reduces handoff L2 by about 4.3%, but success is 30% versus 40% with stale state |
+| D4 delay training | Stale-D4 and Learned-D4 both complete 5,000-step LoRA and paired `d=0..4` rollouts; Learned-D4 success declines from 50% at sync to 30% at `d=4` |
+| Learned-state boundary | With identical Learned-D4 weights, predicted state reduces handoff L2 by about 1.5%--5.6% across `d=1..4`, but does not improve closed-loop success |
 | Important boundary | LIBERO is simulation, not a physical robot; 87.7 ms synthetic warmed inference and about 350 ms full LIBERO policy calls are different measurement conditions |
 
 ![Held-out delayed action alignment](assets/figures/vlash_delay_ablation_first_action_mse.svg)
@@ -78,6 +81,8 @@ flowchart TB
   conditions, and conclusions. This is the source of final VLA claims.
 - `results/libero_standard_delay_ablation/`: closed-loop episode records, paired
   bootstrap analyses, and the detailed Chinese report.
+- `results/libero_d4_delay_sweep/`: D4 training configs, paired `d=0..4`
+  episode records, bootstrap analysis, figure, and detailed Chinese report.
 - `results/project3_qwen25vl_*.md`: supporting visual-token and prefill studies.
 - `results/project3_qwen3vl_vllm_serving.md`: supporting vLLM serving study.
 - `results/project3_final_report.md`: dated historical umbrella report. Its simulator
