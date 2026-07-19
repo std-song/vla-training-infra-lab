@@ -1,6 +1,6 @@
 # Qwen3-MoE-style 4-GPU Mixed Parallel Profiling
 
-Date: 2026-07-10
+Date: 2026-07-10; EP2+DP2 corrected and re-run on 2026-07-19
 Hardware: 4 x RTX 3090 24GB on AutoDL
 Software: Python 3.10.8, PyTorch 2.1.2+cu118, Nanotron 0.4
 
@@ -20,7 +20,7 @@ The table reports 100-step runs. The stable average uses steps >= 50.
 | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- |
 | DP4 | 4 | 4096 | 27.73K | 6.93K | 147.7 | 2642 | 9.79 | yes |
 | TP2+DP2 | 4 | 4096 | 37.23K | 9.31K | 110.0 | 2572 | 9.81 | yes |
-| EP2+DP2 | 4 | 4096 | 48.51K | 12.13K | 84.5 | 1944 | 9.80 | yes |
+| EP2+DP2 | 4 | 4096 | 36.07K | 9.02K | 113.7 | 2008 | 9.80 | yes |
 
 ![4-GPU mixed parallel](../assets/figures/qwen3_moe_4gpu_mixed_parallel.svg)
 
@@ -30,7 +30,16 @@ DP4 is the simplest baseline, but it replicates all experts on every GPU. At thi
 
 TP2+DP2 improves throughput over DP4 because it increases the per-DP-replica micro-batch while sharding dense tensor-parallel layers. It still pays tensor-parallel collectives through the model, so it is not the best choice for this MoE-heavy small validation setting.
 
-EP2+DP2 is the best result here. It shards experts across two ranks inside each data-parallel replica, cuts peak memory to 1.94 GiB/GPU, and reaches 48.51K tokens/s at the same 4096 tokens/step. This result lines up with the EP token-scaling study: once each expert sees enough routed tokens, the fixed dispatch cost is amortized and expert sharding becomes attractive.
+EP2+DP2 shards experts across two ranks inside each data-parallel replica. After
+the dispatcher backward path and replicated-gradient synchronization were fixed,
+it reaches 36.07K tokens/s and 1.96 GiB/GPU. This is 30.1% faster than DP4 and
+uses about 24% less peak reserved memory, while remaining slightly slower than
+TP2+DP2 for this small model and PCIe topology.
+
+The earlier 48.51K result was a real wall-clock measurement but is withdrawn as
+a training result: payload All-to-All did not preserve autograd and replicated
+EP parameters were not synchronized. The missing backward and synchronization
+work made that path artificially fast.
 
 ## What This Proves
 
@@ -43,4 +52,4 @@ This is not a claim that EP2+DP2 is universally faster than DP4 or TP2+DP2. It p
 
 ## Interview-Safe Summary
 
-> On 4 x RTX 3090, I compared DP4, TP2+DP2, and EP2+DP2 under the same 4096-token step size. EP2+DP2 reached 48.5K tokens/s with 1.94 GiB/GPU peak memory, versus DP4 at 27.7K tokens/s and 2.64 GiB/GPU. The result shows that, for this MoE-heavy validation model, expert sharding plus enough routed tokens amortizes dispatch overhead better than pure data parallelism.
+> On 4 x RTX 3090, I compared DP4, TP2+DP2, and corrected EP2+DP2 under the same 4096-token step size. EP2+DP2 reached 36.1K tokens/s with 1.96 GiB/GPU peak memory, versus DP4 at 27.7K and 2.64 GiB/GPU. I also built parameter-consistency and autograd tests that caught and removed an earlier artificially fast EP result.

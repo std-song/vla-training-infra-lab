@@ -1,5 +1,10 @@
 ﻿# Qwen3-MoE-style EP All-to-All Dispatch Validation
 
+> This document preserves the first forward-path validation. A later audit
+> found that payload collectives did not preserve autograd and replicated
+> parameters diverged. The corrected implementation and results are documented
+> in `qwen3_moe_ep_correctness_revalidation.md`.
+
 Date: 2026-07-09
 Hardware: 2 x RTX 3090 24GB on AutoDL
 Software: Python 3.10.8, PyTorch 2.1.2+cu118, FlashAttention 2.5.8, Nanotron 0.4

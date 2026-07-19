@@ -89,11 +89,16 @@ On 2026-07-10, EP2 was revalidated on a freshly rented 2 x RTX 3090 host with `N
 | return all-to-all | 0.226 ms |
 | final replication all-reduce | 0.242 ms |
 
-This validates EP correctness and exposes the next optimization boundary: remove or move the final replication all-reduce, then overlap token dispatch with local expert compute.
+This run validated the first forward dispatch path only. The later gradient and
+parameter audit found that its payload collectives cut autograd, so the
+following timing breakdown is retained as debugging history rather than a
+correct end-to-end training result.
 
 ## EP Token Scaling
 
-The EP2 path was then run without profiler overhead for 20 steps at three micro-batch sizes. This separates two questions: whether the dispatcher is correct, and whether the dispatch cost can be amortized as each expert receives more tokens.
+The following sweep predates the differentiable dispatcher fix. It is useful
+for understanding forward dispatch shape sensitivity, but its throughput is
+not used in the final performance comparison.
 
 | Micro-batch | Tokens/step | Warm tokens/s | Tokens/s/GPU | Avg step ms | Step>=10 tokens/s | Peak reserved MiB |
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
@@ -111,7 +116,9 @@ The profiler run shows why larger token counts matter:
 | mbs8 | 1024 | 2.191 | 0.622 | 0.182 | 0.208 | 1.118 | 0.920 | 0.323 |
 | mbs16 | 2048 | 3.542 | 1.638 | 0.290 | 0.208 | 0.418 | 0.462 | 0.483 |
 
-The dispatcher has a visible fixed cost from route packing, metadata movement, sorting, and launch overhead. As tokens per step rise from 256 to 1024, throughput increases from 5.66K to 22.96K tokens/s while peak memory only increases from 1.30 GiB to 1.40 GiB. The follow-up mbs16 run reaches 45.7K tokens/s with 1.82 GiB peak memory, further showing that EP throughput is highly sensitive to routed-token granularity. At mbs16, dispatcher median latency rises to 3.54 ms and the largest visible segments are route/count, return all-to-all, and final all-reduce. This is the useful EP behavior for larger training: memory is reduced by sharding experts, while throughput depends on sending enough tokens to each local expert to amortize dispatch overhead.
+These historical values omit differentiable payload return and replicated
+shared-gradient synchronization. They must not be compared with DP/TP as
+correct training throughput. The corrected 4-GPU result is reported below.
 
 Full details: [`qwen3_moe_style_ep_token_scaling.md`](qwen3_moe_style_ep_token_scaling.md).
 
@@ -123,15 +130,22 @@ The final Project 1 profiling pass compares three 4-GPU strategies at the same 4
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | DP4 | 4096 | 27.73K | 6.93K | 147.7 | 2642 | 9.79 |
 | TP2+DP2 | 4096 | 37.23K | 9.31K | 110.0 | 2572 | 9.81 |
-| EP2+DP2 | 4096 | 48.51K | 12.13K | 84.5 | 1944 | 9.80 |
+| EP2+DP2 | 4096 | 36.07K | 9.02K | 113.7 | 2008 | 9.80 |
 
-The result is the strongest systems evidence in this project. DP4 is simple but replicates all experts. TP2+DP2 improves throughput but pays tensor-parallel collectives. EP2+DP2 is fastest and lowest-memory in this model shape because expert sharding reduces per-rank expert state, while a 4096-token global step gives the dispatcher enough routed tokens to amortize fixed all-to-all and metadata overhead.
+The corrected EP2+DP2 path is 30.1% faster than DP4 and uses about 24% less
+peak reserved memory, but is slightly slower than TP2+DP2. The original 48.51K
+measurement is superseded because the payload collectives cut autograd and EP
+replicas did not synchronize shared gradients. The corrected result includes
+inverse All-to-All in backward and averaged shared-parameter gradients.
 
 Full details: [`qwen3_moe_style_4gpu_mixed_parallel.md`](qwen3_moe_style_4gpu_mixed_parallel.md).
 
 ## Resume Validation
 
-PP2 checkpoint/resume was validated by saving at step 20 and resuming to step 22. EP2 checkpoint/resume was also validated after the All-to-All dispatcher change: the run loaded `last_train_step=20`, continued to step 22, and saved rank-local expert optimizer shards for both `exp-0-of-2` and `exp-1-of-2`. This confirms that pipeline-stage model shards, expert shards, optimizer state, scheduler state, and random state can be restored well enough for continued training.
+PP2 checkpoint/resume was validated by saving at step 20 and resuming to step
+22. Corrected EP2+DP2 resume was validated from step 100 to 102. This test also
+found and fixed scheduler construction order and an extra `_initial_step()` on
+load: LR now continues from about `1e-5` instead of resetting to `3e-4`.
 
 ## What This Project Claims
 

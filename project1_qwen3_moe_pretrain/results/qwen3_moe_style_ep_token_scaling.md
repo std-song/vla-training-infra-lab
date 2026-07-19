@@ -1,5 +1,10 @@
 # Qwen3-MoE-style EP Token Scaling Study
 
+> Historical diagnostic only. This sweep predates the differentiable
+> All-to-All and shared-gradient synchronization fix. Its throughput values
+> must not be used as correct training-performance results. See
+> `qwen3_moe_ep_correctness_revalidation.md` for the corrected experiment.
+
 Date: 2026-07-10
 Hardware: 2 x RTX 3090 24GB on AutoDL
 Software: Python 3.10.8, PyTorch 2.1.2+cu118, Nanotron 0.4

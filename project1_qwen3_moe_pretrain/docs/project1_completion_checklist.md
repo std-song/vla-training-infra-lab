@@ -16,9 +16,10 @@ This document keeps the project claims honest. It separates finished work from u
   - run GroupedGEMM on local experts,
   - return outputs to token-owner ranks,
   - scatter-add outputs by original token id.
-- Validated EP2 20-step clean training and resume from step 20 to 22.
-- Profiled EP2 dispatcher segments and token scaling for mbs2, mbs4, and mbs8.
-- Extended the EP2 clean throughput sweep to mbs16, reaching 45.7K tokens/s with 1.82 GiB peak reserved memory.
+- Added differentiable payload All-to-All, EP token-shard backward reduction, and replicated shared-gradient averaging.
+- Passed analytical communication-gradient tests and a 20-step audit with all 31 replicated parameters bitwise aligned.
+- Re-ran corrected EP2+DP2 for 100 steps: 36.07K tokens/s and 2,008 MiB peak reserved memory per GPU.
+- Fixed LR scheduler resume ordering and validated continuous resume from step 100 to 102.
 - Completed a 4-GPU mixed-parallel comparison for DP4, TP2+DP2, and EP2+DP2 at the same 4096 tokens/step.
 - Built outer pretraining artifacts: mini corpus manifest, tokenizer/packing scripts, launch matrix, log parser, CSV summaries, and figures.
 

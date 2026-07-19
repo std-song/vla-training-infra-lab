@@ -1,4 +1,4 @@
 strategy,gpus,tokens_per_step,avg_tokens_s_ge50,avg_tokens_s_per_gpu_ge50,avg_step_ms_ge50,peak_reserved_mib,final_loss,checkpoint_ok
 DP4,4,4096,27729,6933,147.686,2642,9.79,true
 TP2+DP2,4,4096,37233,9308,110.039,2572,9.81,true
-EP2+DP2,4,4096,48506,12125,84.504,1944,9.80,true
+EP2+DP2,4,4096,36069,9017,113.686,2008,9.80,true

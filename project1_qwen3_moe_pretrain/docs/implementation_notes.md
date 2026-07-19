@@ -42,11 +42,24 @@ router top-k
   -> replicated output boundary
 ```
 
-The replicated output boundary is intentionally retained so the surrounding Qwen stack remains unchanged. It is correct for this integration, but it is also the next optimization target for a larger EP design.
+The replicated output boundary is intentionally retained so the surrounding
+Qwen stack remains unchanged. The corrected implementation uses custom
+autograd functions: payload All-to-All reverses the exchange in backward,
+token-owner sharding all-reduces hidden/router gradients back to every EP
+replica, and the replicated output reduction has identity backward. Shared
+non-expert gradients are averaged across EP before the optimizer step.
 
 Main patch:
 
 - [`../patches/qwen3_moe_style_ep_alltoall_dispatch.patch`](../patches/qwen3_moe_style_ep_alltoall_dispatch.patch)
+- [`../patches/qwen3_moe_ep_corrected.patch`](../patches/qwen3_moe_ep_corrected.patch)
+
+Correctness checks:
+
+- [`../scripts/test_ep_autograd_primitives.py`](../scripts/test_ep_autograd_primitives.py)
+- [`../scripts/test_ep2_reference_parity.py`](../scripts/test_ep2_reference_parity.py)
+- [`../scripts/audit_ep_parameter_consistency.py`](../scripts/audit_ep_parameter_consistency.py)
+- [`../results/qwen3_moe_ep_correctness_revalidation.md`](../results/qwen3_moe_ep_correctness_revalidation.md)
 
 ## Profiling Utilities
 

@@ -1,25 +1,21 @@
-# Project 1 Resume Bullets
+# 项目一简历表述
 
-## 中文简历版本
+## 推荐版本
 
-**基于 Nanotron 的 Qwen3-MoE 混合并行预训练系统**
+**基于 Nanotron 的 Qwen3-MoE 小型混合并行预训练系统**
 
-- 基于 Nanotron 搭建 Qwen3-MoE-style 小规模预训练系统，覆盖 BF16、FlashAttention-2、GroupedGEMM 专家计算、Router Top-k、全局批次负载均衡、激活重计算与 checkpoint/resume。
-- 适配并验证 DP、TP、PP、EP 多种并行策略；修复 PP 非最终流水段误访问 loss 指标导致的跨 rank 卡死问题，并完成 PP checkpoint/resume 验证。
-- 实现 EP2 token all-to-all dispatch：按 expert owner 交换 token hidden states 与路由元数据，按本地专家重排并合并连续 buffer 后调用 GroupedGEMM，再将专家输出返回 token owner。
-- 在 2 x RTX 3090 上完成 108M 参数 Qwen3-MoE-style 训练矩阵 profiling：single 4.46K tokens/s、DP2 6.95K、TP2 4.20K、PP2 4.56K；EP2 在真实 token dispatch 下峰值显存约 1.3GB/GPU。
-- 对 EP2 做 token 粒度扩展分析：tokens/step 从 256 增至 2048 时，吞吐从 5.66K 提升至 45.7K tokens/s，峰值显存仍低于 1.9GB/GPU，定位 metadata collectives、return all-to-all 与 final all-reduce 为下一步优化边界。
-- 在 4 x RTX 3090 上完成同等 4096 tokens/step 的混合并行对比：DP4 27.7K tokens/s、TP2+DP2 37.2K、EP2+DP2 48.5K；EP2+DP2 峰值显存 1.94GB/GPU，验证专家切分在足够 routed tokens 下可同时改善吞吐和显存。
-- 补齐预训练外层工程链路：语料 manifest、tokenizer/packing、固定长度 shard、实验矩阵脚本、Nanotron 日志解析、吞吐/显存图表与可复现实验报告。
+- 基于 Nanotron 搭建 108M 参数 Qwen3-MoE-style 预训练基座，覆盖 BF16、FlashAttention-2、GroupedGEMM、Top-2 路由、全局批次负载均衡、激活重计算及 checkpoint/resume，并验证 DP、TP、PP、EP 及组合并行。
+- 实现可反向传播的专家 Token All-to-All：按专家归属交换隐藏状态与路由权重，按本地专家重排为连续缓冲区后执行 GroupedGEMM，再将结果返回 Token 所属节点并聚合；补充 Token 分片梯度恢复及 EP 共享参数平均归并。
+- 建立通信原语解析梯度测试、EP2 与未切分 8 专家参考等价测试及跨 rank 参数一致性审计，定位并修复普通 All-to-All 截断反向图、TP=1 无效 tied 标记遮蔽 EP 同步等问题；前向/输入梯度/Router 梯度完全一致，20 步训练后 31 个共享参数保持严格一致。
+- 在 4×RTX 3090、同等 4096 tokens/step 下，修复后 EP2+DP2 达到 36.1K tokens/s、峰值显存 1.96GiB/GPU，相比 DP4 的 27.7K、2.64GiB/GPU，吞吐提升 30.1%、显存降低约 24%。
+- 修复 checkpoint 恢复时学习率调度器构建顺序和重复步进问题，完成 EP2+DP2 从第 100 步恢复至第 102 步，学习率由 1.01e-5 连续衰减至 1.00e-5。
 
-## 面试展开重点
+## 一句话版本
 
-- DP2 为什么不是 2x：小模型、小 batch 场景下，kernel launch、optimizer、logging、gradient sync 和 router 统计同步开销占比较高。
-- TP/PP 为什么不一定提速：TP 引入逐层 collective；PP 需要足够层数和 micro-batch 深度才能摊薄流水线 bubble。
-- EP 为什么显存最低但小 shape 下吞吐敏感：专家权重被切分，但 token dispatch、metadata exchange、buffer coalesce 和 all-to-all 成为主要固定开销。
-- PP bug 的本质：loss/metric ownership 只属于最后一个流水段，非最终 stage 不能构造 `loss_avg.item()`。
-- EP 后续优化方向：压缩 metadata collective、用 CUDA stream 和 async collective 做更深的通信计算重叠、移除或后移 final replication all-reduce。
+基于 Nanotron 实现 Qwen3-MoE 的 DP/TP/PP/EP 混合并行训练，完成可反向传播的专家 All-to-All、连续专家缓冲区和共享梯度同步；在 4×RTX 3090 上使 EP2+DP2 相比 DP4 吞吐提升 30.1%、峰值显存降低约 24%，并通过参数一致性及 checkpoint/resume 测试。
 
-## 更保守的一句话版本
+## 面试说明
 
-基于 Nanotron 构建 Qwen3-MoE-style 预训练 infra，完成 DP/TP/PP/EP 训练验证、checkpoint/resume、日志解析与 profiling；实现 EP2 token all-to-all dispatch 和 expert buffer coalesce，并在 4 x RTX 3090 上完成 DP4/TP2+DP2/EP2+DP2 对比，EP2+DP2 达到 48.5K tokens/s、峰值显存 1.94GB/GPU。
+- 不再使用旧的 48.5K tokens/s。该数值是实际 wall-clock 结果，但对应实现截断了通信反向图并缺少共享梯度同步。
+- 修复后的可信结果为 36.07K tokens/s，略低于 TP2+DP2 的 37.23K，但高于 DP4 的 27.73K。
+- 项目重点不是证明 EP 永远最快，而是展示从异常性能数据出发，通过梯度和参数审计定位训练语义缺陷，并完成修复、回归和公平复测。
